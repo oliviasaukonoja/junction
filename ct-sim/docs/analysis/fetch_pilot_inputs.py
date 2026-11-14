@@ -87,6 +87,7 @@ def hav(a, b, c, d):
     p = math.pi / 180
     x = math.sin((c - a) * p / 2) ** 2 + math.cos(a * p) * math.cos(c * p) * math.sin((d - b) * p / 2) ** 2
     return 12742 * math.asin(math.sqrt(x))
+RETRY_WITH_REGION = {"075": "Kymenlaakso", "102": "Satakunta", "751": "Lappi", "272": "Keski-Pohjanmaa"}   # the plain municipality name found nothing
 if REFRESH or not sp_f.exists():
     import urllib.parse
     scn = {"ct_sites": "confirmed+likely"}
@@ -102,6 +103,11 @@ if REFRESH or not sp_f.exists():
         except Exception as e:
             res = []
         time.sleep(1.2)                                                     # Nominatim usage policy: at most one request per second
+        if not any(hav(r["lat"], r["lon"], float(x["lat"]), float(x["lon"])) <= 60 for x in res if x.get("category") == "boundary") and r["code"] in RETRY_WITH_REGION:
+            q2 = urllib.parse.urlencode({"q": r["name"] + ", " + RETRY_WITH_REGION[r["code"]], "format": "jsonv2", "limit": 10, "countrycodes": "fi"})
+            try: res = json.load(urllib.request.urlopen(urllib.request.Request("https://nominatim.openstreetmap.org/search?" + q2, headers={"User-Agent": "polku-hoitoon-pilot-map/1.0 (open data research prototype)"}), timeout=60))
+            except Exception: pass
+            time.sleep(1.2)
         def ok(x):
             return (x.get("category") == "boundary" and x.get("type") == "administrative" and x.get("addresstype") in ("city", "town", "municipality", "village")) \
                 or (x.get("category") == "place" and x.get("type") in ("city", "town", "village", "suburb", "hamlet"))

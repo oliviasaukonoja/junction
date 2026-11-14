@@ -2,9 +2,9 @@ code,name,lat,lon,km_from_centroid,point_source
 047,Enontekiö,68.38549,23.6438,42.7,nominatim:boundary/administrative
 050,Eura,61.1304,22.13021,5.6,nominatim:boundary/administrative
 051,Eurajoki,61.20182,21.72969,8.1,nominatim:boundary/administrative
-075,Hamina,60.66143,27.24502,0.0,centroid (no settlement found within 60 km)
+075,Hamina,60.56835,27.19259,10.7,nominatim:boundary/administrative
 079,Harjavalta,61.31252,22.13574,2.4,nominatim:boundary/administrative
-102,Huittinen,61.1346,22.72264,0.0,centroid (no settlement found within 60 km)
+102,Huittinen,61.17709,22.69905,4.9,nominatim:boundary/administrative
 148,Inari,69.06354,27.31874,14.4,nominatim:boundary/administrative
 181,Jämijärvi,61.81982,22.69161,2.7,nominatim:boundary/administrative
 214,Kankaanpää,61.80416,22.39372,10.9,nominatim:boundary/administrative
@@ -32,7 +32,7 @@ code,name,lat,lon,km_from_centroid,point_source
 732,Salla,66.83188,28.66686,20.3,nominatim:boundary/administrative
 742,Savukoski,67.29231,28.16388,40.7,nominatim:boundary/administrative
 747,Siikainen,61.87668,21.82175,3.6,nominatim:boundary/administrative
-751,Simo,65.84887,25.37472,0.0,centroid (no settlement found within 60 km)
+751,Simo,65.66228,25.06382,25.1,nominatim:boundary/administrative
 758,Sodankylä,67.41897,26.59022,42.6,nominatim:boundary/administrative
 783,Säkylä,61.04601,22.34309,3.2,nominatim:boundary/administrative
 845,Tervola,66.08229,24.80588,13.5,nominatim:boundary/administrative
@@ -50,7 +50,7 @@ code,name,lat,lon,km_from_centroid,point_source
 167,Joensuu,62.60064,29.76198,28.9,nominatim:boundary/administrative
 179,Jyväskylä,62.24167,25.74958,13.1,nominatim:boundary/administrative
 205,Kajaani,64.22469,27.73393,17.9,nominatim:boundary/administrative
-272,Kokkola,63.80197,23.60975,0.0,centroid (no settlement found within 60 km)
+272,Kokkola,63.83914,23.13368,23.7,nominatim:boundary/administrative
 297,Kuopio,62.89246,27.67836,11.9,nominatim:boundary/administrative
 305,Kuusamo,65.96456,29.18833,3.9,nominatim:boundary/administrative
 398,Lahti,60.98263,25.66134,10.6,nominatim:boundary/administrative
