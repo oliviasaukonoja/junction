@@ -16,14 +16,18 @@ body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background
 a{color:var(--acc2)}
 button,select,input,textarea{font:inherit;color:var(--ink)}
 button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
-header{display:flex;align-items:center;gap:14px;padding:8px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-header h1{font-size:17px;margin:0;font-weight:700;white-space:nowrap}
-header .nav a{margin-inline-end:12px;font-weight:600;text-decoration:none}
-header .tag{color:var(--muted);font-size:13px}
-header .right{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
+.pagebar{display:flex;align-items:center;gap:14px;padding:8px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pagebar h1{font-size:17px;margin:0;font-weight:700;white-space:nowrap}
+.pagebar .tag{color:var(--muted);font-size:13px}
+.pagebar .right{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
+/* shared site header and footer (layout.js): keep the light look of the other pages */
+#site-header,#site-footer{--ink:#14213D;--muted:#4A5872;--line:#E3E8F0;--blue:#1F5FD6;--blue-d:#123E91;color:#14213D}
+#site-header header{z-index:1100}
+#site-footer footer{padding:28px 0 40px;color:#4A5872;font-size:14px;border-top:1px solid #E3E8F0;background:#fff}
+#site-footer a{color:#1F5FD6}
 select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
 .banner{margin:8px 16px 0;padding:8px 12px;border-radius:8px;background:var(--warn-bg);border:1px solid var(--warn-line);font-size:13px}
-.app{display:grid;grid-template-columns:minmax(420px,540px) minmax(0,1fr) minmax(260px,330px);gap:12px;padding:12px 16px;height:calc(100vh - 92px);min-height:560px}
+.app{display:grid;grid-template-columns:minmax(420px,540px) minmax(0,1fr) minmax(260px,330px);gap:12px;padding:12px 16px;height:calc(100vh - 150px);min-height:560px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto;padding:12px 14px}
 .mapbox{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);min-height:420px}
 #map{position:absolute;inset:0;background:#1d2534}
@@ -101,17 +105,16 @@ details.fold>summary::after{content:' ▾';color:var(--muted)}details.fold[open]
 .legendchips{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:12px;color:var(--muted);margin:6px 0 2px}
 .hidden{display:none!important}
 @media (max-width:1150px){.app{grid-template-columns:minmax(380px,480px) minmax(0,1fr);height:auto}.chatp{grid-column:1/-1}.mapbox{min-height:70vh}}
-@media (max-width:760px){.app{grid-template-columns:1fr;padding:8px}.mapbox{min-height:60vh;order:-1}.panel{max-height:none}header h1{font-size:15px}header .tag{display:none}}
+@media (max-width:760px){.app{grid-template-columns:1fr;padding:8px}.mapbox{min-height:60vh;order:-1}.panel{max-height:none}.pagebar h1{font-size:15px}.pagebar .tag{display:none}}
 </style>
 </head>
-<body>
-<header>
+<body data-languages="fi,sv,en">
+<div id="site-header"></div><script src="/layout.js"></script>
+<div class="pagebar">
   <h1 data-t="title"></h1>
-  <span class="nav"><a href="/keuhkodata" data-t="nav_data"></a><a href="/" data-t="nav_bus"></a></span>
   <span class="tag" data-t="tagline"></span>
-  <span class="right"><label for="lang" class="hidden">Language</label><select id="lang"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
-  <button class="btn" id="lockTop" type="button"><span id="lockIcon">🔒</span> <span data-t="adv"></span></button></span>
-</header>
+  <span class="right"><button class="btn" id="lockTop" type="button"><span id="lockIcon">🔒</span> <span data-t="adv"></span></button></span>
+</div>
 <div class="banner" data-t="banner"></div>
 <div class="app">
   <aside class="panel" id="left" aria-label="Routes"></aside>
@@ -129,6 +132,7 @@ details.fold>summary::after{content:' ▾';color:var(--muted)}details.fold[open]
       <div style="display:flex;gap:8px;align-items:center;margin-top:6px"><button class="btn p" type="submit" id="chatSend" data-t="send"></button><span class="sub" id="chatNote"></span></div></form>
   </aside>
 </div>
+<div id="site-footer"></div>
 <script src="/vendor/leaflet.js"></script>
 <script>
 const T={
