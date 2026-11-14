@@ -91,6 +91,7 @@ th{color:var(--muted);font-weight:600}
 .ptable td:empty{display:none}
 }
 .reco{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.rc{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.rc h3{font-size:16px;margin:0 0 6px}.rc p{margin:0 0 8px;font-size:14.5px}.rc .why{font-size:13px;color:var(--muted)}
+.keymsg{font-weight:600;font-size:15.5px;margin:2px 0 10px;color:var(--ink);border-inline-start:3px solid var(--blue);padding-inline-start:10px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .tile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
 .tile .v{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;color:var(--blue-d);line-height:1.15}
@@ -456,6 +457,29 @@ function body(v){
   if(v.kind==='goal3') return `<div class="goal">${GOAL3.map(x=>`<div><b>${L(x.b)} ${tagHTML(x.tag)}</b><span>${L(x.s)}</span></div>`).join('')}</div>`;
   return `<div class="chartbox${v.tall?' tall':''}"><canvas id="cv-${v.id}" role="img" aria-label="${L(v.title)}"></canvas></div><div class="tbl hidden" id="tb-${v.id}"></div>`;
 }
+
+function MSG(v){
+  const f1=x=>fmt(Math.round(x*10)/10);
+  let m=null;
+  if(v.id==='smr'){const top=D.smr[0],n=D.smr.filter(r=>r[2]>1).length,pct=Math.round((top[1]-1)*100);
+    m={fi:`${nm(top[0])} alueella keuhkosyöpään kuolee ${pct} % enemmän kuin ikärakenteen perusteella odottaisi. ${n} aluetta on merkitsevästi maan tason yläpuolella.`,
+       sv:`I ${nm(top[0])} välfärdsområde dör ${pct} % fler i lungcancer än åldersstrukturen förutsäger. ${n} områden ligger signifikant över riksnivån.`,
+       en:`In ${nm(top[0])}, ${pct}% more people die of lung cancer than its age structure would predict. ${n} areas are significantly above the national level.`}[lang];}
+  if(v.id==='scrlang'){const b=D.scr_lang.breast,d=Math.round((b.Domestic-b['Other/missing'])*10)/10;
+    m={fi:`Rintasyöpäseulontaan osallistuu ${f1(b.Domestic)} % kotimaisen äidinkielen puhujista mutta ${f1(b['Other/missing'])} % muun kielen puhujista: ero on ${f1(d)} prosenttiyksikköä.`,
+       sv:`${f1(b.Domestic)} % med inhemskt modersmål deltar i bröstcancerscreeningen men ${f1(b['Other/missing'])} % med annat språk: skillnaden är ${f1(d)} procentenheter.`,
+       en:`${f1(b.Domestic)}% of domestic-language speakers attend breast screening versus ${f1(b['Other/missing'])}% of other-language speakers: a gap of ${f1(d)} percentage points.`}[lang];}
+  if(v.id==='smokeedu'){const i=D.smoke_edu.low.length-1,lo=D.smoke_edu.low[i],hi=D.smoke_edu.high[i],y=D.smoke_edu.years[i],r=Math.round(lo/hi*10)/10;
+    m={fi:`Vuonna ${y} matalasti koulutetuista tupakoi päivittäin ${f1(lo)} %, korkeasti koulutetuista ${f1(hi)} %: noin ${f1(r)}-kertainen ero.`,
+       sv:`År ${y} rökte ${f1(lo)} % av de lågutbildade dagligen mot ${f1(hi)} % av högutbildade: ungefär ${f1(r)} gånger fler.`,
+       en:`In ${y}, ${f1(lo)}% of people with low education smoked daily versus ${f1(hi)}% of the highly educated: roughly ${f1(r)} times as many.`}[lang];}
+  if(v.id==='nordsurv'){const a=D.nordsurv.men;
+    m={fi:`Miehistä keuhkosyövästä on viiden vuoden kuluttua elossa ${a.Finland} % Suomessa, ${a.Norway} % Norjassa.`,
+       sv:`Fem år efter diagnos lever ${a.Finland} % av männen i Finland men ${a.Norway} % i Norge.`,
+       en:`Five years after diagnosis, ${a.Finland}% of men with lung cancer are alive in Finland versus ${a.Norway}% in Norway.`}[lang];}
+  if(v.id==='delay'){m={fi:'Oireista hoidon alkuun kuluu Suomessa keskimäärin 155 päivää, Ruotsissa 107 ja Tanskassa 67.',sv:'Från symtom till behandling går i genomsnitt 155 dagar i Finland, 107 i Sverige och 67 i Danmark.',en:'From symptoms to treatment takes on average 155 days in Finland, 107 in Sweden and 67 in Denmark.'}[lang];}
+  return m?`<p class="keymsg">${m}</p>`:'';
+}
 function render(){
   markPre();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
@@ -464,7 +488,7 @@ function render(){
   document.getElementById('empty').classList.toggle('hidden',vs.length>0);
   grid.innerHTML=vs.map(v=>{
     const charty=!v.kind||v.kind==='smr';
-    return `<div class="card${(v.wide||v.tall)?' wide':''}"><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
+    return `<div class="card${(v.wide||v.tall)?' wide':''}"><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
   }).join('');
   vs.filter(v=>!v.kind||v.kind==='smr').forEach(v=>{const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);});
   grid.querySelectorAll('button[data-t2]').forEach(b=>b.onclick=()=>{const v=VIEWS.find(x=>x.id===b.dataset.t2);const tb=document.getElementById('tb-'+v.id);const show=tb.classList.contains('hidden');tb.innerHTML=show?tableHTML(v,v._spec):'';tb.classList.toggle('hidden',!show);b.textContent=show?t('hide'):t('show');});
