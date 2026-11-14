@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Merge Cancer Registry incidence (2020-24) with cancer deaths (2023-25, Statistics Finland) and oncology referrals/waits.
 Usage: python3 incidence_crossref.py WAIT_CACHE_DIR  (needs deaths.json from wait_times_syopataudit.py and its output CSV)"""
-import csv, itertools, json, sys
+import csv, itertools, json, sys, urllib.request
 from pathlib import Path
 C = Path(sys.argv[1]); ROOT = Path(__file__).resolve().parents[2]
 inc = {}
@@ -11,7 +11,17 @@ def js(f):
     r = json.load(open(C / f)); ids = r["id"]
     cats = [list(r["dimension"][i]["category"]["index"]) for i in ids]
     return {tuple(cats[j][c[j]] for j in range(len(ids))): r["value"][k] for k, c in enumerate(itertools.product(*[range(s) for s in r["size"]]))}
-deaths, pop = js("deaths.json"), js("pop.json")
+def fetch_lung():
+    f = C / "deaths_lung.json"
+    if not f.exists():
+        q = {"query": [{"code": "alue_23_20260101", "selection": {"filter": "item", "values": [f"HVA{i:02d}" for i in range(1, 22)] + ["HVA90"]}},
+                       {"code": "kuolinsyyt_1_20210101", "selection": {"filter": "item", "values": ["11"]}},
+                       {"code": "timeperiod_y", "selection": {"filter": "item", "values": ["2023", "2024", "2025"]}},
+                       {"code": "contentscode", "selection": {"filter": "item", "values": ["ksyylkm"]}}], "response": {"format": "json-stat2"}}
+        req = urllib.request.Request("https://statfin.stat.fi/PXWeb/api/v1/fi/StatFin/ksyyt/13u5.px", data=json.dumps(q).encode(), headers={"Content-Type": "application/json"})
+        f.write_bytes(urllib.request.urlopen(req, timeout=90).read())
+    return js("deaths_lung.json")
+deaths, pop, ldeaths = js("deaths.json"), js("pop.json"), fetch_lung()
 GRP = {"Etelä-Karjala": ["Etelä-Karjalan hyvinvointialue"], "Etelä-Pohjanmaa": ["Etelä-Pohjanmaan hyvinvointialue"], "Etelä-Savo": ["Etelä-Savon hyvinvointialue"],
  "HUS (Uusimaa 4 + Helsinki)": ["Itä-Uudenmaan hyvinvointialue", "Keski-Uudenmaan hyvinvointialue", "Länsi-Uudenmaan hyvinvointialue", "Vantaan ja Keravan hyvinvointialue", "Helsingin kaupunki"],
  "Kainuu": ["Kainuun hyvinvointialue"], "Kanta-Häme": ["Kanta-Hämeen hyvinvointialue"], "Keski-Pohjanmaa": ["Keski-Pohjanmaan hyvinvointialue"], "Keski-Suomi": ["Keski-Suomen hyvinvointialue"],
@@ -37,20 +47,21 @@ for g, parts in GRP.items():
     w = {a: sum(pop[(SF[b], "vaerak-vaesto", "2024")] for b in parts if b == a) for a in parts}; tw = sum(w.values())
     asr = lambda sex, k: sum(float(inc[a][sex][k]) * w[a] for a in parts) / tw   # population-weighted (approximation for HUS)
     d = sum(deaths[(SF[a], "04-21", y, "ksyylkm")] for a in parts for y in ("2023", "2024", "2025")) / 3
+    ld = sum(ldeaths[(SF[a], "11", y, "ksyylkm")] for a in parts for y in ("2023", "2024", "2025")) / 3
     wr = wait.get(wname(g))
     rows.append(dict(g=g, n=n, nl=nl, inc_rate=1e5 * n / (sum(p23_25.values()) / 3), asr_m=asr("Miehet", "asr_all_per100k_finland2014"), asr_f=asr("Naiset", "asr_all_per100k_finland2014"),
-                     lung_m=asr("Miehet", "asr_lung_per100k_finland2014"), lung_f=asr("Naiset", "asr_lung_per100k_finland2014"), deaths=d, mir=d / n,
+                     lung_m=asr("Miehet", "asr_lung_per100k_finland2014"), lung_f=asr("Naiset", "asr_lung_per100k_finland2014"), deaths=d, mir=d / n, ld=ld, lmir=ld / nl, lrate=1e5 * ld / (sum(p23_25.values()) / 3),
                      ref=fl(wr["referrals_ytd_at_year_end"]) if wr else None, h90=fl(wr["treat_pct_over90d"]) if wr else None))
 nat = {s: inc["Koko maa"][s] for s in ("Miehet", "Naiset")}
 tot_n = sum(int(nat[s]["new_cases_all_2020_2024"]) for s in nat) / 5
 chk = sum(r["n"] for r in rows)
 out = ["# Cancer incidence by welfare area (Finnish Cancer Registry, 2020-2024) next to deaths and oncology referrals", "",
        f"Annual new cases = five-year total / 5 (all sexes). National: {tot_n:,.0f} a year; sum of areas: {chk:,.0f} (the gap is mostly Åland and unassigned residence; not checked). Deaths: Statistics Finland, all cancers, 2023-25 average. "
-       "Rates are age-standardised per 100,000 (Finland 2014 standard) for men (M) and women (F); lung = C33-34. HUS rates are population-weighted averages of its five areas (approximation).", "",
-       "| Area | New cancers /yr | Lung /yr | All cancers ASR M / F | Lung ASR M / F | Cancer deaths /yr | Deaths per new case | Oncology referrals 2025 | Referrals per new case | Treat >90 d % (2025) |",
-       "|---|--:|--:|---|---|--:|--:|--:|--:|--:|"]
+       "Rates are age-standardised per 100,000 (Finland 2014 standard) for men (M) and women (F); lung incidence = C33-34 (registry); lung deaths = Statistics Finland cause group 11, which is C32-34 (includes larynx), so lung deaths per case is slightly overstated. HUS rates are population-weighted averages of its five areas (approximation).", "",
+       "| Area | New cancers /yr | Lung /yr | All cancers ASR M / F | Lung ASR M / F | Cancer deaths /yr | Deaths per new case | Lung deaths /yr | Lung deaths per new lung case | Lung deaths /100k | Oncology referrals 2025 | Referrals per new case | Treat >90 d % (2025) |",
+       "|---|--:|--:|---|---|--:|--:|--:|--:|--:|--:|--:|"]
 for r in sorted(rows, key=lambda r: -r["n"]):
-    out.append(f"| {r['g']} | {r['n']:,.0f} | {r['nl']:,.0f} | {r['asr_m']:.0f} / {r['asr_f']:.0f} | {r['lung_m']:.0f} / {r['lung_f']:.0f} | {r['deaths']:,.0f} | {r['mir']:.2f} | "
+    out.append(f"| {r['g']} | {r['n']:,.0f} | {r['nl']:,.0f} | {r['asr_m']:.0f} / {r['asr_f']:.0f} | {r['lung_m']:.0f} / {r['lung_f']:.0f} | {r['deaths']:,.0f} | {r['mir']:.2f} | {r['ld']:,.0f} | {r['lmir']:.2f} | {r['lrate']:.0f} | "
                f"{(f'{r['ref']:,.0f}' if r['ref'] else '–')} | {(f'{r['ref']/r['n']:.2f}' if r['ref'] else '–')} | {(f'{r['h90']:.0f}' if r['h90'] is not None else '–')} |")
 out += ["", f"National lung ASR: M {nat['Miehet']['asr_lung_per100k_finland2014']}, F {nat['Naiset']['asr_lung_per100k_finland2014']}; all cancers M {nat['Miehet']['asr_all_per100k_finland2014']}, F {nat['Naiset']['asr_all_per100k_finland2014']}.", ""]
 (ROOT / "docs/incidence_by_area_2020_2024.md").write_text("\n".join(out) + "\n", encoding="utf-8")
