@@ -2,6 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import {createSpider} from './model.mjs';
 import {SpiderCrowd} from './crowd.mjs';
 import {sampleMotion} from './motion.mjs';
+import {NeedleScene} from './needle.mjs';
 export {createSpider} from './model.mjs';
 
 export class SpiderScene {
@@ -26,12 +27,14 @@ export class SpiderScene {
     for(const item of [this.simple,this.real]){item.root.visible=false;this.scene.add(item.root);}
     this.neutral=new THREE.Mesh(new THREE.CircleGeometry(.047,48),new THREE.MeshBasicMaterial({color:0xb6e0bd}));
     this.neutral.position.set(0,.08,0);this.neutral.lookAt(this.camera.position);this.neutral.visible=false;this.scene.add(this.neutral);
+    this.needles=new NeedleScene(this.scene);
     this.clear();
   }
-  clear(){this.visible=false;this.neutral.visible=false;for(const i of [this.simple,this.real])i.root.visible=false;for(const c of this.crowds.values())c.root.visible=false;this.activeCrowd=null;this.renderer.render(this.scene,this.camera);}
+  clear(){this.needles?.clear();this.visible=false;this.neutral.visible=false;for(const i of [this.simple,this.real])i.root.visible=false;for(const c of this.crowds.values())c.root.visible=false;this.activeCrowd=null;this.renderer.render(this.scene,this.camera);}
   dot(){this.clear();this.neutral.visible=true;this.renderer.render(this.scene,this.camera);}
   show(plan){
     this.clear();this.plan=plan;this.visible=true;this.rotation=0;
+    if(plan.fear==='needles'){this.instances=[];this.activeCrowd=null;this.needles.show(plan);this.render(0);return;}
     if(plan.count>1){
       const key=plan.realistic?'real':'simple';
       if(!this.crowds.has(key)){const crowd=new SpiderCrowd(plan.realistic);this.crowds.set(key,crowd);this.scene.add(crowd.root);}
@@ -46,6 +49,7 @@ export class SpiderScene {
   }
   render(time,speed=1){
     if(!this.visible)return;
+    if(this.plan?.fear==='needles'){this.needles.render(time,this.plan,speed);this.renderer.render(this.scene,this.camera);return;}
     if(this.activeCrowd){
       this.activeCrowd.update(time,this.plan,speed);
       this.renderer.render(this.scene,this.camera);return;
@@ -59,7 +63,7 @@ export class SpiderScene {
     });
     this.renderer.render(this.scene,this.camera);
   }
-  motionLabel(time,speed=1){return this.plan?(this.plan.count>1?this.plan.count+' spiders · ':'')+sampleMotion(time,this.plan,0,speed).label:'';}
+  motionLabel(time,speed=1){if(this.plan?.fear==='needles')return (this.plan.count>1?this.plan.count+' needles · ':'')+this.needles.label(time*speed,this.plan);return this.plan?(this.plan.count>1?this.plan.count+' spiders · ':'')+sampleMotion(time,this.plan,0,speed).label:'';}
   capture(size=384,quality=.76){
     if(this.transferCanvas.width!==size){this.transferCanvas.width=size;this.transferCanvas.height=size;}
     this.transferContext.drawImage(this.canvas,0,0,size,size);

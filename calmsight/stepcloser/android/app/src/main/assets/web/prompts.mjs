@@ -18,5 +18,11 @@ export const PROMPTS={
   stay:"If this feels manageable, give yourself time to observe. If you want to pause or finish, use the controls. You are choosing the pace.",
   pause:"The activity is paused and the image is being cleared. Notice your surroundings. Restart only when you choose to.",
   stopped:"You have stopped the activity. Check that the image has disappeared. Take a moment before deciding what comes next.",
+  nlevel1:"Here is a simple, friendly syringe with its cap on. It stays still. Just look at its shape. You choose how long.",
+  nlevel2:"This is a real syringe, cap still on, turning slowly. Notice the plastic, the markings, the little plunger. Nothing will touch you.",
+  nlevel3:"The cap is off now. You can see the needle. It's thin and short. Keep looking for a moment, and let your shoulders drop.",
+  nlevel4:"The needle comes towards you and backs away again. It can't reach you. Stay with it, and notice your fear rise and fall.",
+  nlevel5:"A close-up of the tip. A small drop forms. Look at it, describe it to yourself. You can stop any time.",
+  nlevel6:"Now the full injection. The needle goes into the arm, the medicine goes in, it comes out. A few seconds. Watch it as many times as you choose.",
   completed:"This practice interval has ended. Notice what you learned. You can repeat the same step. A timer does not decide when you are ready for a harder one."
 };

@@ -1,4 +1,4 @@
-import {Practice,LEVELS} from './engine.mjs';
+import {Practice,LEVELS,NEEDLE_LEVELS} from './engine.mjs';
 import {SpiderScene} from './spider.mjs';
 import {PROMPTS} from './prompts.mjs';
 import {guideCue} from './motion.mjs';
@@ -22,14 +22,19 @@ try{
   $('motionSpeed').value=String([.5,1,1.5,2].includes(options.speed)?options.speed:1);
   $('deliveryProfile').value=['auto','fast','balanced','sharp'].includes(options.profile)?options.profile:'auto';
   $('matchMirror').checked=options.mirror!==false;
+  $('sizeFactor').value=String([.75,1,1.5,2].includes(options.size)?options.size:1);
+  practice.fear=options.fear==='needles'?'needles':'spiders';
 }catch{
   $('spiderCount').value='1';$('motionSpeed').value='1';$('deliveryProfile').value='auto';$('matchMirror').checked=true;
 }
+function noun(n){return practice.fear==='needles'?(n===1?'needle':'needles'):(n===1?'spider':'spiders');}
 function applyOptions(){
   practice.configureOptions(Number($('spiderCount').value),Number($('motionSpeed').value));
+  practice.configureFear(practice.fear,Number($('sizeFactor').value));
+  window.StepCloserFear=practice.fear;
   delivery.setProfile($('deliveryProfile').value);
   try{localStorage.setItem('stepcloser3d-options',JSON.stringify({count:practice.spiderCount,speed:practice.motionSpeed,
-    profile:delivery.profile,mirror:$('matchMirror').checked}));}catch{}
+    profile:delivery.profile,mirror:$('matchMirror').checked,size:practice.sizeFactor,fear:practice.fear}));}catch{}
 }
 applyOptions();
 const notice=message=>{$('notice').textContent=message;$('notice').hidden=!message;};
@@ -50,9 +55,12 @@ function update(){
   $('displaySetup').hidden=practice.mode!=='display';
   $('outputLabel').textContent=practice.mode==='display'?'Meta Display glasses':'Phone 3D preview';
   for(const id of ['quickWalk','quickJump','startSelected'])$(id).disabled=!practice.renderReady||busy;
-  $('quickWalk').textContent=pendingStart?'Connecting display…':practice.spiderCount===1?'Start walking toward me →':'Start '+practice.spiderCount+' walking spiders →';
-  $('quickJump').textContent=practice.spiderCount===1?'Start large spider · circling & jumps':'Start '+practice.spiderCount+' spiders · circling & jumps';
-  $('selectedName').textContent=practice.plan.name;$('selectedDetail').textContent=practice.spiderCount+' spider'+(practice.spiderCount===1?'':'s')+' · '+practice.motionSpeed+'× walking/circling speed · '+practice.plan.detail;
+  const nd=practice.fear==='needles';
+  $('quickWalk').textContent=pendingStart?'Connecting display…':nd?'Start: needle coming closer →':practice.spiderCount===1?'Start walking toward me →':'Start '+practice.spiderCount+' walking spiders →';
+  $('quickJump').textContent=nd?'Start: the injection':practice.spiderCount===1?'Start large spider · circling & jumps':'Start '+practice.spiderCount+' spiders · circling & jumps';
+  $('fearSpiders').classList.toggle('selected',!nd);$('fearNeedles').classList.toggle('selected',nd);
+  $('fearSpiders').disabled=busy;$('fearNeedles').disabled=busy;$('sizeFactor').disabled=busy;
+  $('selectedName').textContent=practice.plan.name;$('selectedDetail').textContent=practice.spiderCount+' '+noun(practice.spiderCount)+' · '+practice.motionSpeed+'× walking/circling speed · '+practice.plan.detail;
   $('startSelected').textContent='Start '+practice.plan.name.toLowerCase()+' →';
   $('readyHint').textContent=!practice.renderReady?'3D rendering is unavailable on this device.':
     pendingStart?'Connecting, then starting your chosen spider. STOP cancels.':
@@ -63,7 +71,7 @@ function update(){
   $('renderOptions').hidden=showing;
   $('reflection').hidden=practice.state!=='reflection';
   $('practiceTitle').textContent=practice.state==='drill'?'Optional STOP test':realPlace?realPlace+' · coach is with you':practice.plan.name;
-  $('practiceEyebrow').textContent=practice.state==='drill'?'NEUTRAL DOT ONLY':realPlace?'REAL-LIFE COACH · NOTHING VIRTUAL SHOWN':practice.spiderCount+' SPIDER'+(practice.spiderCount===1?'':'S')+' · '+practice.motionSpeed+'× SPEED';
+  $('practiceEyebrow').textContent=practice.state==='drill'?'NEUTRAL DOT ONLY':realPlace?'REAL-LIFE COACH · NOTHING VIRTUAL SHOWN':practice.spiderCount+' '+noun(practice.spiderCount).toUpperCase()+' · '+practice.motionSpeed+'× SPEED';
   $('stageLabel').textContent=practice.mode==='display'?($('matchMirror').checked?'Glasses-paced preview · submitted frames':'Live phone preview · glasses update separately'):'Phone 3D preview';
   $('pause').hidden=practice.state==='drill';
   $('stopStatus').textContent=pendingStart?'Connecting · STOP cancels':showing?'Spider / dot is being shown':'Nothing is being shown on this phone';
@@ -131,7 +139,7 @@ function startNow(level){
   $('frameStats').textContent=practice.mode==='display'?'Waiting for SDK acknowledgement…':'';
   if(realPlace)calmScene.show(practice.plan,realPlace);else scene.show(practice.plan);notice('');
   if(practice.mode==='display')native.arm(token);else practice.shown(token,performance.now());
-  if(!realPlace)say('level'+practice.level);update();$('practiceSection').scrollIntoView({behavior:'smooth',block:'start'});
+  if(!realPlace)say((practice.fear==='needles'?'nlevel':'level')+practice.level);update();$('practiceSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function begin(level){
   if(practice.visible||pendingStart)return;
@@ -144,15 +152,25 @@ function begin(level){
   }
   try{startNow(level);}catch(error){hide('interrupted');notice(error.message);}
 }
-for(const plan of LEVELS){
-  const b=document.createElement('button');b.className='level';b.dataset.level=plan.id;
-  const n=document.createElement('span');n.className='level-number';n.textContent=plan.id;
-  const text=document.createElement('span'),title=document.createElement('strong'),detail=document.createElement('small');
-  title.textContent=plan.name;detail.textContent=plan.detail;text.append(title,detail);b.append(n,text);
-  b.onclick=()=>{practice.configure(plan.id,Number($('duration').value),Number($('before').value));update();};$('levels').append(b);
+function buildLevels(){
+  $('levels').replaceChildren();
+  for(const plan of practice.levels){
+    const b=document.createElement('button');b.className='level';b.dataset.level=plan.id;
+    const n=document.createElement('span');n.className='level-number';n.textContent=plan.id;
+    const text=document.createElement('span'),title=document.createElement('strong'),detail=document.createElement('small');
+    title.textContent=plan.name;detail.textContent=plan.detail;text.append(title,detail);b.append(n,text);
+    b.onclick=()=>{practice.configure(plan.id,Number($('duration').value),Number($('before').value));update();};$('levels').append(b);
+  }
 }
+function setFear(f){
+  if(practice.visible||pendingStart)return;
+  practice.fear=f;try{applyOptions();}catch(e){notice(e.message);}
+  buildLevels();update();
+}
+buildLevels();
+$('fearSpiders').onclick=()=>setFear('spiders');$('fearNeedles').onclick=()=>setFear('needles');
 $('quickWalk').onclick=()=>begin(4);$('quickJump').onclick=()=>begin(6);$('startSelected').onclick=()=>begin(practice.level);
-for(const id of ['spiderCount','motionSpeed','deliveryProfile','matchMirror'])$(id).onchange=()=>{try{applyOptions();update();}catch(error){notice(error.message);}};
+for(const id of ['spiderCount','sizeFactor','motionSpeed','deliveryProfile','matchMirror'])$(id).onchange=()=>{try{applyOptions();update();}catch(error){notice(error.message);}};
 $('phoneMode').onclick=()=>setMode('phone');$('displayMode').onclick=()=>setMode('display');
 $('register').onclick=()=>{pendingStart=null;if(native)native.register();else notice('Registration is available in the Android APK.');};
 $('connect').onclick=()=>{if(native)native.connect();else notice('Glasses connection is available in the APK.');};

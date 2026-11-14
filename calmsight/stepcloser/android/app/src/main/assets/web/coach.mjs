@@ -20,7 +20,7 @@ async function call(path, body){
   }finally{clearTimeout(t);}
 }
 function status(text){$('coachStatus').textContent=text;}
-function speak(reply){
+let speak=function(reply){
   if(!reply.audioUrl)return;               // app's own guide audio stays available
   if(native?.playUrl){native.playUrl(reply.audioUrl);return;}
   try{audio?.pause();audio=new Audio(reply.audioUrl);audio.play().catch(()=>{});}catch{}
@@ -48,8 +48,8 @@ async function saveProfile(fear){
 async function openSession(level){
   try{
     const m=mode();
-    await saveProfile(m?.fear||'spiders');
-    const reply=await call('/start',{situation:m?m.situation:'spider stepcloser',level:m?null:level});
+    await saveProfile(m?.fear||window.StepCloserFear||'spiders');
+    const reply=await call('/start',{situation:m?m.situation:(window.StepCloserFear==='needles'?'needle practice':'spider stepcloser'),level:m?null:level});
     sessionOpen=true;$('coachLine').textContent=reply.line||'';$('coachNext').hidden=true;
     if(m){lens(reply);speak(reply);}   // real life: the coach opens the conversation
     status('Tap a number any time');
@@ -124,4 +124,31 @@ window.CalmsightCoach={
     else if(String(s).startsWith('UNAVAILABLE')||String(s).startsWith('ERROR'))status('Voice unavailable · tap a number instead');
   }
 };
+// ---- Laptop preview: the browser's microphone stands in for the glasses ----
+let rec=null,recOn=false;
+function browserVoice(on){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(native||!SR)return;
+  if(!on){recOn=false;try{rec?.stop();}catch{}return;}
+  if(recOn)return;
+  rec=new SR();rec.lang='en-US';rec.continuous=true;rec.interimResults=true;recOn=true;
+  rec.onresult=e=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const r=e.results[i],t=r[0].transcript;
+      if(r.isFinal){if(!speaking)heard(t);}else window.CalmsightCoach.partial(t);
+    }
+  };
+  rec.onend=()=>{if(recOn)setTimeout(()=>{try{rec.start();}catch{}},300);};
+  try{rec.start();window.CalmsightCoach.speechState('STARTED');}catch{}
+}
+let speaking=false;
+const _speak=speak;
+speak=function(reply){
+  if(native){_speak(reply);return;}
+  if(!reply.audioUrl)return;
+  speaking=true;
+  try{audio?.pause();audio=new Audio(reply.audioUrl);audio.onended=()=>setTimeout(()=>speaking=false,500);
+    audio.play().catch(()=>{speaking=false;});}catch{speaking=false;}
+};
+setInterval(()=>{const d=diag();browserVoice(!!(d&&['starting','active'].includes(d.state)&&mode()));},800);
 build();saveProfile();watch();

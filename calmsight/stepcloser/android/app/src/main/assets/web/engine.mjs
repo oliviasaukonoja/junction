@@ -6,16 +6,32 @@ export const LEVELS = Object.freeze([
   {id:5,name:'Circling your view',detail:'Large spider · circles within the lens view · calming guide',scale:0.95,motion:2,behavior:'orbit',realistic:true,count:1},
   {id:6,name:'Circling & jumps',detail:'Advanced · large spider circles and jumps toward your view · spoken jump cues',scale:0.95,motion:3,behavior:'orbitJump',realistic:true,count:1}
 ]);
+export const NEEDLE_LEVELS=Object.freeze([
+  {id:1,name:'A friendly syringe',detail:'Simple soft-coloured syringe · cap on · still',scale:.95,motion:0,realistic:false,count:1,fear:'needles',cap:true,view:'side'},
+  {id:2,name:'A real syringe',detail:'Realistic syringe · cap on · slowly turning',scale:.8,motion:1,realistic:true,count:1,fear:'needles',cap:true,view:'turn'},
+  {id:3,name:'Cap comes off',detail:'Needle uncovered · slowly turning',scale:.85,motion:1,realistic:true,count:1,fear:'needles',cap:false,view:'turn'},
+  {id:4,name:'Needle coming closer',detail:'Tip points at you · comes closer, then backs away',scale:.9,motion:2,behavior:'approach',realistic:true,count:1,fear:'needles',cap:false,view:'front'},
+  {id:5,name:'Close-up of the tip',detail:'Large needle tip · a drop forms · gentle tilt',scale:1.35,motion:1,realistic:true,count:1,fear:'needles',cap:false,view:'tip'},
+  {id:6,name:'The injection',detail:'Advanced · needle goes into an arm · plunger pushed · repeats',scale:.95,motion:3,behavior:'inject',realistic:true,count:1,fear:'needles',cap:false,view:'inject'}
+]);
+export const SIZES=[.75,1,1.5,2];
 export class Practice {
   constructor() {
     this.mode='phone'; this.level=4; this.duration=60; this.before=3;
-    this.spiderCount=1;this.motionSpeed=1;
+    this.spiderCount=1;this.motionSpeed=1;this.fear='spiders';this.sizeFactor=1;
     this.consent=false; this.audioChecked=false; this.drillPassed=false;
     this.lensReady=false; this.renderReady=false; this.state='setup';
     this.serial=0; this.token=''; this.startedAt=null; this.lastResult=null;
     this.clearConfirmed=false; this.neutralShown=false;
   }
-  get plan(){return {...LEVELS[this.level-1],count:this.spiderCount};}
+  get levels(){return this.fear==='needles'?NEEDLE_LEVELS:LEVELS;}
+  get plan(){const b=this.levels[this.level-1];return {...b,fear:this.fear,count:this.spiderCount,scale:b.scale*this.sizeFactor};}
+  configureFear(fear,size=this.sizeFactor){
+    if(this.visible)throw Error('Stop before changing what you practise');
+    if(!['spiders','needles'].includes(fear))throw Error('Unknown fear');
+    if(!SIZES.includes(size))throw Error('Invalid size');
+    this.fear=fear;this.sizeFactor=size;
+  }
   get visible(){return ['starting','active'].includes(this.state);}
   get canStart(){
     return this.renderReady && (this.mode==='phone' || this.lensReady) &&

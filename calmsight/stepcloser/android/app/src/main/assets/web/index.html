@@ -18,8 +18,8 @@
   </div>
 </section>
 <section id="intro" class="hero">
-  <span class="eyebrow">PRACTICE AT HOME · VIRTUAL SPIDERS</span>
-  <h1>Try the spider.<br>At your pace.</h1>
+  <span class="eyebrow">PRACTICE AT HOME · SPIDERS OR NEEDLES</span>
+  <h1>Practise your fear.<br>At your pace.</h1>
   <p>No mandatory audio test, STOP rehearsal, or review screen. Tap a button to begin.</p>
   <span id="outputLabel" class="pill">Meta Display glasses</span>
   <div class="quick-actions"><button id="quickWalk" class="primary full">Start walking toward me →</button><button id="quickJump" class="secondary full">Start large spider · circling & jumps</button></div>
@@ -36,9 +36,11 @@
   </div>
 </section>
 <section id="renderOptions" class="card">
-  <h2>How many spiders?</h2>
+  <h2>What do you want to practise?</h2>
+  <div class="mode-switch fear-switch"><button id="fearSpiders">🕷 Spiders<small>3D spiders, still to jumping</small></button><button id="fearNeedles">💉 Needles<small>syringe, cap off, the injection</small></button></div>
   <div class="plan-controls">
-    <label class="label">Spiders<select id="spiderCount"><option value="1">1 spider</option><option value="3">3 spiders</option><option value="5">5 spiders</option><option value="10">10 spiders</option><option value="20">20 spiders</option></select></label>
+    <label class="label">How many<select id="spiderCount"><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label>
+    <label class="label">Size<select id="sizeFactor"><option value="0.75">Small</option><option value="1" selected>Normal</option><option value="1.5">Large</option><option value="2">Very large</option></select></label>
     <label class="label">Walking / circling speed<select id="motionSpeed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
   </div>
   <p class="hint">Crowds use smaller spiders to fit the view. Jump timing stays aligned with the spoken cues.</p>
@@ -49,7 +51,7 @@
   </details>
 </section>
 <section id="planSection" class="card">
-  <div class="section-heading"><div><span class="eyebrow">OR CHOOSE ANOTHER STEP</span><h2>Your spider, your movement</h2></div><span class="pill">6 steps</span></div>
+  <div class="section-heading"><div><span class="eyebrow">OR CHOOSE ANOTHER STEP</span><h2 id="levelsTitle">Your step, your pace</h2></div><span class="pill">6 steps</span></div>
   <div id="levels" class="levels"></div><div class="next-step"><h3 id="selectedName">Walking toward you</h3><p id="selectedDetail"></p></div>
   <button id="startSelected" class="primary full">Start selected spider →</button>
 </section>
