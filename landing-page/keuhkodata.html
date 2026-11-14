@@ -183,7 +183,7 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .num{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--bg);font-size:12px;font-weight:700;color:var(--ink)}
 .navbar{position:sticky;top:64px;z-index:4;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
 .mainnav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}.mainnav::-webkit-scrollbar{display:none}
-.mt{font:inherit;font-size:15px;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:14px 12px 11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.mt{font:inherit;font-size:15px;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:14px 12px 11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
 .mt:hover{color:var(--ink)}.mt.on{color:var(--ink);border-bottom-color:var(--blue)}.mt.on .num{background:var(--blue);color:#fff}
 @media(max-width:780px){.navbar{position:static}}
 .pghead{padding:28px 0 18px}.pghead h1{font-size:clamp(24px,3vw,34px)}.pghead .lead{margin:8px 0 0}
@@ -636,8 +636,7 @@ function headline(){
 function go(t,s){cur={t,s:s||null};render();window.scrollTo({top:0});}
 function buildNav(pg){
   const nav=document.getElementById('mainnav');
-  nav.innerHTML=NAV.filter(n=>n.n).map(n=>`<button class="mt${n.id===pg.id?' on':''}" aria-current="${n.id===pg.id?'page':'false'}" data-go="${n.id}"><span class="num">${n.n}</span>${L(n.t)}</button>`).join('');
-  nav.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  nav.innerHTML=`<a class="mt" href="/kartta">${L({fi:'Pilottikartta',sv:'Pilotkarta',en:'Pilot map'})}</a>`;
 }
 function stepcards(){
   const hi=D.smr.filter(r=>r[2]>1).map(r=>nmN(r[0])).join(', ');
