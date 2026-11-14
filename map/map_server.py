@@ -47,6 +47,10 @@ def facts_text(pub: dict) -> str:
         for s in b["stops"]:
             lines.append(f"  {s['n']}. {s['name']}: {s['days']} days, {s['additional']} extra, catchment eligible {s['catchment_eligible']}, {s['tt_ct_min']} min to CT {s['nearest_ct']} ({s['ct_status']}), "
                          f"role {s['kind']}, other-language {round(s['foreign_share'] * 100, 1)}%, basic-education 55-74 {round(s['basic_share'] * 100, 1)}%, in plan in {round(s.get('stability', {}).get('share', 0) * 100)}% of {c.get('scenarios')} scenarios.")
+    la = pub["counties"].get("HVA21", {}).get("bus", {}).get("totals", {})
+    if la.get("additional"):
+        lines.append(f"\nTeam recommendation (Polku Labs, not yours to change): bus pilot in Lapland, where travel time is the barrier ({round(100 * la['additional_far'] / la['additional'])}% of the people the bus would reach live more than an hour from a CT). "
+                     "In Kymenlaakso and Satakunta start with hospital-CT invitations; a bus would mainly add capacity, which is an assumption.")
     lines.append("\nLimits: CT capacity and CT waiting times are not known by site; lung mortality is known only by region; travel times are OpenStreetMap free-flow (no winter); eligibility has no pack-year data.")
     return "\n".join(lines)
 
