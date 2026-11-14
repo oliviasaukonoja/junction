@@ -187,30 +187,7 @@ footer{padding:40px 0 56px}
     </div>
   </section>
 
-  <section id="sim">
-    <div class="wrap">
-      <h2 style="font-size:28px" data-t="sim_h"></h2>
-      <p style="color:var(--muted);margin:8px 0 0" data-t="sim_p"></p>
-      <div class="sim">
-        <div class="card sl">
-          <label for="s1"><span data-t="s1"></span><b id="v1"></b></label><input id="s1" type="range" min="0" max="100" step="10" value="50">
-          <label for="s2"><span data-t="s2"></span><b id="v2"></b></label><input id="s2" type="range" min="0" max="60" step="5" value="20">
-          <label for="s3"><span data-t="s3"></span><b id="v3"></b></label><input id="s3" type="range" min="0" max="100" step="10" value="30">
-          <div class="assume"><b data-t="as_h"></b><ul><li data-t="as1"></li><li data-t="as2"></li><li data-t="as3"></li><li data-t="as4"></li></ul></div>
-        </div>
-        <div class="card">
-          <div><span class="big" id="saved">0</span> <span data-t="r_saved"></span></div>
-          <div class="rbars" style="margin-top:16px">
-            <div class="rb"><span data-t="r_now"></span><div class="t"><div class="f" id="bNow" style="background:#D9730D"></div></div><b id="nNow"></b></div>
-            <div class="rb"><span data-t="r_new"></span><div class="t"><div class="f" id="bNew" style="background:#1F5FD6"></div></div><b id="nNew"></b></div>
-            <div class="rb"><span data-t="r_se"></span><div class="t"><div class="f" id="bSe" style="background:#9AA6BA"></div></div><b>107</b></div>
-            <div class="rb"><span data-t="r_dk"></span><div class="t"><div class="f" id="bDk" style="background:#9AA6BA"></div></div><b>67</b></div>
-          </div>
-          <div class="sum"><div style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;opacity:.8;margin-bottom:6px" data-t="sum_h"></div><div id="sumT"></div></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Simulator removed 14.11: its effect sizes were assumptions, not evidence (data quality). -->
 
   <section style="background:var(--bg)">
     <div class="wrap g2">
@@ -238,6 +215,7 @@ var lang = "fi";
 var BASE = {patient: 50, primary: 41, specialist: 58, total: 155};
 function el(id){ return document.getElementById(id); }
 function calc(){
+  if (!el("s1")) return;
   var s1 = +el("s1").value, s2 = +el("s2").value, s3 = +el("s3").value;
   var saved = BASE.primary * 0.5 * s1 / 100 + BASE.patient * 0.4 * s2 / 100 + BASE.specialist * 0.15 * s3 / 100;
   var d = Math.round(saved), now = BASE.total, nw = now - d, max = 160;
@@ -257,7 +235,7 @@ function apply(l){
   try { localStorage.setItem("vayla-lang", lang); } catch (e) {}
   calc();
 }
-["s1","s2","s3"].forEach(function(id){ el(id).addEventListener("input", calc); });
+["s1","s2","s3"].forEach(function(id){ if (el(id)) el(id).addEventListener("input", calc); });
 var sel = el("lang"), start = "";
 try { start = localStorage.getItem("vayla-lang") || ""; } catch (e) {}
 if (!start) start = (navigator.language || "fi").slice(0, 2);
