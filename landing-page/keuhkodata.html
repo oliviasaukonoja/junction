@@ -166,6 +166,15 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .sm{font-size:13.5px;color:var(--ink);margin-top:2px}.sc{font-size:12.5px;color:var(--muted);margin-top:2px}
 .sv small{font-family:Inter,sans-serif;font-size:12.5px;font-weight:500;color:var(--muted)}
 .sv .tag{font-size:10px;vertical-align:3px}
+
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.reco-card{background:var(--ink);color:#fff;border-color:var(--ink)}
+.reco-card h2,.reco-card .eyebrow{color:#fff}.reco-card .eyebrow{color:#9EC1FF}
+.reco-card .sub,.reco-card .foot,.reco-card .foot a{color:#C9D3E6}
+.reco-card .note{background:rgba(255,255,255,.08);color:#E6ECF7}
+.reco-card .rc{background:#fff;color:var(--ink);border:0}
+.reco-card .tag{background:#fff}
+.chartbox.tall{height:520px}
 </style>
 </head>
 <body>
@@ -489,13 +498,18 @@ function smrSpec(){
 }
 const dimc=c=>(typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c))?c+'3D':c;
 function highlight(spec){
+  const HI=new Set(D.smr.filter(r=>r[2]>1).map(r=>r[0]));
+  if(spec.codes&&spec.data.datasets.length===1&&!spec.smrTable){
+    spec.data.datasets[0].backgroundColor=spec.codes.map(c=>HI.has(c)?css('--hi'):'#B9C3D3');
+    spec.data.datasets[0].maxBarThickness=16;
+  }
   if(!myArea||!spec.codes) return;
   const i=spec.codes.indexOf(myArea); if(i<0) return;
   spec.data.datasets.forEach(d=>{
     ['backgroundColor','pointBackgroundColor'].forEach(k=>{
       if(d[k]==null) return;
       const arr=Array.isArray(d[k])?d[k]:spec.codes.map(()=>d[k]);
-      d[k]=arr.map((c,j)=>j===i?c:dimc(c));
+      d[k]=arr.map((c,j)=>j===i?(spec.data.datasets.length===1&&!spec.smrTable&&!HI.has(myArea)?css('--ink'):c):dimc(c));
     });
   });
 }
@@ -563,6 +577,10 @@ function MSG(v){
     m={fi:`Miehistä keuhkosyövästä on viiden vuoden kuluttua elossa ${a.Finland} % Suomessa, ${a.Norway} % Norjassa.`,
        sv:`Fem år efter diagnos lever ${a.Finland} % av männen i Finland men ${a.Norway} % i Norge.`,
        en:`Five years after diagnosis, ${a.Finland}% of men with lung cancer are alive in Finland versus ${a.Norway}% in Norway.`}[lang];}
+  if(v.id==='risk'){const rs=D.risk.slice().sort((a,b)=>b[1]/b[2]-a[1]/a[2]),tp=rs[0],sh=f1(tp[1]/tp[2]*100);
+    m={fi:`Riskiryhmän osuus on suurin ${nm(tp[0])} alueella (${sh} % 50–74-vuotiaista). Punaiset alueet ovat samat, joilla kuolleisuus on merkitsevästi koholla.`,
+       sv:`Riskgruppens andel är störst i ${nm(tp[0])} välfärdsområde (${sh} % av 50–74-åringarna). De röda områdena är samma som har signifikant förhöjd dödlighet.`,
+       en:`The risk group is largest in ${nm(tp[0])} (${sh}% of 50–74-year-olds). Red marks the same areas that have significantly raised mortality.`}[lang];}
   if(v.id==='delay'){m={fi:'Oireista hoidon alkuun kuluu Suomessa keskimäärin 155 päivää, Ruotsissa 107 ja Tanskassa 67.',sv:'Från symtom till behandling går i genomsnitt 155 dagar i Finland, 107 i Sverige och 67 i Danmark.',en:'From symptoms to treatment takes on average 155 days in Finland, 107 in Sweden and 67 in Denmark.'}[lang];}
   return m?`<p class="keymsg">${m}</p>`:'';
 }
@@ -617,11 +635,13 @@ function render(){
   markPre(); snapHTML(); syncHash(); headline();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
   const grid=document.getElementById('grid');
-  const vs=VIEWS.filter(v=>selected.includes(v.id));
+  const RANK={kpi:-3,smr:-2,pathway:-1,reco:999};
+  const vs=VIEWS.map((v,i)=>[v,RANK[v.id]??i]).filter(x=>selected.includes(x[0].id)).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+  const EB={smr:{fi:'1 · Mikä on ero',sv:'1 · Vad är skillnaden',en:'1 · What is the gap'},pathway:{fi:'2 · Missä kohtaa polkua',sv:'2 · Var i vårdkedjan',en:'2 · Where on the pathway'},risk:{fi:'3 · Ketä se koskee',sv:'3 · Vem det gäller',en:'3 · Who it affects'},reco:{fi:'4 · Mitä tehdään',sv:'4 · Vad gör vi',en:'4 · What to do'}};
   document.getElementById('empty').classList.toggle('hidden',vs.length>0);
   grid.innerHTML=vs.map(v=>{
     const charty=!v.kind||v.kind==='smr';
-    return `<div class="card${(v.wide||v.tall)?' wide':''}"><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
+    return `<div class="card${(v.wide||v.tall)?' wide':''}${v.id==='reco'?' reco-card':''}">${EB[v.id]?`<div class="eyebrow">${L(EB[v.id])}</div>`:''}<h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
   }).join('');
   vs.filter(v=>!v.kind||v.kind==='smr').forEach(v=>{const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);});
   grid.querySelectorAll('button[data-t2]').forEach(b=>b.onclick=()=>{const v=VIEWS.find(x=>x.id===b.dataset.t2);const tb=document.getElementById('tb-'+v.id);const show=tb.classList.contains('hidden');tb.innerHTML=show?tableHTML(v,v._spec):'';tb.classList.toggle('hidden',!show);b.textContent=show?t('hide'):t('show');});
