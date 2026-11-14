@@ -1,4 +1,19 @@
 (() => {
+  const style = document.createElement("style");
+  style.textContent = `
+    #site-header header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+    #site-header .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+    #site-header .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;flex-wrap:wrap;padding:12px 24px}
+    #site-header .logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+    #site-header .bar-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    #site-header select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+    #site-header .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+    #site-header .btn:hover{background:var(--blue-d);color:#fff}
+    #site-header .btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+    @media (max-width:780px){#site-header .wrap{padding:0 20px}#site-header .bar{padding:12px 20px;gap:12px}#site-header .bar-r{display:contents}#site-header .logo{order:1;flex:1;font-size:22px}#site-header select{order:2;padding:0 8px;font-size:14px}#site-header .btn.sm{display:none}}
+  `;
+  document.head.append(style);
+
   const languages = {
     fi: "Suomi", sv: "Svenska", en: "English", ru: "Русский",
     et: "Eesti", ar: "العربية", so: "Soomaali", uk: "Українська"

@@ -180,19 +180,12 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .seg{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.seg button{padding:8px 6px!important;font-size:13px!important}
 .myarea{width:100%}.myarea select{flex:1}.hero h1{font-size:25px}.hero{padding-top:20px}}
 
-.navbar{position:sticky;top:64px;z-index:4;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-.navrow{display:flex;align-items:center;gap:16px;justify-content:space-between}
-.mainnav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}.mainnav::-webkit-scrollbar{display:none}
-.mt{font:inherit;font-size:15px;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:14px 12px 11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
-.mt:hover{color:var(--ink)}.mt.on{color:var(--ink);border-bottom-color:var(--blue)}
 .num{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--bg);font-size:12px;font-weight:700;color:var(--ink)}
-.mt.on .num{background:var(--blue);color:#fff}
-.navrow .myarea{margin:0;flex:none}.navrow .myarea select{min-height:38px}
-.subnav{display:flex;gap:6px;padding:10px 0;overflow-x:auto}
-.subnav.hidden{display:none}
-.st{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap}
-.st.on{background:var(--ink);border-color:var(--ink);color:#fff}
-@media(max-width:780px){.navbar{position:static}.navrow{flex-direction:column;align-items:stretch;gap:0}.navrow .myarea{padding:8px 0}}
+.navbar{position:sticky;top:64px;z-index:4;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.mainnav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}.mainnav::-webkit-scrollbar{display:none}
+.mt{font:inherit;font-size:15px;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:14px 12px 11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.mt:hover{color:var(--ink)}.mt.on{color:var(--ink);border-bottom-color:var(--blue)}.mt.on .num{background:var(--blue);color:#fff}
+@media(max-width:780px){.navbar{position:static}}
 .pghead{padding:28px 0 18px}.pghead h1{font-size:clamp(24px,3vw,34px)}.pghead .lead{margin:8px 0 0}
 .stepcards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
 @media(max-width:900px){.stepcards{grid-template-columns:1fr 1fr}}@media(max-width:560px){.stepcards{grid-template-columns:1fr}}
@@ -207,10 +200,7 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 <body data-languages="fi,sv,en">
 <div id="site-header"></div><script src="/layout.js"></script>
 <main>
-  <div class="navbar"><div class="wrap navrow">
-    <nav class="mainnav" id="mainnav" role="tablist"></nav>
-    <div class="myarea"><label for="area" data-t="area_l"></label><select id="area"></select></div>
-  </div><div class="wrap"><nav class="subnav hidden" id="subnav" role="tablist"></nav></div></div>
+  <div class="navbar"><div class="wrap"><nav class="mainnav" id="mainnav" aria-label="Keuhkodatan vaiheet"></nav></div></div>
   <div class="wrap">
     <section id="pg-ov">
       <div class="hero">
@@ -597,6 +587,7 @@ function MSG(v){
 }
 function buildArea(){
   const el=document.getElementById('area');
+  if(!el) return;
   const codes=Object.keys(D.names).sort((a,b)=>nmN(a).localeCompare(nmN(b),LOC[lang]));
   el.innerHTML=`<option value="">${t('area_none')}</option>`+codes.map(c=>`<option value="${c}"${c===myArea?' selected':''}>${nmN(c)}</option>`).join('');
   el.onchange=()=>{myArea=el.value;try{localStorage.setItem('keuhkodata-area',myArea)}catch(e){}render();};
@@ -644,14 +635,9 @@ function headline(){
 }
 function go(t,s){cur={t,s:s||null};render();window.scrollTo({top:0});}
 function buildNav(pg){
-  const mapTab={fi:'Pilottikartta',sv:'Pilotkarta',en:'Pilot map'};
-  document.getElementById('mainnav').innerHTML=NAV.map(n=>`<button role="tab" class="mt${n.id===pg.id?' on':''}" aria-selected="${n.id===pg.id}" data-go="${n.id}">${n.n?`<span class="num">${n.n}</span>`:''}${L(n.t)}</button>`).join('')+`<a class="mt" href="/kartta">${L(mapTab)}</a>`;
-  const sn=document.getElementById('subnav'),many=pg.subs&&pg.subs.length>1;
-  sn.classList.toggle('hidden',!many);
-  sn.innerHTML=many?pg.subs.map(x=>`<button role="tab" class="st${x.id===cur.s?' on':''}" aria-selected="${x.id===cur.s}" data-sub="${x.id}">${L(x.t)}</button>`).join(''):'';
-  {const mn=document.getElementById('mainnav'),on=mn.querySelector('.mt.on');if(on)mn.scrollLeft=on.offsetLeft-mn.offsetLeft-16;}
-  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
-  sn.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{cur.s=b.dataset.sub;render();});
+  const nav=document.getElementById('mainnav');
+  nav.innerHTML=NAV.filter(n=>n.n).map(n=>`<button class="mt${n.id===pg.id?' on':''}" aria-current="${n.id===pg.id?'page':'false'}" data-go="${n.id}"><span class="num">${n.n}</span>${L(n.t)}</button>`).join('');
+  nav.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 function stepcards(){
   const hi=D.smr.filter(r=>r[2]>1).map(r=>nmN(r[0])).join(', ');
