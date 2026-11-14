@@ -31,7 +31,8 @@ import uuid
 import modal
 
 app = modal.App("calmsight-brain")
-COACH_VOICE = "PStJ2DzQnh8zxG5PDf1s"  # chosen ElevenLabs coach voice
+COACH_VOICE = "PStJ2DzQnh8zxG5PDf1s"  # chosen ElevenLabs coach voice (library voice)
+BACKUP_VOICE = "21m00Tcm4TlvDq8ikWAM"  # premade "Rachel": works on every plan
 image = modal.Image.debian_slim().pip_install("fastapi[standard]", "httpx", "psycopg[binary]")
 
 # Audio clips are short-lived binary blobs -> Modal Dict.
@@ -404,11 +405,15 @@ def speak(text: str, base_url: str):
         return None
     import httpx
     try:
-        r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
-                       params={"output_format": "mp3_44100_128"},
-                       headers={"xi-api-key": key},
-                       json={"text": text, "model_id": "eleven_flash_v2_5"},
-                       timeout=10)
+        for v in dict.fromkeys([voice, BACKUP_VOICE]):
+            r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{v}",
+                           params={"output_format": "mp3_44100_128"},
+                           headers={"xi-api-key": key},
+                           json={"text": text, "model_id": "eleven_flash_v2_5"},
+                           timeout=10)
+            if r.status_code not in (401, 402, 403):
+                break
+            print("elevenlabs voice", v, "refused:", r.status_code, r.text[:200])
         r.raise_for_status()
         aid = uuid.uuid4().hex
         audio_store[aid] = r.content
@@ -430,6 +435,16 @@ def tts_many(texts: dict) -> dict:
                        params={"output_format": "mp3_44100_128"},
                        headers={"xi-api-key": key},
                        json={"text": text, "model_id": "eleven_multilingual_v2"}, timeout=60)
+        if r.status_code in (401, 402, 403) and voice != BACKUP_VOICE:
+            print("voice", voice, "refused:", r.status_code, r.text[:300])
+            print("-> switching to premade backup voice", BACKUP_VOICE)
+            voice = BACKUP_VOICE
+            r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
+                           params={"output_format": "mp3_44100_128"},
+                           headers={"xi-api-key": key},
+                           json={"text": text, "model_id": "eleven_multilingual_v2"}, timeout=60)
+        if r.status_code >= 400:
+            print("ElevenLabs error:", r.status_code, r.text[:500])
         r.raise_for_status()
         out[name] = r.content
         print("voiced", name, len(r.content))
