@@ -30,6 +30,7 @@ image = (
     .add_local_file(HERE / "palaute.html", "/root/palaute.html")
     .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
+    .add_local_file(HERE / "vendor" / "chart.umd.js", "/root/chart.umd.js")
     .add_local_file(HERE / "regions.json", "/root/regions.json")
 )
 
@@ -218,6 +219,12 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, sh
     @api.get("/team.jpg")
     def team_jpg():
         return Response(team_img, media_type="image/jpeg", headers={"Cache-Control": "public, max-age=86400"})
+
+    chart_js = Path("/root/chart.umd.js").read_bytes()
+
+    @api.get("/vendor/chart.umd.js")
+    def chart_lib():  # served locally so charts work without the CDN
+        return Response(chart_js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
 
     @api.post("/api/signup")
     def signup(body: dict = Body(...)):

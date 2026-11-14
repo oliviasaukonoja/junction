@@ -103,7 +103,7 @@ main.doc{padding:56px 24px 72px}
   <div class="wrap bar">
     <a class="logo" href="/">Polku hoitoon</a>
     <div class="bar-r">
-      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" id="tb"></a><a class="tab" href="/sovellus" id="ta"></a></nav>
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" id="tb"></a></nav>
       <label for="lang" class="hidden" id="langLbl">Language</label>
       <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
       <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
@@ -215,7 +215,7 @@ function apply(l){
   if (!TABS[l]) l = "en";
   document.documentElement.lang = l;
   document.querySelectorAll("article").forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-lang") === l); });
-  document.getElementById("tb").textContent = TABS[l][0]; document.getElementById("ta").textContent = TABS[l][1];
+  document.getElementById("tb").textContent = TABS[l][0]; var ta = document.getElementById("ta"); if (ta) ta.textContent = TABS[l][1];
   document.title = document.querySelector("article.on h1").textContent + " – Polku hoitoon";
   try { localStorage.setItem("vayla-lang", l); } catch (e) {}
   sel.value = l;
