@@ -398,6 +398,7 @@ try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!Array.isArray(selected)) selected=PRE.sum.slice();
 const charts={};
 let myArea='';try{myArea=localStorage.getItem('keuhkodata-area')||''}catch(e){}
+if(!D.names[myArea]) myArea='';
 function save(){try{localStorage.setItem(KEY,JSON.stringify(selected))}catch(e){}}
 (function(){try{const h=new URLSearchParams(location.hash.slice(1));const v=h.get('v');if(v){const ids=v.split(',').filter(x=>VIEWS.some(w=>w.id===x));if(ids.length)selected=ids;}const a=h.get('a');if(a&&D.names[a]){myArea=a;}}catch(e){}})();
 function syncHash(){try{const p=new URLSearchParams();p.set('v',VIEWS.map(v=>v.id).filter(id=>selected.includes(id)).join(','));if(myArea)p.set('a',myArea);history.replaceState(null,'','#'+p.toString());}catch(e){}}

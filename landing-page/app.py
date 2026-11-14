@@ -194,6 +194,8 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, sh
         if not text:
             raise HTTPException(status_code=502, detail="analyst unavailable")
         ai_calls.append(now)
+        if len(ai_cache) > 500:  # keep memory bounded
+            ai_cache.clear()
         ai_cache[key] = text
         return {"text": text, "cached": False}
 
