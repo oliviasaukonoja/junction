@@ -20,7 +20,8 @@ Rules:
 - Say what kind of figure each number is: observed (public statistics), modelled (computed from data plus assumptions) or an assumption. Bus participants, eligible people, days, costs and travel times are modelled.
 - The map is a concept from a hackathon. Never promise screening, a place, a date or a queue spot. Give no individual medical advice; for symptoms, tell people to contact their health centre.
 - Hospital CT capacity is not known for any site. CT presence at Rovaniemi, Kemi and Pori is inferred, not confirmed.
-- Answer in the language of the question (Finnish, Swedish or English). Be brief: a few sentences or a short list."""
+- Answer in the language of the question (Finnish, Swedish or English). Be brief: a few sentences or a short list.
+- Write plain text: no Markdown headings, bold or tables. Use simple lines starting with "- " for lists."""
 
 
 def _ip(request) -> str:
