@@ -449,7 +449,7 @@ function makeChart(canvas,spec){
       tooltip:{callbacks:{label:c=>{const r=c.raw;if(Array.isArray(r))return ` ${c.dataset.label}: ${r[0].toLocaleString(LOC[lang])}–${r[1].toLocaleString(LOC[lang])}`;return ` ${c.dataset.label}: ${c.parsed[h?'x':'y'].toLocaleString(LOC[lang])} ${spec.unit}`;}}},
       refLine:spec.ref!=null?{value:spec.ref,label:spec.refLabel}:null},
     scales:{x:{grid:{display:h,color:grid},ticks:{color:t2,maxTicksLimit:h?7:12,font:{family:'Inter',size:11}},border:{display:false},beginAtZero:spec.xmin==null,min:spec.xmin,max:spec.xmax},
-            y:{grid:{display:!h,color:grid},ticks:{color:c=>spec.codes&&myArea&&spec.codes[c.index]===myArea?css('--ink'):t2,autoSkip:false,font:c=>({family:'Inter',size:11,weight:spec.codes&&myArea&&spec.codes[c.index]===myArea?'700':'400'})},border:{display:false},beginAtZero:true}}
+            y:{grid:{display:!h,color:grid},ticks:{callback:function(v){const l=String(this.getLabelForValue(v));if(!h||l.length<=22||innerWidth>700)return l;const w=l.split(' ');const out=[];let cur='';w.forEach(x=>{if((cur+' '+x).trim().length>22&&cur){out.push(cur);cur=x}else cur=(cur+' '+x).trim()});out.push(cur);return out},color:c=>spec.codes&&myArea&&spec.codes[c.index]===myArea?css('--ink'):t2,autoSkip:false,font:c=>({family:'Inter',size:11,weight:spec.codes&&myArea&&spec.codes[c.index]===myArea?'700':'400'})},border:{display:false},beginAtZero:true}}
   }});
 }
 function tableHTML(v,spec){
