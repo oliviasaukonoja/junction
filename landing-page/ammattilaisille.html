@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polku hoitoon – ammattilaisille</title>
+<meta name="description" content="Polku hoitoon ammattilaisnäkymä: potilaan oirevastaukset ja Kannan tiedot yhdessä näkymässä.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange:#D9730D;--orange-bg:#FFF3E6;--orange-ink:#8A3B00}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:17px}
+a{color:var(--blue)}a:hover{color:var(--blue-d)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
+.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--blue-d);color:#fff}
+.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+.hero{background:var(--bg);padding:56px 0 48px}
+.hero-g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:16px}
+.hero h1{font-size:clamp(34px,5vw,54px)}
+.lead{font-size:19px;color:var(--muted);margin:18px 0 26px;max-width:36em}
+.bus{width:100%;height:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:-28px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(20,33,61,.05)}
+.faq{border-bottom:1px solid var(--line);padding:14px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq p{margin:8px 0 0;color:var(--muted)}
+.stat-cap{grid-column:1/-1;justify-self:start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--muted)}
+.stat b{display:block;font-family:"Space Grotesk",sans-serif;font-size:34px;color:var(--blue-d)}
+.stat span{font-size:15px;color:var(--muted)}
+section{padding:56px 0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.list li{display:flex;gap:12px;align-items:flex-start}
+.dot{flex:none;width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:9px}
+.uk{background:var(--ink);color:#fff}
+.uk h2{color:#fff}
+.uk p{color:#DCE3F0}
+.uk .src{font-size:14px;color:#AAB6CC}
+.uk a{color:#9EC1FF}
+.warn{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:18px;padding:22px 24px;color:var(--orange-ink)}
+.warn h3{color:var(--orange-ink);font-size:22px;margin-bottom:6px}
+form{display:flex;flex-direction:column;gap:16px}
+label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
+input[type=text],input[type=tel]{width:100%;font:inherit;min-height:48px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)}
+input:focus,select:focus,.btn:focus,.opt:focus-within{outline:3px solid #9EC1FF;outline-offset:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;font-weight:500;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--blue)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:15px}
+.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}
+.msg{padding:14px 16px;border-radius:12px;font-size:16px}
+.msg.ok{background:var(--sky);color:var(--blue-d)}
+.msg.err{background:#FDECEC;color:#9B1C1C}
+.msg.demo{background:var(--orange-bg);color:var(--orange-ink)}
+.team{background:var(--bg)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
+footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;color:var(--ink)}
+.hidden{display:none}
+[dir=rtl] .list li,[dir=rtl] .consent{flex-direction:row}
+@media (max-width:780px){.hero-g,.g2{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr);margin-top:20px}.hero{padding:36px 0}.bus{max-width:360px}}
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
+@media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
+
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:22px}
+.feat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.feat h3{font-size:20px;margin-bottom:6px}.feat p{margin:0;color:var(--muted)}
+.dash{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 30px rgba(20,33,61,.10);overflow:hidden;margin-top:28px}
+.dash-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 18px;background:var(--ink);color:#fff;font-size:14px;font-weight:600}
+.dash-top span{opacity:.75;font-weight:500}
+.dash-g{display:grid;grid-template-columns:240px minmax(0,1fr)}
+.plist{border-inline-end:1px solid var(--line);background:var(--bg);padding:14px}
+.plist h4{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.pr{display:block;padding:10px 12px;border-radius:12px;margin-bottom:6px;font-size:15px}
+.pr b{display:block}.pr small{color:var(--muted);font-size:13px}
+.pr.on{background:#fff;border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,33,61,.08)}
+.pr .fl{color:#8A3B00;font-weight:700}
+.pd{padding:20px 22px;display:grid;gap:16px}
+.pd h3{font-size:22px}
+.meta{color:var(--muted);font-size:14px}
+.flag{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:14px;padding:14px 16px;color:var(--orange-ink)}
+.flag b{display:block;margin-bottom:4px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.box h5{margin:0 0 10px;font-size:14px;color:var(--muted);font-weight:600}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:14px}
+.tl li{display:grid;grid-template-columns:54px 70px minmax(0,1fr);gap:8px;align-items:start}
+.tl time{color:var(--muted);font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;text-align:center}
+.chip.k{background:#EEF0F4;color:#4A5872}.chip.a{background:var(--sky);color:var(--blue-d)}
+.tl .hot{font-weight:600}
+.fb{font-style:italic}
+.demo{font-size:13px;color:var(--muted);margin-top:10px}
+.techbox{background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:22px}
+.techbox p{margin:0 0 10px}
+@media (max-width:860px){.dash-g{grid-template-columns:minmax(0,1fr)}.plist{border-inline-end:0;border-bottom:1px solid var(--line)}.two{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="/" data-t="brand">Polku hoitoon</a>
+    <div class="bar-r">
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" data-t="nav_bus"></a><a class="tab" href="/sovellus" data-t="nav_app"></a></nav>
+      <label for="lang" class="hidden" id="langLbl">Language</label>
+      <select id="lang" aria-labelledby="langLbl">
+        <option value="fi">Suomi</option>
+        <option value="sv">Svenska</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <span class="badge" data-t="badge"></span>
+      <h1 data-t="h1" style="max-width:18em"></h1>
+      <p class="lead" data-t="lead"></p>
+      <a class="btn" href="mailto:info@polkuhoitoon.fi?subject=Polku%20hoitoon%20pilotti" data-t="cta"></a>
+
+      <div class="dash" role="img" aria-label="Polku hoitoon professional dashboard example">
+        <div class="dash-top"><div>Polku hoitoon · <span data-t="d_title"></span></div><span data-t="demo_note"></span></div>
+        <div class="dash-g">
+          <div class="plist">
+            <h4 data-t="d_list"></h4>
+            <div class="pr on"><b data-t="p1"></b><small class="fl" data-t="p1s"></small></div>
+            <div class="pr"><b data-t="p2"></b><small data-t="p2s"></small></div>
+            <div class="pr"><b data-t="p3"></b><small data-t="p3s"></small></div>
+          </div>
+          <div class="pd">
+            <div><h3 data-t="p1"></h3><div class="meta" data-t="d_meta"></div></div>
+            <div class="flag"><b data-t="flag_h"></b><span data-t="flag_p"></span></div>
+            <div class="two">
+              <div class="box">
+                <h5 data-t="chart_h"></h5>
+                <svg viewBox="0 0 300 110" width="100%" role="img" aria-label="Cough trend rising over 6 weeks">
+                  <line x1="10" y1="100" x2="290" y2="100" stroke="#E3E8F0"/>
+                  <line x1="10" y1="55" x2="290" y2="55" stroke="#F1F4F8"/>
+                  <line x1="10" y1="10" x2="290" y2="10" stroke="#F1F4F8"/>
+                  <polyline fill="none" stroke="#1F5FD6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="20,82 74,73 128,73 182,55 236,46 280,28"/>
+                  <circle cx="280" cy="28" r="5" fill="#D9730D"/>
+                  <text x="20" y="96" font-size="10" fill="#4A5872">0</text>
+                  <text x="20" y="18" font-size="10" fill="#4A5872">10</text>
+                </svg>
+                <div class="meta" data-t="chart_x"></div>
+              </div>
+              <div class="box">
+                <h5 data-t="tl_h"></h5>
+                <ul class="tl">
+                  <li><time>12.9.</time><span class="chip k" data-t="src_k"></span><span data-t="t1"></span></li>
+                  <li><time>3.10.</time><span class="chip k" data-t="src_k"></span><span data-t="t2"></span></li>
+                  <li><time>20.10.</time><span class="chip k" data-t="src_k"></span><span data-t="t3"></span></li>
+                  <li><time>28.10.</time><span class="chip a" data-t="src_a"></span><span class="hot" data-t="t4"></span></li>
+                  <li><time>6.11.</time><span class="chip a" data-t="src_a"></span><span class="hot" data-t="t5"></span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="two">
+              <div class="box"><h5 data-t="path_h"></h5><div data-t="path_p"></div></div>
+              <div class="box"><h5 data-t="fb_h"></h5><div class="fb" data-t="fb_p"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="demo" data-t="demo_note"></p>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2 style="font-size:30px" data-t="feat_h"></h2>
+      <div class="feats">
+        <div class="feat"><h3 data-t="g1h"></h3><p data-t="g1p"></p></div>
+        <div class="feat"><h3 data-t="g2h"></h3><p data-t="g2p"></p></div>
+        <div class="feat"><h3 data-t="g3h"></h3><p data-t="g3p"></p></div>
+        <div class="feat"><h3 data-t="g4h"></h3><p data-t="g4p"></p></div>
+        <div class="feat"><h3 data-t="g5h"></h3><p data-t="g5p"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg)">
+    <div class="wrap g2">
+      <div>
+        <h2 style="font-size:30px" data-t="why_h"></h2>
+        <ul class="list">
+          <li><span class="dot" aria-hidden="true"></span><span data-t="w1"></span></li>
+          <li><span class="dot" aria-hidden="true"></span><span data-t="w2"></span></li>
+          <li><span class="dot" aria-hidden="true"></span><span data-t="w3"></span></li>
+        </ul>
+        <p style="font-size:14px;color:var(--muted);margin-top:14px" data-t="w_src"></p>
+      </div>
+      <div class="techbox">
+        <h2 style="font-size:24px;margin-bottom:12px" data-t="tech_h"></h2>
+        <p data-t="tech1"></p><p data-t="tech2"></p><p data-t="tech3"></p>
+        <p style="font-size:14px;color:var(--muted);margin:0" data-t="tech_src"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pilot">
+    <div class="wrap">
+      <div class="card" style="max-width:720px">
+        <h2 style="font-size:28px;margin-bottom:8px" data-t="pilot_h"></h2>
+        <p style="color:var(--muted);margin:0 0 16px" data-t="pilot_p"></p>
+        <a class="btn" href="mailto:info@polkuhoitoon.fi?subject=Polku%20hoitoon%20pilotti">info@polkuhoitoon.fi</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p data-t="note"></p>
+    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
+    <div style="margin-top:10px;font-size:14px;color:var(--muted)"><a href="/ammattilaisille" data-t="nav_pro"></a> · <a href="/paattajille" data-t="nav_dm"></a></div>
+  </div>
+</footer>
+
+<script>
+var T = {"fi": {"brand": "Polku hoitoon", "nav_bus": "Seulontabussi", "nav_app": "Sovellus", "nav_pro": "Ammattilaisille", "badge": "Ammattilaisnäkymä · konsepti", "h1": "Kokonaiskuva potilaasta yhdellä silmäyksellä", "lead": "Polku hoitoon kokoaa potilaan omat oirevastaukset ja Kannan tiedot yhteen näkymään. Hajallaan olevat oireet näkyvät yhdessä, vaikka lääkäri vaihtuisi.", "cta": "Kiinnostaako pilotti? Ota yhteyttä", "demo_note": "Esimerkki. Kaikki tiedot ovat kuvitteellisia.", "d_title": "Ammattilaisnäkymä · Terveysasema", "d_list": "Potilaat", "p1": "Potilas A, 63 v", "p1s": "3 huomiota", "p2": "Potilas B, 58 v", "p2s": "Vointi vakaa", "p3": "Potilas C, 71 v", "p3s": "Uusi vastaus", "d_meta": "63 v · tupakoi · vastaa arabiaksi, käännetty suomeksi", "flag_h": "Huomio", "flag_p": "Yskä yli 3 viikkoa, tupakoija, 3. käynti 8 viikossa. Harkitse jatkotutkimuksia paikallisen hoito-ohjeen mukaan.", "chart_h": "Yskä potilaan omien vastausten mukaan (0–10)", "chart_x": "6 viikkoa", "tl_h": "Aikajana", "src_k": "Kanta", "src_a": "Sovellus", "t1": "Terveysasema, lääkäri 1: ylähengitystieinfektio", "t2": "Keuhkokuva: ei poikkeavaa", "t3": "Työterveys, lääkäri 2: pitkittynyt yskä", "t4": "Yskä pahempi, väsymys, paino laskenut 3 kg", "t5": "Verta yskösissä kerran", "path_h": "Hoitopolku", "path_p": "Seuraavaa askelta ei ole sovittu. Potilas ei tiedä, pitääkö hänen itse varata aika.", "fb_h": "Potilaan palaute", "fb_p": "”En tiennyt, pitääkö minun soittaa vai odottaa yhteydenottoa.”", "feat_h": "Mitä ammattilainen saa?", "g1h": "Kokoava näkymä", "g1p": "Kannan käynnit, tulokset ja potilaan omat vastaukset samalla aikajanalla. Kenenkään ei tarvitse etsiä tietoa eri järjestelmistä.", "g2h": "Huomioliput", "g2p": "Sovittujen kriteerien perusteella näkymä nostaa esiin toistuvat oireet, kuten yskän yli 3 viikkoa tupakoijalla. Liput tukevat päätöstä, eivät tee diagnoosia.", "g3h": "Käännetyt vastaukset", "g3p": "Potilas vastaa omalla kielellään, ammattilainen lukee suomeksi. Alkuperäinen vastaus on aina tallessa.", "g4h": "Näkyvä hoitopolku", "g4p": "Kaikki näkevät, mikä on seuraava askel ja kuka siitä vastaa. Vähemmän puheluita ja katkoksia.", "g5h": "Palaute hoidosta", "g5p": "Potilaan palaute näkyy yksikölle, jotta pullonkaulat löytyvät.", "why_h": "Miksi tätä tarvitaan?", "w1": "Syöpää ei aina osata epäillä terveysasemalla, koska tieto on hajallaan ja oireet ovat epämääräisiä.", "w2": "Lääkärit vaihtuvat ja sama potilas voi käydä usean lääkärin luona. Kukaan ei näe kokonaisuutta.", "w3": "Keuhkosyövässä perusterveydenhuollon osuus viiveestä on Suomessa keskimäärin 41 päivää. Koko viive oireista hoitoon on 155 päivää, Tanskassa 67.", "w_src": "Lähteet: AstraZenecan asiantuntijahaastattelu, Junction 2026; Yle MOT 2026 (Kuittinen ym., julkaisematon tutkimus).", "tech_h": "Tekninen pohja", "tech1": "Kanta-palveluiden hyvinvointisovellusten rajapinnalla potilas voi omalla luvallaan hakea Kantaan tallennetut potilastietonsa sovellukseen, esimerkiksi diagnoosit, laboratorio- ja kuvantamistulokset ja hoitosuunnitelmat.", "tech2": "Rajapinta vaatii tietoturvasertifioinnin. Tietojen välittäminen eteenpäin ammattilaisen näkymään vaatii potilaalta erillisen, nimenomaisen suostumuksen.", "tech3": "Konseptin ensimmäinen versio ei kirjoita mitään potilastietojärjestelmään. Se on lukunäkymä, joka avataan potilaan luvalla.", "tech_src": "Lähde: Kela, Kanta-palvelut, Hyvinvointisovellusten rajapinta: palvelukuvaus sovellustoimittajille (11.6.2026).", "pilot_h": "Kiinnostaako pilotti?", "pilot_p": "Etsimme terveysasemaa tai hyvinvointialuetta, joka haluaa kokeilla näkymää. Kerro, mikä teillä on suurin pullonkaula.", "note": "Tämä ei ole vielä oikea palvelu, vaan Junction 2026 -hackathonissa tehty konsepti. Näkymän tiedot ovat kuvitteellisia.", "nav_dm": "Päättäjille"}, "sv": {"brand": "Polku hoitoon", "nav_bus": "Screeningbussen", "nav_app": "Appen", "nav_pro": "För vårdpersonal", "badge": "Vy för vårdpersonal · koncept", "h1": "Helheten om patienten i en blick", "lead": "Polku hoitoon samlar patientens egna symtomsvar och uppgifterna i Kanta i en vy. Utspridda symtom syns tillsammans, även om läkaren byts.", "cta": "Intresserad av en pilot? Kontakta oss", "demo_note": "Exempel. Alla uppgifter är påhittade.", "d_title": "Vy för vårdpersonal · Hälsostation", "d_list": "Patienter", "p1": "Patient A, 63 år", "p1s": "3 observationer", "p2": "Patient B, 58 år", "p2s": "Stabilt", "p3": "Patient C, 71 år", "p3s": "Nytt svar", "d_meta": "63 år · röker · svarar på arabiska, översatt till svenska", "flag_h": "Observera", "flag_p": "Hosta över 3 veckor, rökare, 3:e besöket på 8 veckor. Överväg vidare undersökningar enligt lokal vårdanvisning.", "chart_h": "Hosta enligt patientens egna svar (0–10)", "chart_x": "6 veckor", "tl_h": "Tidslinje", "src_k": "Kanta", "src_a": "Appen", "t1": "Hälsostation, läkare 1: övre luftvägsinfektion", "t2": "Lungröntgen: normal", "t3": "Företagshälsa, läkare 2: långvarig hosta", "t4": "Hostan värre, trötthet, viktnedgång 3 kg", "t5": "Blod i upphostningar en gång", "path_h": "Vårdväg", "path_p": "Nästa steg är inte överenskommet. Patienten vet inte om hen själv ska boka tid.", "fb_h": "Patientens respons", "fb_p": "”Jag visste inte om jag skulle ringa eller vänta på att någon kontaktar mig.”", "feat_h": "Vad får vårdpersonalen?", "g1h": "Samlad vy", "g1p": "Besök och svar från Kanta och patientens egna svar på samma tidslinje. Ingen behöver leta i olika system.", "g2h": "Observationsflaggor", "g2p": "Utifrån överenskomna kriterier lyfter vyn fram återkommande symtom, som hosta över 3 veckor hos en rökare. Flaggorna stöder beslut men ställer ingen diagnos.", "g3h": "Översatta svar", "g3p": "Patienten svarar på sitt språk, personalen läser på svenska eller finska. Originalsvaret sparas alltid.", "g4h": "Synlig vårdväg", "g4p": "Alla ser vad nästa steg är och vem som ansvarar. Färre samtal och avbrott.", "g5h": "Respons på vården", "g5p": "Patientens respons syns för enheten så att flaskhalsar hittas.", "why_h": "Varför behövs detta?", "w1": "Cancer misstänks inte alltid på hälsostationen, eftersom informationen är utspridd och symtomen diffusa.", "w2": "Läkarna byts och samma patient kan träffa flera läkare. Ingen ser helheten.", "w3": "Vid lungcancer står primärvården i Finland i genomsnitt för 41 dagar av fördröjningen. Hela tiden från symtom till behandling är 155 dagar, i Danmark 67.", "w_src": "Källor: expertintervju med AstraZeneca, Junction 2026; Yle MOT 2026 (Kuittinen m.fl., opublicerad studie).", "tech_h": "Teknisk grund", "tech1": "Med Kanta-tjänsternas gränssnitt för välfärdsappar kan patienten med sitt tillstånd hämta sina patientuppgifter till appen, till exempel diagnoser, laboratorie- och bildsvar och vårdplaner.", "tech2": "Gränssnittet kräver datasäkerhetscertifiering. För att uppgifterna ska förmedlas vidare till vårdpersonalens vy krävs ett separat, uttryckligt samtycke av patienten.", "tech3": "Konceptets första version skriver inget i patientdatasystemet. Det är en läsvy som öppnas med patientens tillstånd.", "tech_src": "Källa: FPA, Kanta-tjänsterna, gränssnittet för välfärdsappar: tjänstebeskrivning för appleverantörer (11.6.2026).", "pilot_h": "Intresserad av en pilot?", "pilot_p": "Vi söker en hälsostation eller ett välfärdsområde som vill prova vyn. Berätta vad er största flaskhals är.", "note": "Det här är ännu ingen riktig tjänst utan ett koncept från Junction 2026-hackathonet. Uppgifterna i vyn är påhittade.", "nav_dm": "För beslutsfattare"}, "en": {"brand": "Polku hoitoon", "nav_bus": "Screening bus", "nav_app": "App", "nav_pro": "For professionals", "badge": "Professional view · concept", "h1": "The whole patient picture at a glance", "lead": "Polku hoitoon brings the patient's own symptom reports and their Kanta records into one view. Scattered symptoms show up together, even when the doctor changes.", "cta": "Interested in a pilot? Get in touch", "demo_note": "Example. All data is fictional.", "d_title": "Professional view · Health centre", "d_list": "Patients", "p1": "Patient A, 63", "p1s": "3 flags", "p2": "Patient B, 58", "p2s": "Stable", "p3": "Patient C, 71", "p3s": "New report", "d_meta": "63 · smoker · answers in Arabic, translated to English", "flag_h": "Flag", "flag_p": "Cough over 3 weeks, smoker, 3rd visit in 8 weeks. Consider further investigation according to local guidelines.", "chart_h": "Cough from the patient's own reports (0–10)", "chart_x": "6 weeks", "tl_h": "Timeline", "src_k": "Kanta", "src_a": "App", "t1": "Health centre, doctor 1: upper respiratory infection", "t2": "Chest X-ray: normal", "t3": "Occupational health, doctor 2: prolonged cough", "t4": "Cough worse, fatigue, lost 3 kg", "t5": "Blood in sputum once", "path_h": "Care path", "path_p": "No next step agreed. The patient doesn't know whether to book an appointment.", "fb_h": "Patient feedback", "fb_p": "“I didn't know whether to call or wait to be contacted.”", "feat_h": "What do professionals get?", "g1h": "One combined view", "g1p": "Kanta visits and results and the patient's own reports on the same timeline. No one has to search through different systems.", "g2h": "Flags", "g2p": "Based on agreed criteria, the view highlights recurring symptoms, such as a cough over 3 weeks in a smoker. Flags support decisions; they don't diagnose.", "g3h": "Translated reports", "g3p": "The patient answers in their own language, the professional reads it in Finnish or English. The original answer is always kept.", "g4h": "A visible care path", "g4p": "Everyone sees the next step and who is responsible. Fewer calls and gaps.", "g5h": "Feedback on care", "g5p": "Patient feedback is visible to the unit, so bottlenecks can be found.", "why_h": "Why is this needed?", "w1": "Cancer is not always suspected at the health centre, because information is scattered and symptoms are vague.", "w2": "Doctors change and the same patient may see several doctors. No one sees the whole picture.", "w3": "For lung cancer in Finland, primary care accounts for 41 days of the delay on average. The full delay from symptoms to treatment is 155 days; in Denmark it is 67.", "w_src": "Sources: AstraZeneca expert interview, Junction 2026; Yle MOT 2026 (Kuittinen et al., unpublished study).", "tech_h": "Technical basis", "tech1": "Through Kanta Services' interface for wellbeing apps, patients can, with their own permission, fetch their patient records into the app: for example diagnoses, lab and imaging results, and care plans.", "tech2": "The interface requires security certification. Passing the data on to the professional view requires separate, explicit consent from the patient.", "tech3": "The first version of the concept writes nothing into the patient record system. It is a read-only view opened with the patient's permission.", "tech_src": "Source: Kela, Kanta Services, Wellbeing app interface: service description for app vendors (11 June 2026).", "pilot_h": "Interested in a pilot?", "pilot_p": "We are looking for a health centre or wellbeing services county that wants to try the view. Tell us what your biggest bottleneck is.", "note": "This is not a real service yet but a concept made at the Junction 2026 hackathon. The data in the view is fictional.", "nav_dm": "For decision-makers"}};
+var lang = "fi";
+function apply(l){
+  lang = T[l] ? l : "en";
+  var t = T[lang];
+  document.documentElement.lang = lang;
+  document.title = t.brand + " – " + t.nav_pro;
+  document.querySelectorAll("[data-t]").forEach(function(el){ var k = el.getAttribute("data-t"); if (t[k] != null) el.textContent = t[k]; });
+  try { localStorage.setItem("vayla-lang", lang); } catch (e) {}
+}
+var sel = document.getElementById("lang");
+var start = "";
+try { start = localStorage.getItem("vayla-lang") || ""; } catch (e) {}
+if (!start) { start = (navigator.language || "fi").slice(0, 2); }
+if (!T[start]) start = "en";
+sel.value = start;
+apply(start);
+sel.addEventListener("change", function(){ apply(sel.value); });
+</script>
+</body>
+</html>

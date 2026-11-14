@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polku hoitoon – sovellus</title>
+<meta name="description" content="Polku hoitoon -sovellus: oirekysely omalla kielelläsi ja seuraava askel hoitoon ilman jonottelua.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange:#D9730D;--orange-bg:#FFF3E6;--orange-ink:#8A3B00}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:17px}
+a{color:var(--blue)}a:hover{color:var(--blue-d)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
+.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--blue-d);color:#fff}
+.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+.hero{background:var(--bg);padding:56px 0 48px}
+.hero-g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:16px}
+.hero h1{font-size:clamp(34px,5vw,54px)}
+.lead{font-size:19px;color:var(--muted);margin:18px 0 26px;max-width:36em}
+.bus{width:100%;height:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:-28px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(20,33,61,.05)}
+.faq{border-bottom:1px solid var(--line);padding:14px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq p{margin:8px 0 0;color:var(--muted)}
+.stat-cap{grid-column:1/-1;justify-self:start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--muted)}
+.stat b{display:block;font-family:"Space Grotesk",sans-serif;font-size:34px;color:var(--blue-d)}
+.stat span{font-size:15px;color:var(--muted)}
+section{padding:56px 0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.list li{display:flex;gap:12px;align-items:flex-start}
+.dot{flex:none;width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:9px}
+.uk{background:var(--ink);color:#fff}
+.uk h2{color:#fff}
+.uk p{color:#DCE3F0}
+.uk .src{font-size:14px;color:#AAB6CC}
+.uk a{color:#9EC1FF}
+.warn{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:18px;padding:22px 24px;color:var(--orange-ink)}
+.warn h3{color:var(--orange-ink);font-size:22px;margin-bottom:6px}
+form{display:flex;flex-direction:column;gap:16px}
+label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
+input[type=text],input[type=tel]{width:100%;font:inherit;min-height:48px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)}
+input:focus,select:focus,.btn:focus,.opt:focus-within{outline:3px solid #9EC1FF;outline-offset:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;font-weight:500;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--blue)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:15px}
+.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}
+.msg{padding:14px 16px;border-radius:12px;font-size:16px}
+.msg.ok{background:var(--sky);color:var(--blue-d)}
+.msg.err{background:#FDECEC;color:#9B1C1C}
+.msg.demo{background:var(--orange-bg);color:var(--orange-ink)}
+.team{background:var(--bg)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
+footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;color:var(--ink)}
+.hidden{display:none}
+[dir=rtl] .list li,[dir=rtl] .consent{flex-direction:row}
+@media (max-width:780px){.hero-g,.g2{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr);margin-top:20px}.hero{padding:36px 0}.bus{max-width:360px}}
+.phone{width:100%;max-width:300px;height:auto;justify-self:center}
+.feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}
+.feat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+.feat .ic{width:44px;height:44px;border-radius:12px;background:var(--sky);color:var(--blue-d);display:flex;align-items:center;justify-content:center;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;margin-bottom:12px}
+.feat h3{font-size:20px;margin-bottom:6px}
+.feat p{margin:0;color:var(--muted)}
+.info{background:var(--sky);border-radius:18px;padding:22px 24px;color:var(--blue-d);font-weight:600}
+.buslink{display:inline-block;margin-top:14px;font-weight:600}
+@media (max-width:780px){.feats{grid-template-columns:minmax(0,1fr)}.phone{max-width:240px}}
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
+@media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
+@media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="/" data-t="brand">Polku hoitoon</a>
+    <div class="bar-r">
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" data-t="nav_bus"></a><a class="tab on" href="/sovellus" data-t="nav_app" aria-current="page"></a></nav>
+      <label for="lang" class="hidden" id="langLbl">Language</label>
+      <select id="lang" aria-labelledby="langLbl">
+        <option value="fi">Suomi</option>
+        <option value="sv">Svenska</option>
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="et">Eesti</option>
+        <option value="ar">العربية</option>
+        <option value="so">Soomaali</option>
+        <option value="uk">Українська</option>
+      </select>
+      <a class="btn sm" href="#join" data-t="nav"></a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap hero-g">
+      <div>
+        <span class="badge" data-t="badge"></span>
+        <span class="badge" style="background:#E7F6EC;color:#14532D;margin-inline-start:6px" data-t="free"></span>
+        <h1 data-t="h1"></h1>
+        <p class="lead" data-t="lead"></p>
+        <a class="btn" href="#join" data-t="cta"></a>
+        <p id="mtNote" class="hidden" style="font-size:14px;color:var(--muted);margin-top:14px"></p>
+      </div>
+      <svg class="phone" viewBox="0 0 260 500" role="img" aria-label="Polku hoitoon app">
+        <rect x="6" y="6" width="248" height="488" rx="36" fill="#14213D"/>
+        <rect x="18" y="18" width="224" height="464" rx="26" fill="#fff"/>
+        <rect x="100" y="28" width="60" height="8" rx="4" fill="#E3E8F0"/>
+        <text x="36" y="72" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="17" fill="#14213D">Polku hoitoon</text>
+        <text x="36" y="94" font-family="Inter, sans-serif" font-size="12" fill="#4A5872">Oma polku · Min väg · My path</text>
+        <rect x="32" y="112" width="196" height="74" rx="14" fill="#EAF1FF"/>
+        <circle cx="54" cy="138" r="10" fill="#1F5FD6"/>
+        <path d="M49 138l4 4 7-8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <rect x="74" y="130" width="120" height="8" rx="4" fill="#123E91"/>
+        <rect x="74" y="146" width="90" height="7" rx="3.5" fill="#9EC1FF"/>
+        <rect x="46" y="164" width="150" height="8" rx="4" fill="#C9D9FA"/>
+        <line x1="54" y1="196" x2="54" y2="228" stroke="#C9D2E0" stroke-width="3" stroke-dasharray="4 5"/>
+        <rect x="32" y="232" width="196" height="74" rx="14" fill="#FFF3E6" stroke="#F5B97A"/>
+        <circle cx="54" cy="258" r="10" fill="#D9730D"/>
+        <text x="50" y="263" font-family="Inter, sans-serif" font-weight="700" font-size="13" fill="#fff">2</text>
+        <rect x="74" y="250" width="130" height="8" rx="4" fill="#8A3B00"/>
+        <rect x="74" y="266" width="100" height="7" rx="3.5" fill="#F5B97A"/>
+        <rect x="46" y="284" width="120" height="8" rx="4" fill="#FAD3A8"/>
+        <line x1="54" y1="316" x2="54" y2="348" stroke="#C9D2E0" stroke-width="3" stroke-dasharray="4 5"/>
+        <rect x="32" y="352" width="196" height="60" rx="14" fill="#F5F7FB" stroke="#E3E8F0"/>
+        <circle cx="54" cy="378" r="10" fill="#fff" stroke="#C9D2E0" stroke-width="2"/>
+        <rect x="74" y="372" width="110" height="8" rx="4" fill="#C9D2E0"/>
+        <rect x="74" y="388" width="80" height="7" rx="3.5" fill="#E3E8F0"/>
+        <rect x="32" y="428" width="196" height="40" rx="12" fill="#1F5FD6"/>
+        <rect x="82" y="444" width="96" height="8" rx="4" fill="#fff"/>
+      </svg>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2 style="font-size:30px" data-t="feat_h"></h2>
+      <div class="feats">
+        <div class="feat"><div class="ic" aria-hidden="true">1</div><h3 data-t="f1h"></h3><p data-t="f1p"></p></div>
+        <div class="feat"><div class="ic" aria-hidden="true">2</div><h3 data-t="f2h"></h3><p data-t="f2p"></p></div>
+        <div class="feat"><div class="ic" aria-hidden="true">3</div><h3 data-t="f3h"></h3><p data-t="f3p"></p></div>
+        <div class="feat"><div class="ic" aria-hidden="true">4</div><h3 data-t="f4h"></h3><p data-t="f4p"></p></div>
+        <div class="feat"><div class="ic" aria-hidden="true">5</div><h3 data-t="f5h"></h3><p data-t="f5p"></p></div>
+        <div class="feat"><div class="ic" aria-hidden="true">6</div><h3 data-t="f6h"></h3><p data-t="f6p"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg)">
+    <div class="wrap g2">
+      <div>
+        <h2 style="font-size:30px" data-t="why_h"></h2>
+        <ul class="list">
+          <li><span class="dot" aria-hidden="true"></span><span data-t="why1"></span></li>
+          <li><span class="dot" aria-hidden="true"></span><span data-t="why2"></span></li>
+          <li><span class="dot" aria-hidden="true"></span><span data-t="why3"></span></li>
+        </ul>
+        <p style="font-size:14px;color:var(--muted);margin-top:14px"><span data-t="src_note"></span></p>
+      </div>
+      <div>
+        <div class="info" data-t="notdx"></div>
+        <a class="buslink" href="/" data-t="bus_link"></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="join">
+    <div class="wrap g2">
+      <div>
+        <h2 data-t="form_h"></h2>
+        <p style="color:var(--muted)" data-t="form_p"></p>
+        <div id="countBox" class="hidden"><div class="card" style="margin-top:16px">
+          <div id="countN" style="font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;color:var(--blue-d)">0</div>
+          <div data-t="count_t" style="color:var(--muted)"></div>
+        </div></div>
+      </div>
+      <div class="card">
+        <form id="f" novalidate>
+          <fieldset style="border:0;padding:0;margin:0">
+            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="int_lbl"></legend>
+            <div class="opts">
+              <label class="opt"><input type="checkbox" name="prod" value="bus"><span data-t="nav_bus"></span></label>
+              <label class="opt"><input type="checkbox" name="prod" value="app" checked><span data-t="nav_app"></span></label>
+            </div>
+          </fieldset>
+          <fieldset style="border:0;padding:0;margin:0">
+            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="who_lbl"></legend>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="who" value="self" checked><span data-t="me"></span></label>
+              <label class="opt"><input type="radio" name="who" value="relative"><span data-t="rel"></span></label>
+            </div>
+            <p id="relHelp" class="hidden" style="margin:8px 0 0;font-size:14px;color:var(--muted)" data-t="rel_help"></p>
+          </fieldset>
+          <div><label for="fname" data-t="f_name"></label><input id="fname" type="text" autocomplete="given-name"></div>
+          <div><label for="contact" data-t="f_contact"></label><input id="contact" type="text" autocomplete="tel"></div>
+          <div><label for="post" data-t="f_post"></label><input id="post" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
+          <div id="eligWrap" class="hidden"><fieldset style="border:0;padding:0;margin:0">
+            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="f_age"></legend>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="elig" value="yes"><span data-t="yes"></span></label>
+              <label class="opt"><input type="radio" name="elig" value="no"><span data-t="no"></span></label>
+              <label class="opt"><input type="radio" name="elig" value="unsure"><span data-t="unsure"></span></label>
+            </div>
+          </fieldset></div>
+          <div style="position:absolute;left:-9999px" aria-hidden="true"><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
+          <label class="consent"><input id="beta" type="checkbox"><span data-t="beta"></span></label>
+          <label class="consent"><input id="consent" type="checkbox"><span data-t="f_consent"></span></label>
+          <button class="btn" type="submit" data-t="submit"></button>
+          <div id="out" class="msg hidden" role="status" aria-live="polite"></div>
+          <div id="shareWrap" class="hidden"><div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:var(--sky)">
+            <b data-t="share_h"></b><span style="font-size:15px" data-t="share_p"></span>
+            <div class="opts"><a id="waBtn" class="btn sm" href="#" target="_blank" rel="noopener" data-t="wa"></a><button id="copyBtn" type="button" class="btn sm" style="background:#fff;color:var(--blue-d);border:1px solid #C9D2E0" data-t="copy"></button></div>
+          </div></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:0"><div class="wrap"><h2 style="font-size:26px;margin-bottom:12px" data-t="faq_h"></h2>
+    <details class="faq"><summary data-t="q1"></summary><p data-t="a1"></p></details>
+    <details class="faq"><summary data-t="q2"></summary><p data-t="a2"></p></details>
+    <details class="faq"><summary data-t="q3"></summary><p data-t="a3"></p></details>
+    <details class="faq"><summary data-t="q5"></summary><p data-t="a5"></p></details>
+    <details class="faq"><summary data-t="q4"></summary><p data-t="a4"></p></details>
+  </div></section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p data-t="note"></p>
+    <p data-t="jx" style="margin-top:12px;background:#fff;font-size:15px;color:var(--muted)"></p>
+    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="/" data-t="bus_link"></a> · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
+    <div style="margin-top:10px;font-size:14px;color:var(--muted)"><a href="/ammattilaisille" data-t="nav_pro"></a> · <a href="/paattajille" data-t="nav_dm"></a></div>
+  </div>
+</footer>
+
+<script>
+var T = {"fi": {"brand": "Polku hoitoon", "nav": "Liity jonoon", "badge": "Sovelluskonsepti", "h1": "Terveystietosi ja vointisi yhdessä paikassa", "lead": "Polku hoitoon kokoaa OmaKannan tiedot, oman vointisi seurannan ja hoitopolkusi yhteen näkymään omalla kielelläsi. Kun tieto ei ole hajallaan, oireet huomataan ajoissa.", "cta": "Liity jonotuslistalle", "feat_h": "Mitä sovellus tekee?", "f1h": "OmaKannan tiedot selkeästi", "f1p": "Haet luvallasi Kannasta diagnoosit, laboratorio- ja kuvantamistulokset sekä hoitosuunnitelmat. Näet ne yhtenä aikajanana.", "f2h": "Seuraa omaa vointiasi", "f2p": "Sovellus kysyy vointiasi säännöllisesti, ja vastaat parissa minuutissa. Näet, miten vointisi muuttuu viikosta toiseen.", "f3h": "Hoitotekstit omalla kielelläsi", "f3p": "Tekoäly kääntää hoito-ohjeet ja tulokset kielellesi ja selkokielelle. Alkuperäinen teksti on aina näkyvissä.", "f4h": "Näet oman hoitopolkusi", "f4p": "Näet, missä vaiheessa olet, mitä seuraavaksi tapahtuu ja pitääkö sinun itse varata aika. Vähemmän soittelua.", "why_h": "Miksi tätä tarvitaan?", "why1": "Tieto on hajallaan eri järjestelmissä ja lääkärit vaihtuvat, joten toistuvat oireet jäävät helposti huomaamatta.", "why2": "Suomessa keuhkosyövän ensioireista hoidon alkuun kuluu keskimäärin 155 päivää. Ruotsissa aika on 107 päivää ja Tanskassa 67.", "why3": "Potilas joutuu usein itse kantamaan vastuun: soittelemaan, muistamaan ja selittämään. Moni myös pelkää ja lykkää hakeutumista.", "src_note": "Lähteet: Yle MOT 2026 (Kuittinen ym., julkaisematon tutkimus); Zai ym. 2025, BMJ Public Health.", "notdx": "Sovellus ei tee diagnoosia. Se auttaa sinua ja hoitajaa huomaamaan, milloin oireet kannattaa tutkia.", "bus_link": "Katso myös keuhkotarkastusbussi", "form_h": "Liity jonotuslistalle", "form_p": "Kerromme, kun sovellus on kokeiltavissa alueellasi.", "who_lbl": "Kenet ilmoitat?", "me": "Itseni", "rel": "Läheiseni", "rel_help": "Kirjoita läheisesi puhelinnumero, tai omasi, jos välität tiedon hänelle.", "f_name": "Etunimi", "f_contact": "Puhelin tai sähköposti", "f_post": "Postinumero", "beta": "Haluan testata sovellusta ensimmäisten joukossa", "f_consent": "Polku hoitoon saa ottaa minuun yhteyttä sovelluksesta. Voin pyytää tietojeni poistoa milloin tahansa.", "submit": "Liity jonotuslistalle", "ok": "Kiitos! Olet listalla. Otamme yhteyttä omalla kielelläsi.", "err_fill": "Täytä yhteystieto ja postinumero ja rastita ruutu.", "err_net": "Tallennus epäonnistui. Yritä hetken päästä uudelleen.", "count_t": "ihmistä odottaa sovellusta", "share_h": "Tunnetko jonkun, jolle tämä sopisi?", "share_p": "Lähetä linkki esimerkiksi vanhemmallesi. Hänen kielensä valitaan sivulla automaattisesti.", "wa": "Lähetä WhatsAppilla", "copy": "Kopioi linkki", "copied": "Linkki kopioitu", "share_msg": "Polku hoitoon -sovellus kokoaa terveystietosi ja vointisi yhteen paikkaan. Liity jonoon:", "faq_h": "Usein kysyttyä", "q1": "Maksaako sovellus jotain?", "a1": "Suunnitelmana on, että sovellus olisi maksuton. Jonoon ilmoittautuminen on aina maksutonta.", "q2": "Tekeekö sovellus diagnoosin?", "a2": "Ei. Sovellus kerää oireesi ja välittää ne hoitajalle. Hoitaja tai lääkäri päättää aina jatkosta.", "q3": "Millä kielillä sovellus toimii?", "a3": "Tavoitteena on suomi, ruotsi, saame ja suurimmat muut kielet, kuten venäjä, viro, arabia, somali ja ukraina.", "q4": "Kuka näkee tietoni?", "a4": "Vain Junction 2026 -tiimi. Käytämme tietoja vain kiinnostuksen mittaamiseen ja yhteydenottoon, jos pilotti alkaa. Poistamme tiedot pyynnöstä: info@polkuhoitoon.fi", "note": "Tämä ei ole vielä oikea palvelu, mutta se voi olla tulossa. Keräämme tällä jonotuslistalla kiinnostusta: kannattaako tällainen sovellus toteuttaa? Konseptin on tehnyt Junction 2026 -tiimi.", "f5h": "Anna palautetta hoidosta", "f5p": "Kerro, mikä toimi ja mikä ei. Palaute menee suoraan hoitoyksikölle.", "f6h": "Hoitajasi näkee kokonaiskuvan", "f6p": "Luvallasi oireesi ja vastauksesi kootaan ammattilaisen näkymään. Sinun ei tarvitse kertoa kaikkea joka kerta alusta.", "pro_link": "Katso, miltä näkymä näyttää ammattilaiselle", "q5": "Miten tiedot haetaan OmaKannasta?", "a5": "Kanta-palveluissa on rajapinta, jonka kautta käyttäjä voi omalla luvallaan hakea Kantaan tallennetut potilastietonsa sovellukseen. Luvan voi perua milloin tahansa OmaKannassa. Sovelluksen pitää läpäistä tietoturvasertifiointi ennen käyttöä."}, "sv": {"brand": "Polku hoitoon", "nav": "Ställ dig i kön", "badge": "Appkoncept", "h1": "Dina hälsouppgifter och ditt mående på ett ställe", "lead": "Polku hoitoon samlar uppgifterna från Mina Kanta-sidor, uppföljningen av ditt mående och din vårdväg i en vy, på ditt eget språk. När informationen inte är utspridd upptäcks symtom i tid.", "cta": "Anmäl dig till väntelistan", "feat_h": "Vad gör appen?", "f1h": "Dina Kanta-uppgifter tydligt", "f1p": "Med ditt tillstånd hämtar du diagnoser, laboratorie- och bildsvar och vårdplaner från Kanta. Du ser dem på en tidslinje.", "f2h": "Följ ditt mående", "f2p": "Appen frågar regelbundet hur du mår och du svarar på ett par minuter. Du ser hur ditt mående förändras från vecka till vecka.", "f3h": "Vårdtexter på ditt språk", "f3p": "AI översätter vårdinstruktioner och svar till ditt språk och till lättläst språk. Originaltexten syns alltid.", "f4h": "Du ser din vårdväg", "f4p": "Du ser var du är, vad som händer härnäst och om du själv ska boka tid. Mindre ringande.", "why_h": "Varför behövs detta?", "why1": "Informationen är utspridd i olika system och läkarna byts, så återkommande symtom förbises lätt.", "why2": "I Finland tar det i genomsnitt 155 dagar från de första symtomen på lungcancer till att behandlingen börjar. I Sverige 107 dagar och i Danmark 67.", "why3": "Patienten får ofta själv bära ansvaret: ringa, komma ihåg och förklara. Många är också rädda och skjuter upp att söka vård.", "src_note": "Källor: Yle MOT 2026 (Kuittinen m.fl., opublicerad studie); Zai m.fl. 2025, BMJ Public Health.", "notdx": "Appen ställer ingen diagnos. Den hjälper dig och sjukskötaren att märka när symtom bör undersökas.", "bus_link": "Se även bussen för screening av lungcancer", "form_h": "Anmäl dig till väntelistan", "form_p": "Vi berättar när appen kan provas i ditt område.", "who_lbl": "Vem anmäler du?", "me": "Mig själv", "rel": "En närstående", "rel_help": "Skriv din närståendes telefonnummer, eller ditt eget om du förmedlar informationen.", "f_name": "Förnamn", "f_contact": "Telefon eller e-post", "f_post": "Postnummer", "beta": "Jag vill testa appen bland de första", "f_consent": "Ni får kontakta mig om appen. Jag kan när som helst be att mina uppgifter raderas.", "submit": "Anmäl mig", "ok": "Tack! Du står på listan. Vi kontaktar dig på ditt språk.", "err_fill": "Fyll i kontaktuppgift och postnummer och kryssa i rutan.", "err_net": "Det gick inte att spara. Försök igen om en stund.", "count_t": "personer väntar på appen", "share_h": "Känner du någon som det här passar?", "share_p": "Skicka länken till exempel till din förälder. Sidan väljer språket automatiskt.", "wa": "Skicka med WhatsApp", "copy": "Kopiera länken", "copied": "Länken kopierad", "share_msg": "Appen Polku hoitoon samlar dina hälsouppgifter och ditt mående på ett ställe. Ställ dig i kön:", "faq_h": "Vanliga frågor", "q1": "Kostar appen något?", "a1": "Planen är att appen ska vara gratis. Att anmäla sig till kön är alltid gratis.", "q2": "Ställer appen en diagnos?", "a2": "Nej. Appen samlar dina symtom och skickar dem till sjukskötaren. En sjukskötare eller läkare beslutar alltid om fortsättningen.", "q3": "Vilka språk fungerar appen på?", "a3": "Målet är finska, svenska, samiska och de största andra språken, som ryska, estniska, arabiska, somaliska och ukrainska.", "q4": "Vem ser mina uppgifter?", "a4": "Bara Junction 2026-teamet. Vi använder uppgifterna bara för att mäta intresset och kontakta dig om en pilot startar. Vi raderar dem på begäran: info@polkuhoitoon.fi", "note": "Det här är ännu ingen riktig tjänst, men den kan vara på väg. Med väntelistan mäter vi intresset: lönar det sig att bygga en sådan app? Konceptet är gjort av ett Junction 2026-team.", "f5h": "Ge respons på vården", "f5p": "Berätta vad som fungerade och vad som inte gjorde det. Responsen går direkt till vårdenheten.", "f6h": "Din sjukskötare ser helheten", "f6p": "Med ditt tillstånd samlas dina symtom och svar i en vy för vårdpersonalen. Du behöver inte berätta allt från början varje gång.", "pro_link": "Se hur vyn ser ut för vårdpersonal", "q5": "Hur hämtas uppgifterna från Kanta?", "a5": "Kanta-tjänsterna har ett gränssnitt där användaren med sitt eget tillstånd kan hämta sina patientuppgifter till en app. Tillståndet kan återkallas när som helst på Mina Kanta-sidor. Appen måste klara en datasäkerhetscertifiering innan den tas i bruk."}, "en": {"brand": "Polku hoitoon", "nav": "Join the waitlist", "badge": "App concept", "h1": "Your health records and how you feel, in one place", "lead": "Polku hoitoon brings together your Kanta health records, tracking of how you feel, and your care path in one view, in your own language. When information isn't scattered, symptoms are noticed in time.", "cta": "Join the waitlist", "feat_h": "What does the app do?", "f1h": "Your Kanta records, made clear", "f1p": "With your permission, fetch your diagnoses, lab and imaging results and care plans from Kanta. See them on one timeline.", "f2h": "Track how you feel", "f2p": "The app checks in on how you feel regularly, and answering takes a couple of minutes. See how you are doing from week to week.", "f3h": "Care texts in your language", "f3p": "AI translates care instructions and results into your language and into plain language. The original text is always shown.", "f4h": "See your care path", "f4p": "See where you are, what happens next, and whether you need to book an appointment yourself. Fewer phone calls.", "why_h": "Why is this needed?", "why1": "Information is scattered across systems and doctors change, so recurring symptoms are easily missed.", "why2": "In Finland it takes on average 155 days from the first lung cancer symptoms to the start of treatment. In Sweden it is 107 days and in Denmark 67.", "why3": "Patients often have to carry the responsibility themselves: calling, remembering and explaining. Many are also afraid and put off seeking help.", "src_note": "Sources: Yle MOT 2026 (Kuittinen et al., unpublished study); Zai et al. 2025, BMJ Public Health.", "notdx": "The app does not diagnose. It helps you and your nurse notice when symptoms should be examined.", "bus_link": "See also the lung check bus", "form_h": "Join the waitlist", "form_p": "We will let you know when the app can be tried in your area.", "who_lbl": "Who are you signing up?", "me": "Myself", "rel": "A relative", "rel_help": "Enter your relative's phone number, or your own if you will pass it on.", "f_name": "First name", "f_contact": "Phone or email", "f_post": "Postcode", "beta": "I want to test the app among the first", "f_consent": "Polku hoitoon may contact me about the app. I can ask to remove my details at any time.", "submit": "Join the waitlist", "ok": "Thank you! You're on the list. We'll contact you in your language.", "err_fill": "Please fill in your contact and postcode, and tick the box.", "err_net": "Could not save. Please try again in a moment.", "count_t": "people waiting for the app", "share_h": "Know someone this is for?", "share_p": "Send the link to a parent, for example. The page picks their language automatically.", "wa": "Send on WhatsApp", "copy": "Copy link", "copied": "Link copied", "share_msg": "The Polku hoitoon app brings your health records and how you feel together in one place. Join the waitlist:", "faq_h": "Questions", "q1": "Does the app cost anything?", "a1": "The plan is that the app would be free. Joining the waitlist is always free.", "q2": "Does the app diagnose me?", "a2": "No. The app collects your symptoms and passes them to a nurse. A nurse or doctor always decides what happens next.", "q3": "Which languages will it support?", "a3": "The goal is Finnish, Swedish, Sámi and the largest other languages, such as Russian, Estonian, Arabic, Somali and Ukrainian.", "q4": "Who sees my details?", "a4": "Only the Junction 2026 team. We use them only to measure interest and to contact you if a pilot starts. We delete them on request: info@polkuhoitoon.fi", "note": "This is not a real service yet, but it may be coming. With this waitlist we are measuring interest: is an app like this worth building? Concept by a Junction 2026 team.", "f5h": "Give feedback on your care", "f5p": "Say what worked and what didn't. Feedback goes straight to the care unit.", "f6h": "Your nurse sees the full picture", "f6p": "With your permission, your symptoms and answers are gathered into a view for professionals. No need to start from scratch every time.", "pro_link": "See what the view looks like for professionals", "q5": "How is data fetched from Kanta?", "a5": "Kanta Services has an interface through which users can, with their own permission, fetch their patient records into an app. Permission can be withdrawn at any time in MyKanta. The app must pass a security certification before use."}, "ru": {"brand": "Polku hoitoon", "nav": "В лист ожидания", "badge": "Концепт приложения", "h1": "Ваши медицинские данные и самочувствие в одном месте", "lead": "Polku hoitoon объединяет данные из OmaKanta, наблюдение за самочувствием и ваш путь лечения в одном окне — на вашем языке. Когда информация не разбросана, симптомы замечают вовремя.", "cta": "Записаться в лист ожидания", "feat_h": "Что делает приложение?", "f1h": "Данные OmaKanta — понятно", "f1p": "С вашего разрешения приложение загружает из Kanta диагнозы, результаты анализов и снимков, планы лечения. Всё видно на одной шкале времени.", "f2h": "Следите за самочувствием", "f2p": "Приложение регулярно спрашивает о самочувствии, ответ занимает пару минут. Видно, как меняется самочувствие от недели к неделе.", "f3h": "Медицинские тексты на вашем языке", "f3p": "ИИ переводит инструкции и результаты на ваш язык и простым языком. Оригинал всегда виден.", "f4h": "Ваш путь лечения", "f4p": "Вы видите, на каком вы этапе, что будет дальше и нужно ли записываться самому. Меньше звонков.", "why_h": "Зачем это нужно?", "why1": "Информация разбросана по разным системам, врачи меняются, поэтому повторяющиеся симптомы легко пропустить.", "why2": "В Финляндии от первых симптомов рака лёгких до начала лечения проходит в среднем 155 дней. В Швеции — 107, в Дании — 67.", "why3": "Пациенту часто приходится самому нести ответственность: звонить, помнить и объяснять. Многие боятся и откладывают обращение.", "src_note": "Источники: Yle MOT 2026 (Kuittinen и др., неопубликованное исследование); Zai и др. 2025, BMJ Public Health.", "notdx": "Приложение не ставит диагноз. Оно помогает вам и медсестре понять, когда симптомы нужно обследовать.", "bus_link": "Смотрите также автобус проверки лёгких", "form_h": "Записаться в лист ожидания", "form_p": "Мы сообщим, когда приложение можно будет попробовать в вашем районе.", "who_lbl": "Кого вы записываете?", "me": "Себя", "rel": "Близкого человека", "rel_help": "Укажите телефон близкого человека или свой, если вы передадите ему информацию.", "f_name": "Имя", "f_contact": "Телефон или e-mail", "f_post": "Почтовый индекс", "beta": "Хочу протестировать приложение одним из первых", "f_consent": "Polku hoitoon может связаться со мной по поводу приложения. Я могу в любой момент попросить удалить мои данные.", "submit": "Записаться", "ok": "Спасибо! Вы в списке. Мы свяжемся с вами на вашем языке.", "err_fill": "Укажите контакт и индекс и отметьте согласие.", "err_net": "Не удалось сохранить. Попробуйте ещё раз чуть позже.", "count_t": "человек ждут приложение", "share_h": "Знаете, кому это подойдёт?", "share_p": "Отправьте ссылку, например, родителям. Язык страницы выберется автоматически.", "wa": "Отправить в WhatsApp", "copy": "Скопировать ссылку", "copied": "Ссылка скопирована", "share_msg": "Приложение Polku hoitoon объединяет ваши медицинские данные и самочувствие в одном месте. Запишитесь в лист ожидания:", "faq_h": "Частые вопросы", "q1": "Приложение платное?", "a1": "Планируется, что приложение будет бесплатным. Запись в лист ожидания всегда бесплатна.", "q2": "Ставит ли приложение диагноз?", "a2": "Нет. Приложение собирает ваши симптомы и передаёт их медсестре. Решение всегда принимает медсестра или врач.", "q3": "На каких языках работает приложение?", "a3": "Цель — финский, шведский, саамский и крупнейшие другие языки: русский, эстонский, арабский, сомалийский и украинский.", "q4": "Кто видит мои данные?", "a4": "Только команда Junction 2026. Мы используем их только для оценки интереса и чтобы связаться с вами, если начнётся пилот. Удалим их по запросу: info@polkuhoitoon.fi", "note": "Это пока не настоящая услуга, но она может появиться. С помощью этого листа ожидания мы изучаем интерес: стоит ли создавать такое приложение? Концепт команды Junction 2026.", "f5h": "Отзыв о лечении", "f5p": "Расскажите, что получилось, а что нет. Отзыв идёт прямо в медицинское отделение.", "f6h": "Медсестра видит полную картину", "f6p": "С вашего разрешения симптомы и ответы собираются в окно для специалистов. Не нужно каждый раз рассказывать всё заново.", "pro_link": "Посмотрите, как это выглядит для специалистов", "q5": "Как данные загружаются из OmaKanta?", "a5": "В сервисах Kanta есть интерфейс, через который пользователь со своего разрешения может загрузить свои медицинские данные в приложение. Разрешение можно отозвать в любой момент в OmaKanta. Приложение должно пройти сертификацию безопасности."}, "et": {"brand": "Polku hoitoon", "nav": "Ootenimekirja", "badge": "Rakenduse kontseptsioon", "h1": "Sinu terviseandmed ja enesetunne ühes kohas", "lead": "Polku hoitoon koondab OmaKanta andmed, enesetunde jälgimise ja sinu raviteekonna ühte vaatesse sinu keeles. Kui info pole laiali, märgatakse sümptomeid õigel ajal.", "cta": "Liitu ootenimekirjaga", "feat_h": "Mida rakendus teeb?", "f1h": "OmaKanta andmed selgelt", "f1p": "Sinu loal tuuakse Kantast diagnoosid, labori- ja pildiuuringute tulemused ning raviplaanid. Näed neid ühel ajajoonel.", "f2h": "Jälgi oma enesetunnet", "f2p": "Rakendus küsib regulaarselt su enesetunde kohta ja vastamine võtab paar minutit. Näed, kuidas enesetunne nädalast nädalasse muutub.", "f3h": "Ravitekstid sinu keeles", "f3p": "Tehisintellekt tõlgib ravijuhised ja tulemused sinu keelde ja lihtsasse keelde. Algtekst on alati nähtav.", "f4h": "Näed oma raviteekonda", "f4p": "Näed, mis etapis oled, mis järgmiseks juhtub ja kas pead ise aja broneerima. Vähem helistamist.", "why_h": "Miks seda vaja on?", "why1": "Info on laiali eri süsteemides ja arstid vahetuvad, nii et korduvad sümptomid jäävad kergesti märkamata.", "why2": "Soomes kulub kopsuvähi esimestest sümptomitest ravi alguseni keskmiselt 155 päeva. Rootsis 107 ja Taanis 67 päeva.", "why3": "Patsient peab sageli ise vastutust kandma: helistama, meeles pidama ja selgitama. Paljud ka kardavad ja lükkavad abi otsimist edasi.", "src_note": "Allikad: Yle MOT 2026 (Kuittinen jt, avaldamata uuring); Zai jt 2025, BMJ Public Health.", "notdx": "Rakendus ei pane diagnoosi. See aitab sul ja õel märgata, millal sümptomeid tuleks uurida.", "bus_link": "Vaata ka kopsukontrolli bussi", "form_h": "Liitu ootenimekirjaga", "form_p": "Anname teada, kui rakendust saab sinu piirkonnas proovida.", "who_lbl": "Keda sa registreerid?", "me": "Ennast", "rel": "Lähedast", "rel_help": "Kirjuta oma lähedase telefoninumber või enda oma, kui annad info edasi.", "f_name": "Eesnimi", "f_contact": "Telefon või e-post", "f_post": "Postiindeks", "beta": "Soovin rakendust esimeste seas testida", "f_consent": "Polku hoitoon võib minuga rakenduse asjus ühendust võtta. Võin igal ajal paluda oma andmed kustutada.", "submit": "Liitu", "ok": "Aitäh! Oled nimekirjas. Võtame sinuga ühendust sinu keeles.", "err_fill": "Täida kontakt ja postiindeks ning märgi nõusolek.", "err_net": "Salvestamine ebaõnnestus. Proovi hetke pärast uuesti.", "count_t": "inimest ootab rakendust", "share_h": "Kas tead kedagi, kellele see sobiks?", "share_p": "Saada link näiteks oma vanemale. Leht valib keele automaatselt.", "wa": "Saada WhatsAppiga", "copy": "Kopeeri link", "copied": "Link kopeeritud", "share_msg": "Polku hoitoon rakendus koondab sinu terviseandmed ja enesetunde ühte kohta. Liitu ootenimekirjaga:", "faq_h": "Korduma kippuvad küsimused", "q1": "Kas rakendus maksab midagi?", "a1": "Plaan on, et rakendus oleks tasuta. Ootenimekirjaga liitumine on alati tasuta.", "q2": "Kas rakendus paneb diagnoosi?", "a2": "Ei. Rakendus kogub sinu sümptomid ja edastab need õele. Edasise üle otsustab alati õde või arst.", "q3": "Mis keeltes rakendus töötab?", "a3": "Eesmärk on soome, rootsi, saami ja suurimad muud keeled, nagu vene, eesti, araabia, somaali ja ukraina.", "q4": "Kes näeb minu andmeid?", "a4": "Ainult Junction 2026 meeskond. Kasutame andmeid ainult huvi mõõtmiseks ja sinuga ühenduse võtmiseks, kui pilootprojekt algab. Kustutame need soovi korral: info@polkuhoitoon.fi", "note": "See ei ole veel päris teenus, kuid see võib tulla. Selle ootenimekirjaga mõõdame huvi: kas sellist rakendust tasub luua? Kontseptsioon on Junction 2026 meeskonnalt.", "f5h": "Anna ravi kohta tagasisidet", "f5p": "Ütle, mis toimis ja mis mitte. Tagasiside jõuab otse raviüksusesse.", "f6h": "Õde näeb tervikpilti", "f6p": "Sinu loal koondatakse sümptomid ja vastused spetsialisti vaatesse. Ei pea iga kord kõike algusest rääkima.", "pro_link": "Vaata, milline on vaade spetsialistile", "q5": "Kuidas andmed OmaKantast tuuakse?", "a5": "Kanta teenustel on liides, mille kaudu kasutaja saab oma loal tuua Kantasse salvestatud patsiendiandmed rakendusse. Loa saab igal ajal OmaKantas tagasi võtta. Rakendus peab enne kasutamist läbima turvasertifitseerimise."}, "ar": {"brand": "Polku hoitoon", "nav": "قائمة الانتظار", "badge": "فكرة تطبيق", "h1": "بياناتك الصحية وحالتك في مكان واحد", "lead": "يجمع Polku hoitoon بيانات OmaKanta ومتابعة حالتك ومسار علاجك في واجهة واحدة بلغتك. عندما لا تكون المعلومات مبعثرة، تُلاحَظ الأعراض في الوقت المناسب.", "cta": "انضم إلى قائمة الانتظار", "feat_h": "ماذا يفعل التطبيق؟", "f1h": "بيانات OmaKanta بوضوح", "f1p": "بإذنك، تجلب من Kanta التشخيصات ونتائج المختبر والتصوير وخطط العلاج، وتراها على خط زمني واحد.", "f2h": "تابع حالتك", "f2p": "يسألك التطبيق عن حالتك بانتظام، والإجابة تستغرق دقيقتين. وترى كيف تتغير حالتك من أسبوع لآخر.", "f3h": "نصوص العلاج بلغتك", "f3p": "يترجم الذكاء الاصطناعي تعليمات العلاج والنتائج إلى لغتك وبلغة مبسطة. النص الأصلي ظاهر دائمًا.", "f4h": "ترى مسار علاجك", "f4p": "ترى في أي مرحلة أنت، وما الخطوة التالية، وهل عليك حجز موعد بنفسك. اتصالات أقل.", "why_h": "لماذا نحتاج هذا؟", "why1": "المعلومات مبعثرة في أنظمة مختلفة والأطباء يتغيرون، لذلك تُغفل الأعراض المتكررة بسهولة.", "why2": "في فنلندا يمر في المتوسط 155 يومًا من أول أعراض سرطان الرئة حتى بدء العلاج. في السويد 107 أيام وفي الدنمارك 67.", "why3": "غالبًا ما يتحمل المريض المسؤولية بنفسه: الاتصال والتذكّر والشرح. كما يخاف كثيرون ويؤجلون طلب المساعدة.", "src_note": "المصادر: Yle MOT 2026 (Kuittinen وآخرون، دراسة غير منشورة)؛ Zai وآخرون 2025، BMJ Public Health.", "notdx": "التطبيق لا يشخّص. إنه يساعدك أنت والممرضة على ملاحظة متى يجب فحص الأعراض.", "bus_link": "شاهد أيضًا حافلة فحص الرئة", "form_h": "انضم إلى قائمة الانتظار", "form_p": "سنخبرك عندما يصبح التطبيق متاحًا للتجربة في منطقتك.", "who_lbl": "من تسجّل؟", "me": "نفسي", "rel": "أحد أقاربي", "rel_help": "أدخل رقم هاتف قريبك، أو رقمك إذا كنت ستنقل المعلومات إليه.", "f_name": "الاسم الأول", "f_contact": "الهاتف أو البريد الإلكتروني", "f_post": "الرمز البريدي", "beta": "أريد تجربة التطبيق من بين الأوائل", "f_consent": "أوافق على أن تتواصل معي Polku hoitoon بشأن التطبيق. يمكنني طلب حذف بياناتي في أي وقت.", "submit": "انضم", "ok": "شكرًا! أنت في القائمة. سنتواصل معك بلغتك.", "err_fill": "يرجى إدخال وسيلة التواصل والرمز البريدي ووضع علامة على الموافقة.", "err_net": "تعذّر الحفظ. يرجى المحاولة مرة أخرى بعد قليل.", "count_t": "شخصًا ينتظرون التطبيق", "share_h": "هل تعرف شخصًا يناسبه هذا؟", "share_p": "أرسل الرابط إلى أحد والديك مثلًا. تختار الصفحة لغته تلقائيًا.", "wa": "أرسل عبر واتساب", "copy": "انسخ الرابط", "copied": "تم نسخ الرابط", "share_msg": "يجمع تطبيق Polku hoitoon بياناتك الصحية وحالتك في مكان واحد. انضم إلى قائمة الانتظار:", "faq_h": "أسئلة شائعة", "q1": "هل التطبيق مدفوع؟", "a1": "الخطة أن يكون التطبيق مجانيًا. الانضمام إلى قائمة الانتظار مجاني دائمًا.", "q2": "هل يشخّص التطبيق حالتي؟", "a2": "لا. يجمع التطبيق أعراضك ويرسلها إلى الممرضة. الممرضة أو الطبيب يقرر دائمًا الخطوة التالية.", "q3": "ما اللغات التي يدعمها التطبيق؟", "a3": "الهدف هو الفنلندية والسويدية والسامية وأكبر اللغات الأخرى مثل الروسية والإستونية والعربية والصومالية والأوكرانية.", "q4": "من يرى بياناتي؟", "a4": "فريق Junction 2026 فقط. نستخدمها فقط لقياس الاهتمام وللتواصل معك إذا بدأ مشروع تجريبي. نحذفها عند الطلب: info@polkuhoitoon.fi", "note": "هذه ليست خدمة حقيقية بعد، لكنها قد تأتي قريبًا. نقيس من خلال قائمة الانتظار هذه مدى الاهتمام: هل يستحق تطبيق كهذا أن يُنشأ؟ الفكرة من فريق Junction 2026.", "f5h": "قدّم ملاحظاتك عن العلاج", "f5p": "أخبرنا بما نجح وما لم ينجح. تصل ملاحظاتك مباشرة إلى وحدة العلاج.", "f6h": "ترى الممرضة الصورة الكاملة", "f6p": "بإذنك، تُجمع أعراضك وإجاباتك في واجهة للمختصين. لا داعي لإعادة كل شيء من البداية في كل مرة.", "pro_link": "شاهد كيف تبدو الواجهة للمختصين", "q5": "كيف تُجلب البيانات من OmaKanta؟", "a5": "لدى خدمات Kanta واجهة يمكن للمستخدم من خلالها، بإذنه، جلب بياناته الصحية إلى التطبيق. يمكن سحب الإذن في أي وقت في OmaKanta. يجب أن يجتاز التطبيق شهادة أمان قبل الاستخدام."}, "so": {"brand": "Polku hoitoon", "nav": "Liiska sugitaanka", "badge": "Fikrad app", "h1": "Xogtaada caafimaad iyo xaaladdaada hal meel", "lead": "Polku hoitoon wuxuu isku keenaa xogta OmaKanta, la socodka xaaladdaada iyo waddadaada daryeelka hal muuqaal, luqaddaada. Marka xogtu aanay kala firirsanayn, calaamadaha goor hore ayaa la ogaadaa.", "cta": "Ku biir liiska sugitaanka", "feat_h": "Maxay app-ku qabataa?", "f1h": "Xogta OmaKanta si cad", "f1p": "Oggolaanshahaaga, waxaad Kanta ka soo qaadataa ogaanshaha, natiijooyinka shaybaarka iyo sawirrada iyo qorshayaasha daryeelka. Waxaad ku arkaysaa hal jadwal.", "f2h": "La soco xaaladdaada", "f2p": "App-ku si joogto ah ayuu u weydiiyaa xaaladdaada, jawaabtuna waxay qaadataa dhowr daqiiqo. Waxaad arkaysaa sida xaaladdaadu isu beddesho toddobaad kasta.", "f3h": "Qoraallada daryeelka luqaddaada", "f3p": "AI wuxuu u turjumaa tilmaamaha daryeelka iyo natiijooyinka luqaddaada iyo luqad fudud. Qoraalka asalka ah had iyo jeer waa muuqdaa.", "f4h": "Arag waddadaada daryeelka", "f4p": "Waxaad aragtaa meesha aad joogto, waxa xiga iyo haddii ay tahay inaad adigu ballan qabsato. Wicitaanno yar.", "why_h": "Maxaa loogu baahan yahay?", "why1": "Xogtu waxay ku kala firirsan tahay nidaamyo kala duwan, dhakhaatiirtuna way isbeddelaan, sidaa darteed calaamadaha soo noqnoqda si fudud ayaa loo seegaa.", "why2": "Finland, calaamadaha ugu horreeya ee kansarka sambabada ilaa bilowga daaweynta waxaa qaata celcelis ahaan 155 maalmood. Sweden 107 iyo Denmark 67.", "why3": "Bukaanku inta badan isaga ayaa qaada mas'uuliyadda: wacitaan, xusuusin iyo sharraxaad. Qaar badan ayaa sidoo kale cabsada oo dib u dhiga raadinta caawimaadda.", "src_note": "Ilaha: Yle MOT 2026 (Kuittinen et al., daraasad aan la daabicin); Zai et al. 2025, BMJ Public Health.", "notdx": "App-ku ma sameeyo baaritaan. Wuxuu kaa caawiyaa adiga iyo kalkaalisada inaad ogaataan goorta calaamadaha la baarayo.", "bus_link": "Sidoo kale eeg baska baaritaanka sambabada", "form_h": "Ku biir liiska sugitaanka", "form_p": "Waxaan kuu sheegi doonnaa marka app-ka laga tijaabin karo aaggaaga.", "who_lbl": "Yaad diiwaangelinaysaa?", "me": "Naftayda", "rel": "Qof qoyskayga ah", "rel_help": "Qor lambarka telefoonka qofka qoyskaaga ah, ama kaaga haddii aad warka u gudbin doonto.", "f_name": "Magaca koowaad", "f_contact": "Telefoon ama iimayl", "f_post": "Koodka boostada", "beta": "Waxaan rabaa inaan app-ka ku tijaabiyo kuwa ugu horreeya", "f_consent": "Waxaan oggolahay in Polku hoitoon ila soo xiriirto app-ka. Waxaan codsan karaa in xogtayda la tirtiro waqti kasta.", "submit": "Ku biir", "ok": "Mahadsanid! Waxaad ku jirtaa liiska. Waxaan kugula soo xiriiri doonnaa luqaddaada.", "err_fill": "Fadlan buuxi xiriirka iyo koodka boostada, oo calaamadee oggolaanshaha.", "err_net": "Lama kaydin karin. Fadlan isku day mar kale wax yar kadib.", "count_t": "qof ayaa sugaya app-ka", "share_h": "Ma taqaannaa qof ay tani ku habboon tahay?", "share_p": "U dir xiriirka tusaale ahaan waalidkaa. Boggu wuxuu si toos ah u doortaa luqaddiisa.", "wa": "Ku dir WhatsApp", "copy": "Koobiyee xiriirka", "copied": "Xiriirka waa la koobiyeeyay", "share_msg": "App-ka Polku hoitoon wuxuu isku keenaa xogtaada caafimaad iyo xaaladdaada hal meel. Ku biir liiska sugitaanka:", "faq_h": "Su'aalaha caadiga ah", "q1": "Lacag ma ku baxaysaa app-ka?", "a1": "Qorshuhu waa in app-ku noqdo bilaash. Ku biiridda liiska sugitaanka had iyo jeer waa bilaash.", "q2": "App-ku ma i baarayaa (diagnosis)?", "a2": "Maya. App-ku wuxuu ururiyaa calaamadahaaga oo u gudbiyaa kalkaalisada. Kalkaalisada ama dhakhtarka ayaa had iyo jeer go'aamiya waxa xiga.", "q3": "Luqadee ayuu app-ku ku shaqeeyaa?", "a3": "Hadafku waa Finnish, Swedish, Sámi iyo luqadaha kale ee ugu waaweyn sida Ruush, Estonian, Carabi, Soomaali iyo Ukrainian.", "q4": "Yaa arkaya xogtayda?", "a4": "Kaliya kooxda Junction 2026. Waxaan u isticmaalnaa oo kaliya cabbirka xiisaha iyo inaan kula soo xiriirno haddii mashruuc tijaabo ah bilaabmo. Waan tirtiraynaa markaad codsato: info@polkuhoitoon.fi", "note": "Tani weli ma aha adeeg dhab ah, laakiin wuu iman karaa. Liiskan sugitaanka waxaan ku cabbirnaa xiisaha: ma mudan tahay in app noocan oo kale la sameeyo? Fikradda waxaa sameeyay koox Junction 2026.", "f5h": "Ka bixi ra'yi daryeelka", "f5p": "Sheeg waxa shaqeeyay iyo waxa aan shaqayn. Ra'yigu wuxuu si toos ah u gaaraa unugga daryeelka.", "f6h": "Kalkaalisadu waxay aragtaa sawirka oo dhan", "f6p": "Oggolaanshahaaga, calaamadahaaga iyo jawaabahaaga waxaa lagu ururiyaa muuqaal xirfadlayaasha. Uma baahnid inaad mar kasta bilowdo.", "pro_link": "Eeg sida muuqaalku ugu eg yahay xirfadlayaasha", "q5": "Sidee xogta looga keenaa OmaKanta?", "a5": "Adeegyada Kanta waxay leeyihiin interface uu isticmaaluhu, oggolaanshihiisa, ku keeni karo xogtiisa caafimaad app-ka. Oggolaanshaha waqti kasta waa laga noqon karaa OmaKanta. App-ku waa inuu dhaafaa shahaado ammaan ka hor isticmaalka."}, "uk": {"brand": "Polku hoitoon", "nav": "До списку", "badge": "Концепт застосунку", "h1": "Ваші медичні дані й самопочуття в одному місці", "lead": "Polku hoitoon об'єднує дані з OmaKanta, спостереження за самопочуттям і ваш шлях лікування в одному вікні — вашою мовою. Коли інформація не розпорошена, симптоми помічають вчасно.", "cta": "Записатися до списку очікування", "feat_h": "Що робить застосунок?", "f1h": "Дані OmaKanta — зрозуміло", "f1p": "З вашого дозволу застосунок завантажує з Kanta діагнози, результати аналізів і знімків, плани лікування. Усе видно на одній шкалі часу.", "f2h": "Стежте за самопочуттям", "f2p": "Застосунок регулярно запитує про самопочуття, відповідь займає кілька хвилин. Видно, як змінюється самопочуття від тижня до тижня.", "f3h": "Медичні тексти вашою мовою", "f3p": "ШІ перекладає інструкції та результати вашою мовою і простою мовою. Оригінал завжди видно.", "f4h": "Ваш шлях лікування", "f4p": "Ви бачите, на якому ви етапі, що буде далі і чи потрібно записуватися самому. Менше дзвінків.", "why_h": "Навіщо це потрібно?", "why1": "Інформація розпорошена між різними системами, лікарі змінюються, тому повторювані симптоми легко пропустити.", "why2": "У Фінляндії від перших симптомів раку легень до початку лікування минає в середньому 155 днів. У Швеції — 107, у Данії — 67.", "why3": "Пацієнтові часто доводиться самому нести відповідальність: телефонувати, пам'ятати й пояснювати. Багато хто також боїться і відкладає звернення.", "src_note": "Джерела: Yle MOT 2026 (Kuittinen та ін., неопубліковане дослідження); Zai та ін. 2025, BMJ Public Health.", "notdx": "Застосунок не ставить діагноз. Він допомагає вам і медсестрі помітити, коли симптоми варто обстежити.", "bus_link": "Дивіться також автобус перевірки легень", "form_h": "Записатися до списку очікування", "form_p": "Ми повідомимо, коли застосунок можна буде спробувати у вашому районі.", "who_lbl": "Кого ви записуєте?", "me": "Себе", "rel": "Близьку людину", "rel_help": "Вкажіть телефон близької людини або свій, якщо ви передасте їй інформацію.", "f_name": "Ім'я", "f_contact": "Телефон або e-mail", "f_post": "Поштовий індекс", "beta": "Хочу протестувати застосунок одним із перших", "f_consent": "Polku hoitoon може зв'язатися зі мною щодо застосунку. Я можу будь-коли попросити видалити мої дані.", "submit": "Записатися", "ok": "Дякуємо! Ви в списку. Ми зв'яжемося з вами вашою мовою.", "err_fill": "Вкажіть контакт та індекс і позначте згоду.", "err_net": "Не вдалося зберегти. Спробуйте ще раз трохи пізніше.", "count_t": "людей чекають на застосунок", "share_h": "Знаєте, кому це підійде?", "share_p": "Надішліть посилання, наприклад, батькам. Сторінка сама вибере їхню мову.", "wa": "Надіслати у WhatsApp", "copy": "Скопіювати посилання", "copied": "Посилання скопійовано", "share_msg": "Застосунок Polku hoitoon об'єднує ваші медичні дані й самопочуття в одному місці. Запишіться до списку очікування:", "faq_h": "Часті запитання", "q1": "Застосунок платний?", "a1": "Планується, що застосунок буде безкоштовним. Запис до списку очікування завжди безкоштовний.", "q2": "Чи ставить застосунок діагноз?", "a2": "Ні. Застосунок збирає ваші симптоми й передає їх медсестрі. Рішення завжди ухвалює медсестра або лікар.", "q3": "Якими мовами працює застосунок?", "a3": "Мета — фінська, шведська, саамська та найпоширеніші інші мови: російська, естонська, арабська, сомалійська й українська.", "q4": "Хто бачить мої дані?", "a4": "Лише команда Junction 2026. Ми використовуємо їх лише для оцінки інтересу та щоб зв'язатися з вами, якщо почнеться пілот. Видалимо їх на запит: info@polkuhoitoon.fi", "note": "Це ще не справжня послуга, але вона може з'явитися. За допомогою цього списку очікування ми вимірюємо інтерес: чи варто створювати такий застосунок? Концепт команди Junction 2026.", "f5h": "Відгук про лікування", "f5p": "Розкажіть, що вдалося, а що ні. Відгук іде прямо до медичного відділення.", "f6h": "Медсестра бачить повну картину", "f6p": "З вашого дозволу симптоми й відповіді збираються у вікно для фахівців. Не потрібно щоразу розповідати все спочатку.", "pro_link": "Подивіться, як це виглядає для фахівців", "q5": "Як дані завантажуються з OmaKanta?", "a5": "У сервісах Kanta є інтерфейс, через який користувач зі свого дозволу може завантажити свої медичні дані в застосунок. Дозвіл можна відкликати будь-коли в OmaKanta. Застосунок має пройти сертифікацію безпеки перед використанням."}};
+T.sv.brand = "Polku hoitoon";
+var JX = {"fi": "Mikä on Junction? Junction on Helsingissä vuosittain järjestettävä kansainvälinen hackathon, jossa tiimit kehittävät viikonlopun aikana ratkaisuja yritysten ja organisaatioiden antamiin haasteisiin. Tämä konsepti on syntynyt siellä AstraZenecan haasteessa.", "sv": "Vad är Junction? Junction är ett internationellt hackathon som ordnas varje år i Helsingfors. Under en helg utvecklar team lösningar på utmaningar från företag och organisationer. Det här konceptet har tagits fram där, i AstraZenecas utmaning.", "en": "What is Junction? Junction is an international hackathon held every year in Helsinki, where teams spend a weekend building solutions to challenges set by companies and organisations. This concept was created there, for AstraZeneca's challenge.", "ru": "Что такое Junction? Junction — международный хакатон, который ежегодно проходит в Хельсинки. За выходные команды разрабатывают решения задач, поставленных компаниями и организациями. Этот концепт создан там для задачи от AstraZeneca.", "et": "Mis on Junction? Junction on igal aastal Helsingis toimuv rahvusvaheline häkaton, kus meeskonnad töötavad nädalavahetuse jooksul välja lahendusi ettevõtete ja organisatsioonide väljakutsetele. See kontseptsioon sündis seal AstraZeneca väljakutse raames.", "ar": "ما هو Junction؟ Junction هاكاثون دولي يُقام سنويًا في هلسنكي، تطوّر فيه الفرق خلال عطلة نهاية الأسبوع حلولًا لتحديات تطرحها شركات ومنظمات. وُلدت هذه الفكرة هناك ضمن تحدي AstraZeneca.", "so": "Waa maxay Junction? Junction waa hackathon caalami ah oo sannad kasta lagu qabto Helsinki, halkaas oo kooxuhu dhammaadka toddobaadka ku dhisaan xalal loogu talagalay caqabadaha ay soo bandhigaan shirkadaha iyo hay'adaha. Fikraddan halkaas ayay ka dhalatay, caqabadda AstraZeneca.", "uk": "Що таке Junction? Junction — міжнародний хакатон, який щороку проходить у Гельсінкі. За вихідні команди створюють рішення для завдань від компаній та організацій. Цей концепт народився там у межах завдання від AstraZeneca."};
+Object.keys(JX).forEach(function(k){ T[k].jx = JX[k]; });
+var NAVT = {"fi": {"nav_bus": "Seulontabussi", "nav_app": "Sovellus", "nav_pro": "Ammattilaisille", "nav_dm": "Päättäjille"}, "sv": {"nav_bus": "Screeningbussen", "nav_app": "Appen", "nav_pro": "För vårdpersonal", "nav_dm": "För beslutsfattare"}, "en": {"nav_bus": "Screening bus", "nav_app": "App", "nav_pro": "For professionals", "nav_dm": "For decision-makers"}, "ru": {"nav_bus": "Автобус скрининга", "nav_app": "Приложение", "nav_pro": "Для специалистов", "nav_dm": "Для руководителей"}, "et": {"nav_bus": "Sõeluuringubuss", "nav_app": "Rakendus", "nav_pro": "Spetsialistidele", "nav_dm": "Otsustajatele"}, "ar": {"nav_bus": "حافلة الفحص", "nav_app": "التطبيق", "nav_pro": "للمختصين", "nav_dm": "لصناع القرار"}, "so": {"nav_bus": "Baska baaritaanka", "nav_app": "App-ka", "nav_pro": "Xirfadlayaasha", "nav_dm": "Go'aamiyeyaasha"}, "uk": {"nav_bus": "Автобус скринінгу", "nav_app": "Застосунок", "nav_pro": "Для фахівців", "nav_dm": "Для керівників"}};
+Object.keys(NAVT).forEach(function(k){ Object.assign(T[k], NAVT[k]); });
+var AI = "Translated with AI — to be checked by a native speaker.";
+var FORMX = {"fi": {"int_lbl": "Mistä olet kiinnostunut?", "err_pick": "Valitse vähintään yksi.", "f_consent": "Polku hoitoon saa ottaa minuun yhteyttä valitsemistani asioista. Voin pyytää tietojeni poistoa milloin tahansa.", "free": "Maksuton asiakkaille ja potilaille", "a1": "Ei maksa. Sovellus on asiakkaille ja potilaille maksuton, ja myös jonoon ilmoittautuminen on maksutonta. Alustavassa mallissa palvelun tarjoaa hyvinvointialue osana julkista terveydenhuoltoa.", "f_age": "Oletko 55–74-vuotias ja tupakoitko tai oletko tupakoinut?", "yes": "Kyllä", "no": "Ei", "unsure": "En ole varma"}, "sv": {"int_lbl": "Vad är du intresserad av?", "err_pick": "Välj minst ett alternativ.", "f_consent": "Polku hoitoon får kontakta mig om det jag har valt. Jag kan när som helst be att mina uppgifter raderas.", "free": "Gratis för klienter och patienter", "a1": "Nej. Appen är gratis för klienter och patienter, och det är också gratis att anmäla sig till kön. I den preliminära modellen erbjuds tjänsten av välfärdsområdet som en del av den offentliga hälso- och sjukvården.", "f_age": "Är du 55–74 år och röker eller har rökt?", "yes": "Ja", "no": "Nej", "unsure": "Vet inte"}, "en": {"int_lbl": "What are you interested in?", "err_pick": "Choose at least one.", "f_consent": "Polku hoitoon may contact me about what I selected. I can ask to remove my details at any time.", "free": "Free for clients and patients", "a1": "No. The app is free for clients and patients, and joining the waitlist is free too. In the preliminary model, the service is provided by the wellbeing services county as part of public healthcare.", "f_age": "Are you 55–74 and do you smoke or used to?", "yes": "Yes", "no": "No", "unsure": "Not sure"}, "ru": {"int_lbl": "Что вас интересует?", "err_pick": "Выберите хотя бы один вариант.", "f_consent": "Polku hoitoon может связаться со мной по выбранным мной темам. Я могу в любой момент попросить удалить мои данные.", "free": "Бесплатно для клиентов и пациентов", "a1": "Нет. Приложение бесплатно для клиентов и пациентов, запись в лист ожидания тоже бесплатна. В предварительной модели услугу предоставляет регион благосостояния (hyvinvointialue) в рамках государственного здравоохранения.", "f_age": "Вам 55–74 года и вы курите или курили?", "yes": "Да", "no": "Нет", "unsure": "Не уверен(а)"}, "et": {"int_lbl": "Millest oled huvitatud?", "err_pick": "Vali vähemalt üks.", "f_consent": "Polku hoitoon võib minuga valitud teemadel ühendust võtta. Võin igal ajal paluda oma andmed kustutada.", "free": "Tasuta klientidele ja patsientidele", "a1": "Ei. Rakendus on klientidele ja patsientidele tasuta, ka ootenimekirjaga liitumine on tasuta. Esialgse mudeli järgi pakub teenust heaoluteenuste piirkond (hyvinvointialue) osana avalikku tervishoidu.", "f_age": "Kas oled 55–74-aastane ja suitsetad või oled suitsetanud?", "yes": "Jah", "no": "Ei", "unsure": "Ei tea"}, "ar": {"int_lbl": "ما الذي يهمك؟", "err_pick": "اختر خيارًا واحدًا على الأقل.", "f_consent": "أوافق على أن تتواصل معي Polku hoitoon بشأن ما اخترته. يمكنني طلب حذف بياناتي في أي وقت.", "free": "مجاني للعملاء والمرضى", "a1": "لا. التطبيق مجاني للعملاء والمرضى، والانضمام إلى قائمة الانتظار مجاني أيضًا. في النموذج الأولي، تقدم الخدمةَ منطقةُ خدمات الرفاه (hyvinvointialue) كجزء من الرعاية الصحية العامة.", "f_age": "هل عمرك بين 55 و74 عامًا وتدخن أو كنت تدخن؟", "yes": "نعم", "no": "لا", "unsure": "لست متأكدًا"}, "so": {"int_lbl": "Maxaad xiisaynaysaa?", "err_pick": "Dooro ugu yaraan hal.", "f_consent": "Waxaan oggolahay in Polku hoitoon ila soo xiriirto waxa aan doortay. Waxaan codsan karaa in xogtayda la tirtiro waqti kasta.", "free": "Bilaash macaamiisha iyo bukaannada", "a1": "Maya. App-ku waa bilaash macaamiisha iyo bukaannada, ku biiridda liiska sugitaankuna waa bilaash. Qaabka hordhaca ah, adeegga waxaa bixiya gobolka adeegyada daryeelka (hyvinvointialue) iyadoo qayb ka ah daryeelka caafimaadka dadweynaha.", "f_age": "Ma tahay 55–74 jir oo sigaar cabba ama horey u cabbi jiray?", "yes": "Haa", "no": "Maya", "unsure": "Ma hubo"}, "uk": {"int_lbl": "Що вас цікавить?", "err_pick": "Виберіть хоча б один варіант.", "f_consent": "Polku hoitoon може зв'язатися зі мною щодо вибраного. Я можу будь-коли попросити видалити мої дані.", "free": "Безкоштовно для клієнтів і пацієнтів", "a1": "Ні. Застосунок безкоштовний для клієнтів і пацієнтів, запис до списку очікування теж безкоштовний. У попередній моделі послугу надає регіон добробуту (hyvinvointialue) у межах державної охорони здоров'я.", "f_age": "Вам 55–74 роки і ви курите або курили?", "yes": "Так", "no": "Ні", "unsure": "Не впевнений(а)"}};
+Object.keys(FORMX).forEach(function(k){ Object.assign(T[k], FORMX[k]); });
+function prodVals(){ return Array.prototype.map.call(document.querySelectorAll("input[name=prod]:checked"), function(x){ return x.value; }); }
+function syncElig(){ document.getElementById("eligWrap").classList.toggle("hidden", prodVals().indexOf("bus") < 0); }
+document.querySelectorAll("input[name=prod]").forEach(function(x){ x.addEventListener("change", syncElig); });
+var MT = {ru:AI,et:AI,ar:AI,so:AI,uk:AI};
+
+var lang = "fi";
+function apply(l){
+  lang = T[l] ? l : "fi";
+  var t = T[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.title = t.brand + " – " + t.badge;
+  document.querySelectorAll("[data-t]").forEach(function(el){ var k = el.getAttribute("data-t"); if (t[k] != null) el.textContent = t[k]; });
+  var mt = document.getElementById("mtNote");
+  if (MT[lang]) { mt.textContent = MT[lang]; mt.classList.remove("hidden"); } else { mt.classList.add("hidden"); }
+  try { localStorage.setItem("vayla-lang", lang); } catch (e) {}
+  setupShare();
+}
+var sel = document.getElementById("lang");
+var start = "";
+try { start = localStorage.getItem("vayla-lang") || ""; } catch (e) {}
+if (!start) { var nl = (navigator.language || "fi").slice(0, 2); start = T[nl] ? nl : "fi"; }
+sel.value = T[start] ? start : "fi";
+apply(sel.value);
+sel.addEventListener("change", function(){ apply(sel.value); });
+
+function show(kind, text){ var o = document.getElementById("out"); o.className = "msg " + kind; o.textContent = text; }
+
+var SRC = (function(){ try { var q = new URLSearchParams(location.search); var v = q.get("src") || q.get("utm_source"); if (!v && document.referrer) { var h = new URL(document.referrer).hostname; if (h !== location.hostname) v = h; } return ((v || "direct").toLowerCase().replace(/[^a-z0-9._-]/g, "")).slice(0, 40) || "direct"; } catch (e) { return "direct"; } })();
+
+async function loadCount(){ try { var r = await fetch("/api/count?product=app"); if (!r.ok) return; var d = await r.json(); if (!d.total) return; document.getElementById("countN").textContent = String(d.total); document.getElementById("countBox").classList.remove("hidden"); } catch (e) {} }
+function shareUrl(){ return location.origin + "/sovellus?src=share"; }
+function setupShare(){ var b = document.getElementById("waBtn"); if (b) b.href = "https://wa.me/?text=" + encodeURIComponent(T[lang].share_msg + " " + shareUrl()); }
+function whoVal(){ var w = document.querySelector("input[name=who]:checked"); return w ? w.value : "self"; }
+document.querySelectorAll("input[name=who]").forEach(function(r){ r.addEventListener("change", function(){ document.getElementById("relHelp").classList.toggle("hidden", whoVal() !== "relative"); }); });
+document.getElementById("copyBtn").addEventListener("click", async function(){ var btn = this; try { await navigator.clipboard.writeText(shareUrl()); btn.textContent = T[lang].copied; } catch (e) { btn.textContent = shareUrl(); } });
+loadCount();
+
+var busy = false;
+document.getElementById("f").addEventListener("submit", async function(ev){
+  ev.preventDefault();
+  if (busy) return;
+  var t = T[lang];
+  var contact = document.getElementById("contact").value.trim();
+  var post = document.getElementById("post").value.trim();
+  var consent = document.getElementById("consent").checked;
+  var prods = prodVals();
+  if (!prods.length) { show("err", t.err_pick); return; }
+  if (!contact || !/^\d{5}$/.test(post) || !consent) { show("err", t.err_fill); return; }
+  var eligEl = document.querySelector("input[name=elig]:checked");
+  busy = true;
+  try {
+    var r = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ products: prods, beta: document.getElementById("beta").checked, name: document.getElementById("fname").value.trim(), contact: contact, postcode: post, eligible: (prods.indexOf("bus") >= 0 && eligEl) ? eligEl.value : "unsure", lang: lang, consent: true, website: document.getElementById("website").value, "for": whoVal(), src: SRC })
+    });
+    if (!r.ok) throw new Error("fail");
+    show("ok", t.ok);
+    document.getElementById("shareWrap").classList.remove("hidden");
+    document.getElementById("f").reset();
+    document.getElementById("relHelp").classList.add("hidden");
+    syncElig();
+    loadCount();
+  } catch (e) {
+    show("err", t.err_net);
+  }
+  busy = false;
+});
+</script>
+</body>
+</html>
