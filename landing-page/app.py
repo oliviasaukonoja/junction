@@ -56,7 +56,7 @@ PRODUCTS = {"bus", "app"}
 @modal.asgi_app()
 def web():
     from fastapi import Body, FastAPI, HTTPException
-    from fastapi.responses import HTMLResponse, Response
+    from fastapi.responses import HTMLResponse, RedirectResponse, Response
 
     api = FastAPI(docs_url=None, redoc_url=None)
     page = Path("/root/index.html").read_text(encoding="utf-8")
@@ -98,7 +98,7 @@ def web():
     @api.get("/paattajille", response_class=HTMLResponse)
     @api.get("/paattajille/", response_class=HTMLResponse)
     def dm_index():
-        return HTMLResponse(dm_page)
+        return RedirectResponse(url="/keuhkodata", status_code=302)
 
     @api.get("/tietosuoja", response_class=HTMLResponse)
     @api.get("/tietosuoja/", response_class=HTMLResponse)
