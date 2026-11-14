@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.5.0",
   "scripts": {
-    "test": "node --test tests/engine.test.mjs tests/geometry.test.mjs tests/motion.test.mjs tests/delivery.test.mjs tests/crowd.test.mjs",
+    "test": "node --test tests/engine.test.mjs tests/geometry.test.mjs tests/motion.test.mjs tests/delivery.test.mjs tests/crowd.test.mjs tests/protocol.test.mjs",
     "audio": "node scripts/generate-audio.mjs",
     "preview": "python3 -m http.server 18763 -d android/app/src/main/assets/web",
     "test:flow": "node tests/direct-start.test.mjs"

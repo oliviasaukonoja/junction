@@ -92,6 +92,7 @@ export class NeedleScene {
         x=.2+away*.35;y=.27+away*.25;z=.05+away*.1;
         s.setPlunger(.05+.9*push);s.setNeedle(1-.6*enter);
       }
+      if(v!=='inject'){x+=plan.ox||0;yaw+=(plan.yaw0||0)*.35;}
       s.root.position.set(x,y,z);s.root.rotation.set(pitch,yaw,roll,'YXZ');s.root.scale.setScalar(sc);
     }
   }

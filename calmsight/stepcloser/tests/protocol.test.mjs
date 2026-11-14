@@ -1,0 +1,18 @@
+import * as p from '../android/app/src/main/assets/web/protocol.mjs';
+const eq=(a,b,m)=>{if(JSON.stringify(a)!==JSON.stringify(b)){console.log('FAIL',m,a,b);process.exitCode=1}};
+eq(p.phobiaFrom("I'm scared of needles"),'needles','needle');
+eq(p.phobiaFrom('the elevator at work'),'spaces','lift');
+eq(p.phobiaFrom('I have an MRI on Monday'),'mri','mri');
+eq(p.realNow("I'm about to get a blood test"),true,'real');
+eq(p.realNow("I'm scared of spiders"),false,'notreal');
+eq(p.realNow("I'm in the lift now"),true,'lift now');
+eq(p.numberFrom('about a seven',10),7,'7');eq(p.numberFrom('80%',100),80,'80');eq(p.numberFrom('eighty percent',100),80,'80w');eq(p.numberFrom('a hundred',100),100,'100');
+eq(p.yesNo("no it didn't"),'no','no');eq(p.yesNo('yes it did'),'yes','yes');eq(p.yesNo('kind of'),'partly','partly');
+eq(p.expectancyFrom('I think I will pass out','needles'),'faint','faint');
+eq(p.startStep('needles',null,true),0,'faint first');
+eq(p.startStep('spiders',[1,2,4,6,7,8,9,10],false),2,'first>=3');
+eq(p.nextAfter({happened:'no',fearPeak:6},2,'spiders').advice,'harder','up');
+eq(p.nextAfter({happened:'yes',fearPeak:6},2,'spiders').advice,'again','again');
+eq(p.nextAfter({happened:'yes',fearPeak:10,stoppedEarly:true},2,'spiders').advice,'easier','down');
+const v=p.vary(p.PHOBIAS.spiders.steps[3].plan,.3);
+console.log('done');

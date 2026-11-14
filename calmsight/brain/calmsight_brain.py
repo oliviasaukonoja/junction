@@ -246,9 +246,20 @@ CLINICAL_PRIOR = {
 TECHNIQUES = tuple(TECH)
 
 
+EXPOSURE_NOTE = (
+    "This is a planned exposure exercise (inhibitory learning). Do NOT suggest distraction, looking away, "
+    "escaping or safety behaviours. Encourage staying with it, naming the feeling out loud, and noticing what "
+    "actually happens compared with what they feared. Fear does not need to go to zero. ")
+
+
 def allowed_techniques(profile: dict) -> list:
     """Safety guardrails: the bandit may only pick from these."""
     fear = profile.get("fear", "spaces")
+    if profile.get("exposure"):
+        # During exposure only non-avoidant coping: applied tension (needles) and reframing.
+        if fear == "needles":
+            return ["appliedTension", "reframe"]
+        return ["reframe", "breathing"]
     if fear == "needles" and profile.get("faint_history"):
         # Vasovagal fainting: relaxation/breathing can lower blood pressure further.
         return ALLOWED["needles_faint"]
@@ -425,6 +436,7 @@ def build_prompt(base: str, profile: dict, style: int, memory: str, key: str,
         f"Situation right now: {session.get('situationText') or session.get('situation') or 'unknown'}. "
         f"Fear: {profile.get('fear')}. Fear ratings so far: {session.get('ratings') or 'none'}.\n"
         f"{memory}\n{task}\n"
+        + (EXPOSURE_NOTE if session.get("mode") == "exposure" else "") +
         "Make it concrete to THIS situation (e.g. lift: buttons, doors, floors; injection: nurse, arm, chair). "
         "One instruction at a time. Do not mention breathing unless the technique is breathing or humming. "
         f"Do not repeat these recent lines: {recent or 'none'}.\n"
@@ -442,6 +454,7 @@ def chat_prompt(heard: str, profile: dict, session: dict, style: int, memory: st
         f"The person just said: \"{heard}\". "
         f"Their fear: {profile.get('fear')}. Situation: {session.get('situationText') or session.get('situation')}. "
         f"Fear ratings so far: {rs or 'none yet'}. {memory}\n"
+        + (EXPOSURE_NOTE if session.get("mode") == "exposure" else "") +
         "Reply in spoken style: acknowledge what they said in their own words, keep them grounded, "
         f"max {STYLE_WORDS[style]} words, no medical advice, no lists, no emojis. "
         + ("End by asking how scared they are from 0 to 10. " if not rs else
@@ -644,7 +657,7 @@ def web():
         session = {"ratings": [], "times": [], "techniques": [], "step_start": None,
                    "situation": situation_key(body.get("situation")),
                    "situationText": body.get("situation"), "pending": None,
-                   "level": body.get("level")}
+                   "level": body.get("level"), "mode": body.get("mode")}
         store.set("sessions", uid, session)
         out = respond(req, uid, profile, session, {"action": "start",
                       "situation": session["situation"]}, "start", get_learning(uid))
@@ -691,7 +704,8 @@ def web():
             if session.get("techniques"):
                 avoid.add(session["techniques"][-1]) if len(session["techniques"]) >= 2 and \
                     session["techniques"][-1] == session["techniques"][-2] else None
-            pick = choose_technique(profile, session["situation"], lrn["stats"], pop, avoid=avoid)
+            pick = choose_technique({**profile, "exposure": session.get("mode") == "exposure"},
+                                    session["situation"], lrn["stats"], pop, avoid=avoid)
             d.update(technique=pick["technique"], why=pick["reason"])
             session["techniques"].append(pick["technique"])
             session["pending"] = {"tech": pick["technique"], "rating": d["rating"], "t": now}
@@ -710,6 +724,24 @@ def web():
         else:
             store.set("sessions", uid, session)
         return out
+
+    @api.post("/say")
+    async def say(req: Request, body: dict):
+        text = (body.get("text") or "").strip()[:600]
+        return {"audioUrl": speak(text, base(req)) if text else None}
+
+    @api.post("/trial")
+    async def trial(body: dict):
+        """One exposure round: prediction, how sure before/after, what happened, fear curve."""
+        uid = body["userId"]
+        t = {k: body.get(k) for k in ("phobia", "step", "expect", "expectText", "sureBefore", "sureAfter",
+                                      "happened", "fear0", "fearPeak", "fearEnd", "stoppedEarly",
+                                      "seconds", "variation", "learned", "real")}
+        t["at"] = time.time()
+        past = store.get("trials", uid, [])
+        past.append(t)
+        store.set("trials", uid, past[-200:])
+        return {"ok": True, "count": len(past)}
 
     @api.post("/stop")
     async def stop(body: dict):
