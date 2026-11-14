@@ -151,6 +151,21 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .card h2{font-size:20px}
 .tiles{grid-template-columns:repeat(3,1fr)}
 @media(max-width:780px){.tiles{grid-template-columns:1fr 1fr}}
+
+.steps{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:s}
+@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}@media(max-width:560px){.steps{grid-template-columns:1fr}}
+.step{position:relative;border:1px solid var(--line);border-top:5px solid var(--mid);border-radius:14px;padding:14px 16px;background:#fff}
+.step.gap{border-top-color:var(--hi);background:#FFF8F7}.step.ok{border-top-color:var(--total)}
+@media(min-width:901px){.step:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:14px;color:var(--muted);font-size:16px;background:var(--bg);line-height:1}}
+.sh{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.step.gap .stl{color:#B42318}.step.ok .stl{color:#0B7A53}
+.sn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--bg);color:var(--ink);font-size:12px}
+.step h3{font-size:17px;margin:8px 0 10px}
+.si{padding:8px 0;border-top:1px dashed var(--line)}
+.sv{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;line-height:1.15}
+.sm{font-size:13.5px;color:var(--ink);margin-top:2px}.sc{font-size:12.5px;color:var(--muted);margin-top:2px}
+.sv small{font-family:Inter,sans-serif;font-size:12.5px;font-weight:500;color:var(--muted)}
+.sv .tag{font-size:10px;vertical-align:3px}
 </style>
 </head>
 <body>
@@ -258,7 +273,7 @@ const VIEWS = [
  {id:'kpi', g:'sum', wide:true, kind:'tiles', title:{fi:'Avainluvut',sv:'Nyckeltal',en:'Key figures'}},
  {id:'pathway', g:'sum', wide:true, kind:'pathway', tag:'N', src:['team','mot'],
   title:{fi:'Missä kohtaa hoitopolkua ero syntyy',sv:'Var i vårdkedjan uppstår skillnaden',en:'Where on the care pathway the gap emerges'},
-  sub:{fi:'Polku Labsin kooste: punainen = ero syntyy tässä, vihreä = pääosin ajallaan',sv:'Polku Labs sammanställning: rött = skillnaden uppstår här, grönt = mestadels i tid',en:'Polku Labs summary: red = the gap forms here, green = mostly on time'},
+  sub:{fi:'Polku Labsin kooste vaiheittain: Suomen luku isolla, vertailu alla',sv:'Polku Labs sammanställning per steg: Finlands siffra stort, jämförelse under',en:'Polku Labs summary by stage: Finland in large type, comparison below'},
   note:{fi:'Ero syntyy pääosin ennen diagnoosia, perusterveydenhuollossa. Diagnoosista hoitoon päästään useimmiten ajallaan.',sv:'Skillnaden uppstår främst före diagnos, i primärvården. Från diagnos till behandling går det oftast i tid.',en:'The gap forms mostly before diagnosis, in primary care. Diagnosis to treatment is mostly on time.'}},
  {id:'reco', g:'sum', wide:true, kind:'reco', tag:'N', src:['team'],
   title:{fi:'Mitä tehdään: suositukset',sv:'Vad gör vi: rekommendationer',en:'What to do: recommendations'},
@@ -509,8 +524,9 @@ function tableHTML(v,spec){
 const tagHTML = k => k?`<span class="tag ${k}" title="${t('tag'+k)}" aria-label="${t('tag'+k)}" role="img">${k}</span>`:'';
 function body(v){
   if(v.kind==='tiles') return `<div class="tiles">${TILES().map(x=>`<div class="tile"><div class="v">${pc(x.v)}</div><div class="l">${L(x.l)}</div><div class="s">${L(x.s)}</div></div>`).join('')}</div>`;
-  if(v.kind==='pathway'){const col={true:'var(--hi)',false:'var(--total)',null:'var(--mid)'};const hd={fi:['Vaihe','Mittari','Suomi','Vertailu','Lähde'],sv:['Fas','Mått','Finland','Jämförelse','Källa'],en:['Stage','Measure','Finland','Comparison','Source']}[lang];
-    return `<div class="tablewrap" style="max-height:none"><table class="ptable"><thead><tr>${hd.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${PATH.map(p=>p.items.map((it,i)=>`<tr${i===0?' class="first"':''}>${i===0?`<td class="stage" rowspan="${p.items.length}"><span class="dot" style="background:${col[p.gap]}"></span>${L(p.st)}</td>`:''}<td data-l="${hd[1]}">${L(it.m)}</td><td data-l="${hd[2]}"><b>${pc(L(it.f))}</b></td><td data-l="${hd[3]}">${L(it.c)}</td><td data-l="${hd[4]}">${tagHTML(it.tag)}</td></tr>`).join('')).join('')}</tbody></table></div>`;}
+  if(v.kind==='pathway'){
+    const ST={true:['gap',{fi:'Ero syntyy tässä',sv:'Skillnaden uppstår här',en:'The gap forms here'}],false:['ok',{fi:'Pääosin ajallaan',sv:'Mestadels i tid',en:'Mostly on time'}],null:['na',{fi:'Ei dataa',sv:'Inga data',en:'No data'}]};
+    return `<ol class="steps">${PATH.map((p,i)=>{const st=ST[p.gap];return `<li class="step ${st[0]}"><div class="sh"><span class="sn">${i+1}</span><span class="stl">${L(st[1])}</span></div><h3>${L(p.st)}</h3>${p.items.map(it=>`<div class="si"><div class="sv">${(()=>{const f=pc(L(it.f)),k=f.indexOf(" (");return k<0?f:f.slice(0,k)+`<small>${f.slice(k)}</small>`})()}${tagHTML(it.tag)}</div><div class="sm">${L(it.m)}</div><div class="sc">${L(it.c)}</div></div>`).join('')}</li>`}).join('')}</ol>`;}
   if(v.kind==='reco'){
     const hi=D.smr.filter(r=>r[2]>1).map(r=>nm(r[0])).join(', ');
     const R={
