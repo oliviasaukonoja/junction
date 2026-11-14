@@ -25,3 +25,6 @@ build/
 
 # Project
 data/raw/
+
+# Source PDFs (large, not ours to redistribute)
+*.pdf

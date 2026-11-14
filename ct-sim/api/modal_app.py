@@ -7,7 +7,7 @@
 WARNING: the web endpoint has no authentication and runs CPU work on request. n is capped, but anyone with the URL can use your credits.
 Deploy only for the demo and `modal app stop ctsim` afterwards.
 
-Only public aggregate data (municipality table, researched CT site list) and the front end are copied into the image.
+Only public aggregate data (municipality table, researched CT site list, county area data, gap-finder data) and the front end are copied into the image. Put a filled data/area/ct_waits.csv next to them to use observed county CT waits.
 """
 import sys
 from pathlib import Path
@@ -27,6 +27,8 @@ image = (
     .add_local_file(ROOT / "data" / "routing" / "municipalities.csv", remote_path="/root/data/routing/municipalities.csv")
     .add_local_file(ROOT / "data" / "ct_sites" / "ct_sites.csv", remote_path="/root/data/ct_sites/ct_sites.csv")
     .add_local_file(ROOT / "data" / "gap" / "gapdata.json", remote_path="/root/data/gap/gapdata.json")
+    .add_local_file(ROOT / "data" / "area" / "county_map.csv", remote_path="/root/data/area/county_map.csv")
+    .add_local_file(ROOT / "data" / "area" / "county_indicators.csv", remote_path="/root/data/area/county_indicators.csv")
     .add_local_dir(ROOT / "web", remote_path="/root/web")
 )
 

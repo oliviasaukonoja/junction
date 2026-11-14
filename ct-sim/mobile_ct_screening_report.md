@@ -380,7 +380,7 @@ National, one year, modelled (`campaign_intensity`, `triage`, `priority_eligible
 |---|---|---|---|---|
 | No campaign | 25,000 / 0 | 17,000 | 28% | +4.0 weeks (Kymenlaakso) |
 | Campaign 2, 60% of ineligible requests filtered, eligible booked first | 40,000 / 38,000 | 17,000 | 28% | +14.8 weeks |
-| Campaign 2, 80% filtered, eligible booked first | 40,000 / 25,000 | 17,000 | 28% | +11.4 weeks |
+| Campaign 2, 80% filtered, eligible booked first | 40,000 / 19,000 | 17,000 | 28% | +11.4 weeks |
 | Campaign 2, no filtering, everyone queues together | 40,000 / 94,000 | 17,000 | 8% | +24.8 weeks |
 What it shows: a campaign mostly generates demand from people who are not eligible. Filtering requests and booking eligible people first protects screening of the high-risk group, but the queue grows anyway (the gap equals about 21 truck-years at intensity 2); the plan stays targeted only if capacity is added or invitations are paced. All campaign effects are assumptions; the pilot should measure them.
 

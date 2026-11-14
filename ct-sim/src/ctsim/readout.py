@@ -44,7 +44,7 @@ def readout(res: dict, other: dict | None = None) -> str:
                   f"interpreters, evening hours at a hospital CT) before committing to a truck.")
     elif share >= TARGETING_ABOVE:
         bottom = (f"A unit would be well used and well targeted under these assumptions: about {_fmt(o['additional'])} extra participants a year "
-                  f"({share:.0f}% of scans). That targeting depends on the assumed distance-decay of uptake, so test it in a pilot before relying on it.")
+                  f"({share:.0f}% of scans). That targeting depends on the assumed uptake curves and the assumed free CT capacity, so test it in a pilot before relying on it.")
     else:
         bottom = (f"A unit would be fully used, but only about {share:.0f}% of its scans reach people a hospital CT would miss "
                   f"(about {_fmt(o['additional'])} extra participants a year). Most scans would replace what a hospital CT could do.")
