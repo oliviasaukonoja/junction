@@ -1,0 +1,81 @@
+area,year,referrals_ytd_at_year_end,referrals_month_used,referrals_per_1000,pct_referrals_processed_over_21d,assess_queue_mean,assess_months_reported,assess_pct_over90d,assess_pct_over180d,treat_queue_mean,treat_months_reported,treat_pct_over90d,treat_pct_over180d
+Etelä-Karjalan hyvinvointialue,2023,539,12,4.3,0.0,1.0,1,0.0,0.0,2.3,3,0.0,0.0
+Etelä-Karjalan hyvinvointialue,2024,1261,12,10.1,0.0,,0,,,7.7,7,3.7,0.0
+Etelä-Karjalan hyvinvointialue,2025,1242,12,10.0,0.0,,0,,,16.1,11,1.1,1.1
+Etelä-Karjalan hyvinvointialue,2026 (Jan-Sep),742,09,6.0,0.1,,0,,,13.3,9,0.0,0.0
+Etelä-Pohjanmaan hyvinvointialue,2023,1036,12,5.4,0.0,17.1,12,54.1,43.9,18.8,12,5.3,2.2
+Etelä-Pohjanmaan hyvinvointialue,2024,986,12,5.2,0.0,14.3,12,2.9,0.0,20.9,12,8.8,2.8
+Etelä-Pohjanmaan hyvinvointialue,2025,935,12,4.9,0.2,8.5,11,1.1,0.0,18.3,12,8.6,0.9
+Etelä-Pohjanmaan hyvinvointialue,2026 (Jan-Sep),760,09,4.0,0.0,9.5,4,0.0,0.0,15.0,9,14.8,2.2
+Etelä-Savon hyvinvointialue,2023,514,12,4.0,0.0,,0,,,7.1,12,2.4,0.0
+Etelä-Savon hyvinvointialue,2024,527,12,4.1,0.0,,0,,,13.0,12,3.2,0.0
+Etelä-Savon hyvinvointialue,2025,665,12,5.2,0.0,,0,,,16.4,12,1.0,0.0
+Etelä-Savon hyvinvointialue,2026 (Jan-Sep),700,09,5.5,0.0,,0,,,16.4,9,2.0,0.7
+HUS,2023,1984,12,1.1,1.0,181.9,12,0.4,0.0,331.2,12,0.4,0.3
+HUS,2024,2040,12,1.1,0.4,167.2,12,0.2,0.2,329.7,12,0.0,0.0
+HUS,2025,1541,12,0.9,0.5,248.9,12,0.2,0.0,280.8,12,0.4,0.0
+HUS,2026 (Jan-Sep),1190,09,0.7,0.4,245.6,9,0.1,0.0,255.6,9,0.3,0.0
+"Helsingin sosiaali-, terveys- ja pelastustoimi",2023,,,,,,0,,,,0,,
+"Helsingin sosiaali-, terveys- ja pelastustoimi",2024,,,,,,0,,,,0,,
+"Helsingin sosiaali-, terveys- ja pelastustoimi",2025,,,,,,0,,,,0,,
+"Helsingin sosiaali-, terveys- ja pelastustoimi",2026 (Jan-Sep),,,,,,0,,,,0,,
+Kainuun hyvinvointialue,2023,,,,,,0,,,,0,,
+Kainuun hyvinvointialue,2024,,,,,,0,,,,0,,
+Kainuun hyvinvointialue,2025,,,,,,0,,,,0,,
+Kainuun hyvinvointialue,2026 (Jan-Sep),,,,,,0,,,,0,,
+Kanta-Hämeen hyvinvointialue,2023,772,12,4.6,0.1,2.7,10,37.0,37.0,16.3,12,6.1,0.5
+Kanta-Hämeen hyvinvointialue,2024,1432,12,8.5,0.0,2.0,7,21.4,0.0,19.5,12,3.0,1.7
+Kanta-Hämeen hyvinvointialue,2025,823,12,4.9,0.0,1.0,1,0.0,0.0,9.4,10,0.0,0.0
+Kanta-Hämeen hyvinvointialue,2026 (Jan-Sep),592,09,3.5,0.0,,0,,,11.4,9,3.9,0.0
+Keski-Pohjanmaan hyvinvointialue,2023,375,12,5.5,0.0,,0,,,15.0,12,16.7,0.6
+Keski-Pohjanmaan hyvinvointialue,2024,325,12,4.8,0.0,,0,,,13.8,12,14.5,0.6
+Keski-Pohjanmaan hyvinvointialue,2025,357,12,5.3,0.0,,0,,,16.3,12,16.8,1.0
+Keski-Pohjanmaan hyvinvointialue,2026 (Jan-Sep),351,09,5.2,0.0,,0,,,13.8,9,7.3,0.0
+Keski-Suomen hyvinvointialue,2023,835,12,3.1,0.1,1.5,2,0.0,0.0,3.1,12,13.5,0.0
+Keski-Suomen hyvinvointialue,2024,1129,12,4.1,0.2,,0,,,7.5,11,19.5,9.8
+Keski-Suomen hyvinvointialue,2025,1142,12,4.2,0.0,1.0,2,0.0,,6.2,12,24.3,17.6
+Keski-Suomen hyvinvointialue,2026 (Jan-Sep),876,09,3.2,0.1,2.0,2,0.0,,6.6,9,8.5,6.8
+Kymenlaakson hyvinvointialue,2023,910,12,5.7,0.3,1.7,6,0.0,0.0,7.9,11,1.1,0.0
+Kymenlaakson hyvinvointialue,2024,899,12,5.7,0.0,,0,,,7.7,12,7.6,4.3
+Kymenlaakson hyvinvointialue,2025,1261,12,8.1,0.0,,0,,,8.6,12,1.0,0.0
+Kymenlaakson hyvinvointialue,2026 (Jan-Sep),870,09,5.6,0.0,,0,,,7.8,9,0.0,0.0
+Lapin hyvinvointialue,2023,694,12,3.9,0.0,6.0,12,12.5,5.6,7.0,12,0.0,0.0
+Lapin hyvinvointialue,2024,765,12,4.3,0.4,9.9,11,22.0,10.1,8.2,12,0.0,0.0
+Lapin hyvinvointialue,2025,803,12,4.6,0.1,21.8,12,12.3,6.9,6.7,12,5.0,1.2
+Lapin hyvinvointialue,2026 (Jan-Sep),620,09,3.5,0.2,18.8,9,13.6,10.7,4.4,9,0.0,0.0
+Pirkanmaan hyvinvointialue,2023,821,12,1.5,0.4,3.7,10,0.0,0.0,25.5,12,2.9,2.6
+Pirkanmaan hyvinvointialue,2024,2997,12,5.5,0.7,41.5,11,72.4,60.2,12.8,6,0.0,0.0
+Pirkanmaan hyvinvointialue,2025,2602,12,4.7,0.9,1.0,3,100.0,100.0,,0,,
+Pirkanmaan hyvinvointialue,2026 (Jan-Sep),1518,09,2.8,0.5,4.7,3,0.0,0.0,,0,,
+Pohjanmaan hyvinvointialue,2023,2077,12,11.7,0.0,1.7,10,0.0,0.0,2.7,12,12.5,0.0
+Pohjanmaan hyvinvointialue,2024,2286,12,12.8,0.0,2.1,9,5.3,0.0,1.7,6,0.0,0.0
+Pohjanmaan hyvinvointialue,2025,2229,12,12.4,1.3,2.0,1,0.0,0.0,2.0,4,12.5,0.0
+Pohjanmaan hyvinvointialue,2026 (Jan-Sep),1803,09,10.0,0.1,1.0,2,0.0,0.0,4.2,9,0.0,0.0
+Pohjois-Karjalan hyvinvointialue,2023,124,12,0.8,0.0,2.4,11,0.0,0.0,24.0,12,0.7,0.0
+Pohjois-Karjalan hyvinvointialue,2024,123,12,0.8,0.0,2.9,12,0.0,0.0,19.8,12,0.8,0.0
+Pohjois-Karjalan hyvinvointialue,2025,116,12,0.7,0.0,3.0,12,5.6,0.0,26.8,12,3.7,0.0
+Pohjois-Karjalan hyvinvointialue,2026 (Jan-Sep),113,09,0.7,0.0,3.4,8,0.0,0.0,27.3,9,3.3,0.0
+Pohjois-Pohjanmaan hyvinvointialue,2023,2797,12,6.7,0.0,1.1,10,36.4,0.0,69.0,12,0.7,0.4
+Pohjois-Pohjanmaan hyvinvointialue,2024,2658,12,6.4,0.2,2.9,8,0.0,0.0,107.3,12,2.6,1.1
+Pohjois-Pohjanmaan hyvinvointialue,2025,2320,12,5.6,0.0,3.0,7,9.5,9.5,162.6,12,16.8,4.1
+Pohjois-Pohjanmaan hyvinvointialue,2026 (Jan-Sep),1709,09,4.1,0.1,6.6,9,6.8,5.1,51.6,9,0.6,0.4
+Pohjois-Savon hyvinvointialue,2023,2269,12,9.1,0.9,115.2,12,1.0,0.4,17.2,11,6.9,1.1
+Pohjois-Savon hyvinvointialue,2024,2153,12,8.7,0.6,148.7,12,0.5,0.1,12.6,12,6.6,5.3
+Pohjois-Savon hyvinvointialue,2025,2134,12,8.6,0.6,159.9,12,0.6,0.1,10.8,12,17.8,10.1
+Pohjois-Savon hyvinvointialue,2026 (Jan-Sep),1581,09,6.4,0.9,144.0,8,0.9,0.3,7.6,8,13.1,6.6
+Päijät-Hämeen hyvinvointialue,2023,1426,12,7.0,2.1,,0,,,1.1,7,25.0,0.0
+Päijät-Hämeen hyvinvointialue,2024,1697,12,8.3,1.3,3.7,3,0.0,0.0,1.3,3,0.0,0.0
+Päijät-Hämeen hyvinvointialue,2025,1313,12,6.4,1.6,10.8,12,18.5,4.6,2.3,6,0.0,0.0
+Päijät-Hämeen hyvinvointialue,2026 (Jan-Sep),1281,09,6.3,0.0,10.2,9,22.8,12.0,3.2,6,0.0,0.0
+Satakunnan hyvinvointialue,2023,1352,12,6.4,0.1,3.9,7,11.1,,3.9,10,0.0,0.0
+Satakunnan hyvinvointialue,2024,1494,12,7.1,0.0,5.5,8,11.4,33.3,13.2,11,1.4,0.0
+Satakunnan hyvinvointialue,2025,1409,12,6.7,0.1,1.8,5,33.3,100.0,34.6,12,6.3,1.7
+Satakunnan hyvinvointialue,2026 (Jan-Sep),1187,09,5.6,0.1,1.0,4,25.0,0.0,24.2,9,12.4,4.1
+Varsinais-Suomen hyvinvointialue,2023,677,12,1.4,0.3,1.4,7,0.0,0.0,44.2,12,1.3,1.3
+Varsinais-Suomen hyvinvointialue,2024,762,12,1.5,0.3,1.0,5,0.0,0.0,44.7,11,1.4,0.4
+Varsinais-Suomen hyvinvointialue,2025,895,12,1.8,0.5,1.4,7,0.0,0.0,38.2,12,7.8,3.3
+Varsinais-Suomen hyvinvointialue,2026 (Jan-Sep),623,09,1.3,0.2,1.0,4,0.0,0.0,22.1,9,1.5,1.0
+Kaikki hyvinvointialueet,2023,19202,12,3.4,0.4,334.3,12,4.0,2.7,591.4,12,1.7,0.5
+Kaikki hyvinvointialueet,2024,23534,12,4.2,0.3,390.0,12,8.2,6.2,624.4,12,1.9,0.7
+Kaikki hyvinvointialueet,2025,21787,12,3.9,0.5,456.2,12,1.6,0.6,650.6,12,6.6,1.7
+Kaikki hyvinvointialueet,2026 (Jan-Sep),16516,09,2.9,0.2,419.4,9,1.6,0.9,482.7,9,2.2,0.6

@@ -71,3 +71,31 @@ Preparation 3-6 months (approvals, identification method, vehicle or pop-up venu
 
 ## 12. What this pilot will not tell us
 Whether screening saves lives in Finland; the true overdiagnosis rate; how many eligible people exist (it needs the pack-year data); whether results transfer to other counties. It tells us whether an extra delivery channel adds scans, for whom, and at what cost and capacity impact.
+
+## 13. Fit with the Finnish national cancer strategy 2026-2035
+Sources: the strategy *Kansallinen syöpästrategia 2026-2035* and its implementation roadmap *Toimeenpanon tiekartta 2026-2031* (STM, FICAN, Cancer Society of Finland, THL). Action numbers below are the roadmap's. Read from the PDFs in November 2026; the roadmap was searched by keyword, not read end to end, so check the cited actions before quoting them.
+
+### Where this pilot sits
+The roadmap (action 2.3.4) says the EU recommends piloting lung-cancer screening for long-term smokers, that a randomised pilot started in early 2026 in Helsinki and eight wellbeing counties, and that by 2028 the small pilot should have expanded regionally to invite the EU target population. This design is **not a competing programme**. It proposes the access-and-equity arm of that regional expansion: it asks whether bringing the scan closer, with language support, adds participation among people far from a hospital or from language minorities, which a hospital-based pilot cannot show. Action 2.4.4 reserves an estimated €2.5 million for pilot studies run with the Cancer Registry and the counties; that is the funding route this protocol would apply to.
+
+### Pilot outcomes mapped to strategy measures
+| Pilot outcome (section 5) | Strategy measure it informs | What the pilot can and cannot say |
+|---|---|---|
+| Uptake by language group (secondary) | Participation of people whose native language is not Finnish or Swedish reaches the level of Finnish and Swedish speakers (actions 1.1 and 1.3.1) | Can show whether the offer and interpreter support narrow the gap in the pilot county. Does not show national change. |
+| Uptake by distance band (secondary) | Regional equality theme; the roadmap states that people living far from a hospital or in rural areas are diagnosed at a later stage and seek care more slowly | Tests whether distance is a barrier to screening uptake. Our own Cancer Registry participation tables suggest it is not the main one (see the equity step in `demo_script.md`), so a null distance result is a valid finding. |
+| Uptake overall and by county (primary) | 80% participation in every screening programme in every county (headline target and action 2.4.1) | Can report participation in the pilot county. The 80% target is for established programmes, not a lung pilot. |
+| Stage of screen-detected cancers (process indicator) | At least 70% of cancers diagnosed at stage I-II by 2035 | Process indicator only: lead-time bias and small numbers rule out any claim of benefit. |
+| Cost per additional scan, added CT wait | Cost-effective, risk-based screening (action 2.4.3); capacity and waits | Gives measured utilisation and queue effects the national pilot may not report. |
+| None | Lung-cancer 5-year survival up more than 14 points to the Swedish-Norwegian level; cancer mortality down 10% | **Not measurable here.** A 12-18 month pilot cannot show survival or mortality, and this design does not claim to. |
+
+### Constraints from the strategy that shape the design
+- **Finding eligible people.** Action 2.4.2 says current law does not allow screening and other health registers to be used directly to select invitees; STM is preparing a legislative change, with the update expected in 2029-2031. Register-based invitation therefore cannot be assumed for this pilot. Section 3's options (questionnaire, self-referral, records with a lawful basis) stay open, and any use of the Mass Screening Registry's invitation service must be agreed with the registry. This is an open question, not an available service.
+- **Governance.** Actions 2.3.1 and 2.3.2 clarify the roles of the national screening steering group and the Palko screening subcommittee and update the decision criteria (the 2006 national criteria are due for revision). The pilot should be proposed through the Cancer Registry and the counties, not run alongside them, and its results framed as evidence for that process.
+- **Opportunistic scanning.** Action 2.4.2 would require all screening-type tests outside the national programme to be reported to the screening registry. The pilot should plan to send individual-level invitation, scan and result data to the registry from the start (this matches section 6c of the screening decree, which applies already).
+- **Patient and community involvement.** Actions 1.1.1 and 1.3.1 expect screening design to involve patients and organisations representing language and cultural minorities. Section 2's interpreter factor and the outreach through municipal and community organisations (see the outreach list) answer this and should be named as part of the design, not added afterwards.
+- **Cessation.** Action 2.2.2 sets a target of national-model nicotine cessation services in half of the counties by 2028. A cessation offer can be an optional add-on arm, run in coordination with the 2026 national pilot's own cessation component; it is not part of the primary question and is not costed here.
+
+### What not to claim
+- That the pilot advances the survival, mortality or stage targets. It informs participation and equity measures; the others need years and a programme.
+- That the pilot is part of, endorsed by or funded under the national programme. It is a proposal that fits action 2.3.4 and 2.4.4; no one has agreed to it.
+- That register-based invitation is available. See above.
