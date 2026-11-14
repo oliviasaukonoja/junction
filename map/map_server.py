@@ -51,40 +51,14 @@ def facts_text(pub: dict) -> str:
     return "\n".join(lines)
 
 
-def create_app(root: Path, advanced_json: bytes):
-    """root = directory that holds the map files (map/ in the repo, /root/map on Modal)."""
+def register_api(api, pub: dict, advanced_json: bytes):
+    """Add the map API to an existing FastAPI app (used by preview_app.py via create_app, and by landing-page/app.py):
+    POST /api/map/unlock, GET /api/map/advanced, POST /api/map/route, POST /api/map/hospital, GET+POST /api/map/chat."""
     import map_gate
     import route_engine as E
-    from fastapi import Body, FastAPI, HTTPException, Request
-    from fastapi.responses import HTMLResponse, RedirectResponse, Response
-
-    api = FastAPI(docs_url=None, redoc_url=None)
-    page = (root / "kartta.html").read_text(encoding="utf-8")
-    data = (root / "pilot_map.json").read_bytes()
-    pub = json.loads(data)
-    js, css = (root / "vendor/leaflet.js").read_bytes(), (root / "vendor/leaflet.css").read_bytes()
+    from fastapi import Body, HTTPException, Request
+    from fastapi.responses import Response
     facts = facts_text(pub)
-    live, live_paths = "https://polkuhoitoon.fi", {"sovellus", "ammattilaisille", "paattajille", "keuhkodata", "meista", "ukk", "palaute", "tietosuoja"}
-
-    @api.middleware("http")
-    async def noindex(request, call_next):
-        resp = await call_next(request)
-        resp.headers["X-Robots-Tag"] = "noindex, nofollow"
-        return resp
-
-    @api.get("/", response_class=HTMLResponse)
-    @api.get("/kartta", response_class=HTMLResponse)
-    @api.get("/kartta/", response_class=HTMLResponse)
-    def kartta(): return HTMLResponse(page)
-
-    @api.get("/pilot_map.json")
-    def pilot_map(): return Response(data, media_type="application/json", headers={"Cache-Control": "no-cache"})
-
-    @api.get("/vendor/leaflet.js")
-    def leaflet_js(): return Response(js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
-
-    @api.get("/vendor/leaflet.css")
-    def leaflet_css(): return Response(css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
 
     map_gate.register(api, advanced_json)
 
@@ -132,6 +106,43 @@ def create_app(root: Path, advanced_json: bytes):
         except anthropic.APIConnectionError: raise HTTPException(502, "Assistant unreachable")
         text = "".join(b.text for b in r.content if b.type == "text")
         return {"configured": True, "answer": text}
+
+
+def create_app(root: Path, advanced_json: bytes):
+    """root = directory that holds the map files (map/ in the repo, /root/map on Modal)."""
+    import map_gate
+    import route_engine as E
+    from fastapi import Body, FastAPI, HTTPException, Request
+    from fastapi.responses import HTMLResponse, RedirectResponse, Response
+
+    api = FastAPI(docs_url=None, redoc_url=None)
+    page = (root / "kartta.html").read_text(encoding="utf-8")
+    data = (root / "pilot_map.json").read_bytes()
+    pub = json.loads(data)
+    js, css = (root / "vendor/leaflet.js").read_bytes(), (root / "vendor/leaflet.css").read_bytes()
+    live, live_paths = "https://polkuhoitoon.fi", {"sovellus", "ammattilaisille", "paattajille", "keuhkodata", "meista", "ukk", "palaute", "tietosuoja"}
+
+    @api.middleware("http")
+    async def noindex(request, call_next):
+        resp = await call_next(request)
+        resp.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return resp
+
+    @api.get("/", response_class=HTMLResponse)
+    @api.get("/kartta", response_class=HTMLResponse)
+    @api.get("/kartta/", response_class=HTMLResponse)
+    def kartta(): return HTMLResponse(page)
+
+    @api.get("/pilot_map.json")
+    def pilot_map(): return Response(data, media_type="application/json", headers={"Cache-Control": "no-cache"})
+
+    @api.get("/vendor/leaflet.js")
+    def leaflet_js(): return Response(js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
+
+    @api.get("/vendor/leaflet.css")
+    def leaflet_css(): return Response(css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
+
+    register_api(api, pub, advanced_json)
 
     @api.get("/{path:path}")
     def other(path: str):

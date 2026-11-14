@@ -1,6 +1,9 @@
 """Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + lung cancer data dashboard (/keuhkodata) + sign-up API on Modal.
 
-Deploy:      modal deploy app.py
+Deploy:      python3 ../ct-sim/docs/analysis/build_pilot_map_data.py   (creates map/private/pilot_map_advanced.json, not in git)
+             modal deploy app.py
+Secrets:     polku-ai holds ANTHROPIC_API_KEY (analyst + map chat) and MAP_PASSWORD (map advanced tools). Without them the
+             analyst and map chat show their fallback messages and the map tools stay locked.
 Sign-ups:    python signups.py   (reads the Modal Volume with your own Modal login)
 
 There is deliberately no admin page on the website: sign-ups are only
@@ -17,10 +20,14 @@ import modal
 
 HERE = Path(__file__).parent
 MAP = HERE.parent / "map"
+REPO = HERE.parent
+ADVANCED = MAP / "private/pilot_map_advanced.json"
+if not ADVANCED.exists():
+    raise SystemExit(f"Missing {ADVANCED}. Run: python3 ct-sim/docs/analysis/build_pilot_map_data.py (from the repo root), then deploy again.")
 
 image = (
     modal.Image.debian_slim()
-    .pip_install("fastapi[standard]")
+    .pip_install("fastapi[standard]", "anthropic")
     .add_local_file(HERE / "index.html", "/root/index.html")
     .add_local_file(HERE / "sovellus.html", "/root/sovellus.html")
     .add_local_file(HERE / "ammattilaisille.html", "/root/ammattilaisille.html")
@@ -36,6 +43,17 @@ image = (
     .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
     .add_local_file(HERE / "regions.json", "/root/regions.json")
+    # map API (same layout as the repo, so map/route_engine.py finds ct-sim/ and landing-page/regions.json)
+    .add_local_file(MAP / "map_server.py", "/root/map/map_server.py")
+    .add_local_file(MAP / "route_engine.py", "/root/map/route_engine.py")
+    .add_local_file(MAP / "map_gate.py", "/root/map/map_gate.py")
+    .add_local_file(ADVANCED, "/root/map/private/pilot_map_advanced.json")
+    .add_local_file(HERE / "regions.json", "/root/landing-page/regions.json")
+    .add_local_dir(REPO / "ct-sim/src/ctsim", "/root/ct-sim/src/ctsim", ignore=["**/__pycache__/**"])
+    .add_local_dir(REPO / "ct-sim/data/routing", "/root/ct-sim/data/routing")
+    .add_local_dir(REPO / "ct-sim/data/area", "/root/ct-sim/data/area")
+    .add_local_dir(REPO / "ct-sim/data/ct_sites", "/root/ct-sim/data/ct_sites")
+    .add_local_dir(REPO / "ct-sim/data/model", "/root/ct-sim/data/model")
 )
 
 app = modal.App("vayla-waitlist")
@@ -54,7 +72,7 @@ PRODUCTS = {"bus", "app"}
 @app.function(
     image=image,
     volumes={"/data": vol},
-    secrets=[modal.Secret.from_name("polku-ai")],  # ANTHROPIC_API_KEY for the AI analyst
+    secrets=[modal.Secret.from_name("polku-ai")],  # ANTHROPIC_API_KEY (analyst, map chat), MAP_PASSWORD (map tools)
     max_containers=1,  # one writer keeps the file consistent
 )
 @modal.concurrent(max_inputs=50)
@@ -82,6 +100,11 @@ def web():
     leaflet_js = Path("/root/leaflet.js").read_bytes()
     leaflet_css = Path("/root/leaflet.css").read_bytes()
     lock = threading.Lock()
+
+    import sys
+    sys.path.insert(0, "/root/map")
+    import map_server
+    map_server.register_api(api, json.loads(map_data), Path("/root/map/private/pilot_map_advanced.json").read_bytes())
 
 
     def read_all():
