@@ -48,6 +48,8 @@ main{padding-bottom:60px}
 .picker>summary::after{content:'▾';margin-inline-start:8px;color:var(--muted)}.picker[open]>summary::after{content:'▴'}
 .picker[open] .btns{margin:10px 0}.picker .btns button:first-child{margin-inline-start:0}
 .picker{padding:14px 20px}.cnt{font-size:13px;color:var(--muted);margin-inline-start:8px}
+.myarea{display:flex;gap:10px;align-items:center;margin-bottom:12px;font-size:14px;color:var(--muted)}.myarea select{font:inherit;font-size:15px;color:var(--ink);border:1px solid #C9D2E0;border-radius:10px;padding:8px 10px;background:#fff;max-width:100%}
+.snap{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:14.5px}.snap b{font-family:'Space Grotesk',sans-serif}.snap ul{margin:6px 0 0;padding-inline-start:18px}
 .presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;font-size:14px;color:var(--muted)}
 .presets button{font:inherit;font-size:15px;border:1px solid #C9D2E0;background:#fff;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
 .presets button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -140,6 +142,8 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
         <span id="pre_l" data-t="pre_l"></span>
         <button data-pre="sum" data-t="pre_sum"></button><button data-pre="reg" data-t="pre_reg"></button><button data-pre="all" data-t="pre_all"></button>
       </div>
+      <div class="myarea"><label for="area" data-t="area_l"></label><select id="area"></select></div>
+      <div class="snap hidden" id="snap"></div>
       <details class="picker" id="pickerbox">
         <summary class="picker-head"><h2 data-t="pick_h"></h2><span class="cnt" id="cnt"></span></summary>
         <div class="btns"><button id="all" data-t="all"></button><button id="none" data-t="none"></button></div>
@@ -164,9 +168,9 @@ const nm = c => D.names[c][lang];
 const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
 
 const T = {
- fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä Suomessa julkisen datan valossa',lead:'Kuolleisuus, alue-erot, viiveet, riskiryhmä ja eriarvoisuus yhdessä paikassa. Valitse alta, mitä haluat katsoa. Jokaisen luvun lähde näkyy kuvaajan alla.',tab_dash:'Dashboard',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
- sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer i Finland i ljuset av öppna data',lead:'Dödlighet, regionala skillnader, fördröjningar, riskgrupp och ojämlikhet på ett ställe. Välj nedan vad du vill se. Källan till varje siffra visas under diagrammet.',tab_dash:'Dashboard',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
- en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer in Finland through public data',lead:'Mortality, regional gaps, delays, the risk group and inequality in one place. Choose below what you want to see. The source of every figure is shown under its chart.',tab_dash:'Dashboard',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
+ fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä Suomessa julkisen datan valossa',lead:'Kuolleisuus, alue-erot, viiveet, riskiryhmä ja eriarvoisuus yhdessä paikassa. Valitse alta, mitä haluat katsoa. Jokaisen luvun lähde näkyy kuvaajan alla.',tab_dash:'Dashboard',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
+ sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer i Finland i ljuset av öppna data',lead:'Dödlighet, regionala skillnader, fördröjningar, riskgrupp och ojämlikhet på ett ställe. Välj nedan vad du vill se. Källan till varje siffra visas under diagrammet.',tab_dash:'Dashboard',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
+ en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer in Finland through public data',lead:'Mortality, regional gaps, delays, the risk group and inequality in one place. Choose below what you want to see. The source of every figure is shown under its chart.',tab_dash:'Dashboard',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
 };
 const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
 const t = k => T[lang][k];
@@ -238,7 +242,7 @@ const VIEWS = [
  {id:'region', g:'mort', tag:'S', src:['st13u5'], tall:true,
   title:{fi:'Karkea kuolleisuus hyvinvointialueittain',sv:'Rå dödlighet per välfärdsområde',en:'Crude mortality by wellbeing services county'},
   sub:{fi:'Ikävakioimaton kuolleisuus / 100 000 asukasta, keskiarvo 2021–2025 (C32–C34)',sv:'Ej åldersstandardiserad dödlighet / 100 000 invånare, medeltal 2021–2025 (C32–C34)',en:'Crude mortality / 100,000 population, mean 2021–2025 (C32–C34)'},
-  chart:()=>bar(D.region.map(r=>nm(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,ref:D.region_fi,refLabel:t('national')}),
+  chart:()=>bar(D.region.map(r=>nm(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,codes:D.region.map(r=>r[0]),ref:D.region_fi,refLabel:t('national')}),
   note:{fi:'Luku ei ole ikävakioitu. Reiluun vertailuun käytä SMR-näkymää.',sv:'Talet är inte åldersstandardiserat. Använd SMR-vyn för en rättvis jämförelse.',en:'Not age-standardised. Use the SMR view for a fair comparison.'}},
  {id:'delay', g:'delay', tag:'N', src:['mot'],
   title:{fi:'Viive oireista hoidon alkuun',sv:'Fördröjning från symtom till behandlingsstart',en:'Delay from symptoms to start of treatment'},
@@ -253,7 +257,7 @@ const VIEWS = [
  {id:'risk', g:'risk', tag:'A', src:['risk'], tall:true,
   title:{fi:'Arvioitu riskiryhmä hyvinvointialueittain',sv:'Uppskattad riskgrupp per välfärdsområde',en:'Estimated high-risk group by wellbeing services county'},
   sub:{fi:'50–74-vuotiaat, ≥20 askivuotta, tupakoi tai lopetti alle 15 v sitten (henkilöä)',sv:'50–74 år, ≥20 paketår, röker eller slutade för under 15 år sedan (personer)',en:'Age 50–74, ≥20 pack-years, current smoker or quit within 15 years (people)'},
-  chart:()=>bar(D.risk.map(r=>nm(r[0])),[{label:{fi:'Arvioitu riskiryhmä',sv:'Uppskattad riskgrupp',en:'Estimated risk group'}[lang],data:D.risk.map(r=>r[1]),c:'--bar'}],'',{horizontal:true,riskTable:true}),
+  chart:()=>bar(D.risk.map(r=>nm(r[0])),[{label:{fi:'Arvioitu riskiryhmä',sv:'Uppskattad riskgrupp',en:'Estimated risk group'}[lang],data:D.risk.map(r=>r[1]),c:'--bar'}],'',{horizontal:true,codes:D.risk.map(r=>r[0]),riskTable:true}),
   note:{fi:`Koko maassa noin ${fmt(D.risk_nat)} henkilöä (7 % 50–74-vuotiaista). Arvio = alueen tupakointiosuus × oletettu kerroin 0,8 (vaihteluväli 0,55–1,1), koska suomalaista askivuosidataa ei löytynyt. Taulukossa myös CT-paikkakunnat (tiimin selvittämä lista, ei virallinen rekisteri).`,sv:`I hela landet cirka ${fmt(D.risk_nat)} personer (7 % av 50–74-åringarna). Uppskattning = områdets rökningsandel × antagen faktor 0,8 (intervall 0,55–1,1), eftersom finländska paketårsdata inte hittades. Tabellen visar också orter med CT (teamets egen lista, inget officiellt register).`,en:`About ${fmt(D.risk_nat)} people nationally (7% of those aged 50–74). Estimate = the area's smoking rate × an assumed factor of 0.8 (range 0.55–1.1), because no Finnish pack-year data was found. The table also lists CT towns (the team's researched list, not an official register).`}},
  {id:'smokeedu', g:'risk', tag:'S', src:['sotk'],
   title:{fi:'Päivittäin tupakoivat koulutusasteittain',sv:'Dagligrökare per utbildningsnivå',en:'Daily smokers by education'},
@@ -263,7 +267,7 @@ const VIEWS = [
  {id:'smokereg', g:'risk', tag:'S', src:['sotk4404'], tall:true,
   title:{fi:'Päivittäin tupakoivat hyvinvointialueittain 2024',sv:'Dagligrökare per välfärdsområde 2024',en:'Daily smokers by wellbeing services county, 2024'},
   sub:{fi:'% väestöstä',sv:'% av befolkningen',en:'% of population'},
-  chart:()=>bar(D.smoke_reg.map(r=>nm(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,ref:D.smoke_fi,refLabel:t('national')})},
+  chart:()=>bar(D.smoke_reg.map(r=>nm(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,codes:D.smoke_reg.map(r=>r[0]),ref:D.smoke_fi,refLabel:t('national')})},
  {id:'edu', g:'eq', tag:'S', src:['ohj'],
   title:{fi:'Koulutus, ilmaantuvuus ja kuolleisuus',sv:'Utbildning, incidens och dödlighet',en:'Education, incidence and mortality'},
   sub:{fi:'Tapauksia / 100 000, 2018–2022, perusaste vs. korkea-aste',sv:'Fall / 100 000, 2018–2022, grundnivå vs. högre nivå',en:'Cases / 100,000, 2018–2022, basic vs. higher education'},
@@ -289,7 +293,7 @@ const VIEWS = [
  {id:'scrcounty', g:'scr', tag:'S', src:['scr'], tall:true,
   title:{fi:'Seulontaan osallistuminen hyvinvointialueittain',sv:'Deltagande i screening per välfärdsområde',en:'Screening participation by wellbeing services county'},
   sub:{fi:'% kutsutuista, 2024. Katkoviiva = tavoite 80 %',sv:'% av de inbjudna, 2024. Streckad linje = mål 80 %',en:'% of those invited, 2024. Dashed line = 80% target'},
-  chart:()=>bar(D.scr_county.map(r=>nm(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,ref:80,refLabel:t('target'),xmin:50}),
+  chart:()=>bar(D.scr_county.map(r=>nm(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,codes:D.scr_county.map(r=>r[0]),ref:80,refLabel:t('target'),xmin:50}),
   note:{fi:'Matalimmat osallistumisasteet ovat pääkaupunkiseudulla (Helsinki, Vantaa–Kerava, Länsi-Uusimaa). Ero seuraa kieltä, koulutusta ja suurkaupunkia enemmän kuin syrjäisyyttä.',sv:'Det lägsta deltagandet finns i huvudstadsregionen (Helsingfors, Vanda–Kervo, Västra Nyland). Skillnaden följer språk, utbildning och storstad mer än avlägsenhet.',en:'Participation is lowest in the capital region (Helsinki, Vantaa–Kerava, West Uusimaa). The gap follows language, education and metropolitan areas more than remoteness.'}},
  {id:'nordsurv', g:'intl', tag:'N', src:['ihe'],
   title:{fi:'Keuhkosyövän elossaolo Pohjoismaissa',sv:'Lungcanceröverlevnad i Norden',en:'Lung cancer survival in the Nordics'},
@@ -410,12 +414,26 @@ const refLine={id:'refLine',afterDatasetsDraw(c){const cfg=c.config.options.plug
 
 function smrSpec(){
   const col=r=>r[2]>1?css('--hi'):(r[3]<1?css('--lo'):css('--mid'));
-  return {type:'bar',unit:'',horizontal:true,ref:1,refLabel:t('natlevel'),smrTable:true,xmin:0.6,xmax:1.5,
+  return {type:'bar',unit:'',horizontal:true,codes:D.smr.map(r=>r[0]),ref:1,refLabel:t('natlevel'),smrTable:true,xmin:0.6,xmax:1.5,
     data:{labels:D.smr.map(r=>nm(r[0])),datasets:[
       {type:'bar',label:t('ci'),data:D.smr.map(r=>[r[2],r[3]]),backgroundColor:D.smr.map(col),barThickness:3,borderRadius:2,order:2},
       {type:'line',label:'SMR',data:D.smr.map(r=>r[1]),showLine:false,pointRadius:6,pointHoverRadius:8,pointBackgroundColor:D.smr.map(col),pointBorderColor:'#fff',pointBorderWidth:2,order:1}]}};
 }
+let myArea='';try{myArea=localStorage.getItem('keuhkodata-area')||''}catch(e){}
+const dimc=c=>(typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c))?c+'3D':c;
+function highlight(spec){
+  if(!myArea||!spec.codes) return;
+  const i=spec.codes.indexOf(myArea); if(i<0) return;
+  spec.data.datasets.forEach(d=>{
+    ['backgroundColor','pointBackgroundColor'].forEach(k=>{
+      if(d[k]==null) return;
+      const arr=Array.isArray(d[k])?d[k]:spec.codes.map(()=>d[k]);
+      d[k]=arr.map((c,j)=>j===i?c:dimc(c));
+    });
+  });
+}
 function makeChart(canvas,spec){
+  highlight(spec);
   const h=!!spec.horizontal, many=spec.data.datasets.length>1&&!spec.smrTable, grid=css('--grid'), t2=css('--muted');
   return new Chart(canvas,{type:spec.type,data:spec.data,plugins:[refLine],options:{
     maintainAspectRatio:false, indexAxis:h?'y':'x', locale:LOC[lang],
@@ -426,7 +444,7 @@ function makeChart(canvas,spec){
       tooltip:{callbacks:{label:c=>{const r=c.raw;if(Array.isArray(r))return ` ${c.dataset.label}: ${r[0].toLocaleString(LOC[lang])}–${r[1].toLocaleString(LOC[lang])}`;return ` ${c.dataset.label}: ${c.parsed[h?'x':'y'].toLocaleString(LOC[lang])} ${spec.unit}`;}}},
       refLine:spec.ref!=null?{value:spec.ref,label:spec.refLabel}:null},
     scales:{x:{grid:{display:h,color:grid},ticks:{color:t2,maxTicksLimit:h?7:12,font:{family:'Inter',size:11}},border:{display:false},beginAtZero:spec.xmin==null,min:spec.xmin,max:spec.xmax},
-            y:{grid:{display:!h,color:grid},ticks:{color:t2,autoSkip:false,font:{family:'Inter',size:11}},border:{display:false},beginAtZero:true}}
+            y:{grid:{display:!h,color:grid},ticks:{color:c=>spec.codes&&myArea&&spec.codes[c.index]===myArea?css('--ink'):t2,autoSkip:false,font:c=>({family:'Inter',size:11,weight:spec.codes&&myArea&&spec.codes[c.index]===myArea?'700':'400'})},border:{display:false},beginAtZero:true}}
   }});
 }
 function tableHTML(v,spec){
@@ -480,8 +498,30 @@ function MSG(v){
   if(v.id==='delay'){m={fi:'Oireista hoidon alkuun kuluu Suomessa keskimäärin 155 päivää, Ruotsissa 107 ja Tanskassa 67.',sv:'Från symtom till behandling går i genomsnitt 155 dagar i Finland, 107 i Sverige och 67 i Danmark.',en:'From symptoms to treatment takes on average 155 days in Finland, 107 in Sweden and 67 in Denmark.'}[lang];}
   return m?`<p class="keymsg">${m}</p>`:'';
 }
+function buildArea(){
+  const el=document.getElementById('area');
+  const codes=Object.keys(D.names).sort((a,b)=>nm(a).localeCompare(nm(b),LOC[lang]));
+  el.innerHTML=`<option value="">${t('area_none')}</option>`+codes.map(c=>`<option value="${c}"${c===myArea?' selected':''}>${nm(c)}</option>`).join('');
+  el.onchange=()=>{myArea=el.value;try{localStorage.setItem('keuhkodata-area',myArea)}catch(e){}render();};
+}
+function snapHTML(){
+  const c=myArea,box=document.getElementById('snap'); if(!c){box.classList.add('hidden');return;}
+  const S=D.smr.find(r=>r[0]===c),R=D.risk.find(r=>r[0]===c),K=D.smoke_reg.find(r=>r[0]===c),C=D.scr_county.find(r=>r[0]===c),M=D.region.find(r=>r[0]===c);
+  const f1=x=>fmt(Math.round(x*10)/10), sg=S?(S[2]>1?{fi:'merkitsevästi yli maan tason',sv:'signifikant över riksnivån',en:'significantly above national'}[lang]:S[3]<1?{fi:'merkitsevästi alle maan tason',sv:'signifikant under riksnivån',en:'significantly below national'}[lang]:{fi:'ei merkitsevästi maan tasosta',sv:'inte signifikant skild från riksnivån',en:'not significantly different from national'}[lang]):'';
+  const lab={fi:['Kuolleisuus (SMR)','Riskiryhmä (arvio)','Päivittäin tupakoivat','Seulonnan osallistuminen (rinta / suolisto / kohdunkaula)','CT-paikkakunnat'],
+             sv:['Dödlighet (SMR)','Riskgrupp (uppskattning)','Dagligrökare','Screeningdeltagande (bröst / tarm / livmoderhals)','Orter med CT'],
+             en:['Mortality (SMR)','Risk group (estimate)','Daily smokers','Screening participation (breast / colorectal / cervical)','CT towns']}[lang];
+  const li=[];
+  if(S) li.push(`${lab[0]}: <b>${fmt(S[1])}</b> (${fmt(S[2])}–${fmt(S[3])}), ${sg}`);
+  if(R) li.push(`${lab[1]}: <b>${fmt(R[1])}</b>`);
+  if(K) li.push(`${lab[2]}: <b>${f1(K[1])} %</b> (${t('national')}: ${f1(D.smoke_fi)} %)`);
+  if(C) li.push(`${lab[3]}: <b>${[C[1],C[2],C[3]].map(x=>x==null?'–':f1(x)+' %').join(' / ')}</b>`);
+  if(R) li.push(`${lab[4]}: ${R[6].join(', ')||'–'}`);
+  box.innerHTML=`<b>${nm(c)}</b><ul>${li.map(x=>`<li>${lang==='en'?x.replace(/ %/g,'%'):x}</li>`).join('')}</ul>`;
+  box.classList.remove('hidden');
+}
 function render(){
-  markPre();
+  markPre(); snapHTML();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
   const grid=document.getElementById('grid');
   const vs=VIEWS.filter(v=>selected.includes(v.id));
@@ -502,7 +542,7 @@ function apply(l){
   document.getElementById('menuBtn').setAttribute('aria-label',MT[lang].menu);
   document.getElementById('sources').innerHTML=SOURCES[lang];
   try{localStorage.setItem('vayla-lang',lang)}catch(e){}
-  buildPicker(); render();
+  buildArea(); buildPicker(); render();
 }
 document.querySelectorAll('.ptabs .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ptabs .tab').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});document.getElementById('tab-dash').classList.toggle('hidden',b.dataset.tab!=='dash');document.getElementById('tab-src').classList.toggle('hidden',b.dataset.tab!=='src');});
 document.addEventListener('click',ev=>{const d=document.querySelector('details.menu');if(d&&d.open&&!d.contains(ev.target))d.open=false;});
