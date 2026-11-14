@@ -97,25 +97,7 @@ footer{padding:40px 0 56px}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap bar">
-    <a class="logo" href="#top" data-t="brand">Polku hoitoon</a>
-    <div class="bar-r">
-      <label for="lang" class="hidden" id="langLbl">Language</label>
-      <select id="lang" aria-labelledby="langLbl">
-        <option value="fi">Suomi</option>
-        <option value="sv">Svenska</option>
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="et">Eesti</option>
-        <option value="ar">العربية</option>
-        <option value="so">Soomaali</option>
-        <option value="uk">Українська</option>
-      </select>
-      <a class="btn sm" href="#join" data-t="nav"></a>
-    </div>
-  </div>
-</header>
+<div id="site-header"></div><script src="/layout.js"></script>
 
 <main id="top">
   <div class="hero">
@@ -169,7 +151,6 @@ footer{padding:40px 0 56px}
     <div class="wrap g2">
       <div>
         <h2 data-t="form_h"></h2>
-        <p style="color:var(--muted)" data-t="who_p"></p>
         <div id="countBox" class="hidden"><div class="card" style="margin-top:16px">
           <div id="countN" style="font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;color:var(--blue-d)">0</div>
           <div data-t="count_t" style="color:var(--muted)"></div>
@@ -206,7 +187,7 @@ footer{padding:40px 0 56px}
           </fieldset>
           <div style="position:absolute;left:-9999px" aria-hidden="true"><label for="website">Website</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
           <label class="consent"><input id="consent" type="checkbox"><span data-t="f_consent"></span></label>
-          <label class="consent"><input id="privok" type="checkbox"><span data-t="privok"></span></label>
+          <label class="consent"><input id="privok" type="checkbox" required aria-required="true"><span data-t="privok"></span></label>
           <button class="btn" type="submit" data-t="submit"></button>
           <div id="out" class="msg hidden" role="status" aria-live="polite"></div>
           <div id="shareWrap" class="hidden"><div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:var(--sky)">
@@ -220,13 +201,8 @@ footer{padding:40px 0 56px}
 
 </main>
 
-<footer>
-  <div class="wrap">
-    <p data-t="note"></p>
-    <nav aria-label="Lisätiedot" style="display:flex;flex-wrap:wrap;gap:18px;margin-top:20px"><a href="/meista" data-m="about">Tietoa meistä</a><a href="/ukk" data-m="faq">Usein kysytyt kysymykset</a><a href="/palaute" data-m="fb">Anna palautetta</a><a href="/tietosuoja" data-m="priv">Tietosuojaseloste</a><a href="/keuhkodata">Päättäjille</a></nav>
-    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
-  </div>
-</footer>
+<div id="site-footer-note"><p data-t="note"></p></div>
+<div id="site-footer"></div>
 
 <script>
 var T = {
@@ -321,7 +297,7 @@ var busy = false;
     var r = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ products: prods, name: document.getElementById("fname").value.trim(), contact: contact, postcode: post, eligible: elig, age: age, smoke: smoke, lang: lang, consent: true, privacy: true, website: hp, "for": whoVal(), src: SRC })
+      body: JSON.stringify({ products: prods, name: document.getElementById("fname").value.trim(), contact: contact, postcode: post, eligible: elig, age: age, smoke: smoke, lang: lang, consent: true, privacy: document.getElementById("privok").checked, website: hp, "for": whoVal(), src: SRC })
     });
     if (!r.ok) throw new Error("fail");
     show("ok", t.ok);

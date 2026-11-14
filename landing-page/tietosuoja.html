@@ -98,20 +98,8 @@ main.doc{padding:56px 24px 72px}
 @media (max-width:780px){.wrap{padding:0 20px}header .bar{padding:12px 20px;gap:12px}.bar-r{display:contents}.logo{order:1;flex:1;font-size:22px}header select{order:2;padding:0 8px;font-size:14px}.menu{order:3}.tabs{order:4;width:100%}header .btn.sm{display:none}section{padding:56px 0}.hero{padding:40px 0 44px}.g2{gap:32px}main.doc{padding:36px 20px 56px}}
 </style>
 </head>
-<body>
-<header>
-  <div class="wrap bar">
-    <a class="logo" href="/">Polku hoitoon</a>
-    <div class="bar-r">
-      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" id="tb"></a><a class="tab" href="/sovellus" id="ta"></a></nav>
-      <label for="lang" class="hidden" id="langLbl">Language</label>
-      <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
-      <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
-        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
-      </div></details>
-    </div>
-  </div>
-</header>
+<body data-languages="fi,sv,en">
+<div id="site-header"></div><script src="/layout.js"></script>
 <main class="wrap doc">
 <article data-lang="fi">
 <h1>Tietosuojaseloste</h1>
@@ -208,7 +196,7 @@ main.doc{padding:56px 24px 72px}
 </article>
 
 </main>
-<footer><div class="wrap"><div style="font-size:15px"><a href="/meista">Polku Labs</a> · <b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>
+<div id="site-footer"></div>
 <script>
 var TABS = {fi:["Seulontabussi","Sovellus"], sv:["Screeningbussen","Appen"], en:["Screening bus","App"]};
 function apply(l){

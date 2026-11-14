@@ -93,29 +93,7 @@ footer{padding:40px 0 56px}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap bar">
-    <a class="logo" href="/" data-t="brand">Polku hoitoon</a>
-    <div class="bar-r">
-      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" data-t="nav_bus"></a><a class="tab" href="/sovellus" data-t="nav_app"></a></nav>
-      <label for="lang" class="hidden" id="langLbl">Language</label>
-      <select id="lang" aria-labelledby="langLbl">
-        <option value="fi">Suomi</option>
-        <option value="sv">Svenska</option>
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="et">Eesti</option>
-        <option value="ar">العربية</option>
-        <option value="so">Soomaali</option>
-        <option value="uk">Українська</option>
-      </select>
-      <a class="btn sm" href="/#join" data-t="nav"></a>
-      <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
-        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
-      </div></details>
-    </div>
-  </div>
-</header>
+<div id="site-header"></div><script src="/layout.js"></script>
 
 <main id="top">
   <div class="hero" style="padding:40px 0 8px"><div class="wrap"><h1 data-t="faq_h" style="font-size:clamp(30px,4.4vw,44px)"></h1><p id="mtNote" class="hidden" style="font-size:14px;color:var(--muted);margin-top:14px"></p></div></div>
@@ -124,12 +102,7 @@ footer{padding:40px 0 56px}
 
 </main>
 
-<footer>
-  <div class="wrap">
-    <p data-t="note"></p>
-    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
 <script>
 var T = {

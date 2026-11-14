@@ -16,6 +16,7 @@ from pathlib import Path
 import modal
 
 HERE = Path(__file__).parent
+MAP = HERE.parent / "map"
 
 image = (
     modal.Image.debian_slim()
@@ -23,12 +24,16 @@ image = (
     .add_local_file(HERE / "index.html", "/root/index.html")
     .add_local_file(HERE / "sovellus.html", "/root/sovellus.html")
     .add_local_file(HERE / "ammattilaisille.html", "/root/ammattilaisille.html")
-    .add_local_file(HERE / "paattajille.html", "/root/paattajille.html")
     .add_local_file(HERE / "tietosuoja.html", "/root/tietosuoja.html")
     .add_local_file(HERE / "meista.html", "/root/meista.html")
     .add_local_file(HERE / "ukk.html", "/root/ukk.html")
     .add_local_file(HERE / "palaute.html", "/root/palaute.html")
     .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
+    .add_local_file(HERE / "layout.js", "/root/layout.js")
+    .add_local_file(MAP / "kartta.html", "/root/kartta.html")
+    .add_local_file(MAP / "pilot_map.json", "/root/pilot_map.json")
+    .add_local_file(MAP / "vendor/leaflet.js", "/root/leaflet.js")
+    .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
     .add_local_file(HERE / "regions.json", "/root/regions.json")
 )
@@ -62,7 +67,6 @@ def web():
     page = Path("/root/index.html").read_text(encoding="utf-8")
     app_page = Path("/root/sovellus.html").read_text(encoding="utf-8")
     pro_page = Path("/root/ammattilaisille.html").read_text(encoding="utf-8")
-    dm_page = Path("/root/paattajille.html").read_text(encoding="utf-8")
     priv_page = Path("/root/tietosuoja.html").read_text(encoding="utf-8")
     team_img = Path("/root/team.jpg").read_bytes()
     regions = json.loads(Path("/root/regions.json").read_text(encoding="utf-8"))
@@ -72,6 +76,11 @@ def web():
     faq_page = Path("/root/ukk.html").read_text(encoding="utf-8")
     fb_page = Path("/root/palaute.html").read_text(encoding="utf-8")
     data_page = Path("/root/keuhkodata.html").read_text(encoding="utf-8")
+    layout_script = Path("/root/layout.js").read_text(encoding="utf-8")
+    map_page = Path("/root/kartta.html").read_text(encoding="utf-8")
+    map_data = Path("/root/pilot_map.json").read_bytes()
+    leaflet_js = Path("/root/leaflet.js").read_bytes()
+    leaflet_css = Path("/root/leaflet.css").read_bytes()
     lock = threading.Lock()
 
 
@@ -84,6 +93,28 @@ def web():
     @api.get("/", response_class=HTMLResponse)
     def index():
         return HTMLResponse(page)
+
+    @api.get("/layout.js")
+    def layout():
+        return Response(content=layout_script, media_type="application/javascript")
+
+    @api.get("/kartta", response_class=HTMLResponse)
+    @api.get("/kartta/", response_class=HTMLResponse)
+    @api.get("/map", response_class=HTMLResponse)
+    def map_index():
+        return HTMLResponse(map_page)
+
+    @api.get("/pilot_map.json")
+    def pilot_map_json():
+        return Response(map_data, media_type="application/json", headers={"Cache-Control": "public, max-age=300"})
+
+    @api.get("/vendor/leaflet.js")
+    def leaflet_js_file():
+        return Response(leaflet_js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
+
+    @api.get("/vendor/leaflet.css")
+    def leaflet_css_file():
+        return Response(leaflet_css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
 
     @api.get("/sovellus", response_class=HTMLResponse)
     @api.get("/sovellus/", response_class=HTMLResponse)
