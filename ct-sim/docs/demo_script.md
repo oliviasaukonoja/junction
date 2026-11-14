@@ -8,6 +8,24 @@ Our recommendation: (1) a **risk-group screening bus** for the significantly hig
 
 Rule for the whole pitch: say what we would measure, never that screening or a slot is coming.
 
+## Product framing (decided 2026-11-14)
+**Main product, where the value is: a data bank.** A backend data system that joins cancer-type-specific pathway data, built separate from Omakanta but designed to connect to it, with the Keuhkodata dashboard on top giving recommendations to professionals. Its first and largest recommendation is a screening pilot. **Visible product, featured most in the video: the bus** (mobile CT) and a bus pilot in **Lapland, Kymenlaakso and Satakunta**.
+**Why a data bank:** there is no data specific to cancer types and to how the care pathway (hoitopolku) runs, so pathway gaps cannot be identified today. What we found (public, reproducible: `wait_times_syopataudit_2023_2026.md`, `incidence_by_area_2020_2024.md`):
+- THL queue data is by specialty (oncology), not by cancer type, so a lung patient cannot be followed through the pathway.
+- Oncology referral counts are not comparable across areas: 0.7 to 12.4 per 1000 residents, and 0.10 to 1.83 per new cancer case. That is how areas register referrals, not demand.
+- Kainuu and Helsinki city report nothing for the specialty; assessment-wait data is mostly missing in 8 of 19 areas.
+**Why these three areas:** lung-cancer deaths per 100,000 aged 50-74 in the Gap finder (Lapland 186, Satakunta 176, Kymenlaakso 175); lung incidence in the Cancer Registry (Lapland men 77 and women 43 per 100,000 against 62 and 35 nationally; Kymenlaakso men 70); and, for Lapland, assessment waits over 90 days in all four years 2023-26. Indicative only: about 19 areas, crude death rates, different time windows. (The pitch-context file mentions Kainuu as an alternative; decide before recording.)
+**What is real:** Gap finder, Keuhkodata, planner, analyst, and the public-data analyses. **Not built:** the data bank itself and any Omakanta/Kanta connection. Say "designed to connect", never "integrated". Connecting needs approvals we have not sought; do not name legal bases on stage until checked.
+**Planner check, 2026-11-14.** All three regions run without errors in the planner (`python -m ctsim scenario <file>`, researched CT list incl. likely, lam 0.5). The region is a circle around a town, not the county, so some stops fall outside it:
+
+| Region (base, radius) | Stops | Outside the county | Eligible in area | Coverage hospital CT only to with truck | Additional scans a year (modelled) |
+|---|---|---|---|---|---|
+| Lapland (Rovaniemi, 150 km) | 12 | None, but the county's northern municipalities are outside the circle (3,571 of 5,213 eligible are inside) | 3,571 | 23% to 50% | about 480 |
+| Kymenlaakso (Kouvola, 60 km) | 6 | Lapinjärvi, Iitti, Luumäki (eligible figure includes them) | 5,178 | 19% to 48% | about 780 |
+| Satakunta (Pori, 80 km) | 8 | Isojoki, Sastamala | 6,721 | 21% to 43% | about 750 |
+
+These come from assumed uptake curves, eligible share and costs. They are not lives saved. Say so if shown.
+
 ## Before you present (10 minutes)
 1. Start the local app: `cd ct-sim`, `export PYTHONPATH=src`, `.venv/bin/python -m ctsim serve`. Open http://127.0.0.1:8000/gap and http://127.0.0.1:8000/.
 2. If you want the deployed copy as a backup: `PYTHONPATH=src modal deploy api/modal_app.py`, open its URL, run one scenario to warm it. Stop it after: `modal app stop ctsim`.
@@ -36,6 +54,9 @@ Rule for the whole pitch: say what we would measure, never that screening or a s
 - The sweep is reproducible: same seed gives the same result whether it runs on one core, local processes or Modal containers.
 
 ## Likely questions
+- **What is the data bank, and does it exist?** "It is the design for a backend that joins pathway data by cancer type. Today we have the joined public data and the Keuhkodata prototype. The data bank itself is not built."
+- **Is it integrated with Omakanta?** "No. It is designed to be separate and connectable. Connecting needs approvals from the Kanta services and permits for secondary use of health data, which we have not sought." Check the exact route before naming it.
+- **Why Lapland, Kymenlaakso and Satakunta?** "They combine high lung-cancer death rates and incidence; Lapland also has long assessment waits. It is indicative, from about 19 areas and crude rates, which is why the pilot and the data bank come first."
 - **Why a truck?** "On our own numbers it is not cheaper than a hospital CT. It only pays off if it reaches people a hospital CT does not, and Finnish screening data suggest the barriers are language, education and metropolitan areas more than distance. So the pilot tests exactly that before anyone buys one."
 - **Where do the 17% and 30% come from?** "IHE's cancer dashboard via our research notes, and NORDCAN is the primary source. We tag them N and have not re-verified them."
 - **Is this AI?** "The analyst layer uses Claude with tool calls over the simulator and refuses numbers not in the facts card or tool results. The planner itself is an optimiser plus Monte Carlo, not machine learning. We say so."
