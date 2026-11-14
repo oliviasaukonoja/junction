@@ -90,6 +90,7 @@ th{color:var(--muted);font-weight:600}
 .ptable tr:not(.first){margin-top:-6px;border-top-left-radius:0;border-top-right-radius:0}
 .ptable td:empty{display:none}
 }
+.reco{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.rc{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.rc h3{font-size:16px;margin:0 0 6px}.rc p{margin:0 0 8px;font-size:14.5px}.rc .why{font-size:13px;color:var(--muted)}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .tile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
 .tile .v{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;color:var(--blue-d);line-height:1.15}
@@ -205,6 +206,10 @@ const VIEWS = [
   title:{fi:'Missä kohtaa hoitopolkua ero syntyy',sv:'Var i vårdkedjan uppstår skillnaden',en:'Where on the care pathway the gap emerges'},
   sub:{fi:'Polku Labsin kooste: punainen = ero syntyy tässä, vihreä = pääosin ajallaan',sv:'Polku Labs sammanställning: rött = skillnaden uppstår här, grönt = mestadels i tid',en:'Polku Labs summary: red = the gap forms here, green = mostly on time'},
   note:{fi:'Ero syntyy pääosin ennen diagnoosia, perusterveydenhuollossa. Diagnoosista hoitoon päästään useimmiten ajallaan.',sv:'Skillnaden uppstår främst före diagnos, i primärvården. Från diagnos till behandling går det oftast i tid.',en:'The gap forms mostly before diagnosis, in primary care. Diagnosis to treatment is mostly on time.'}},
+ {id:'reco', g:'sum', wide:true, kind:'reco', tag:'N', src:['team'],
+  title:{fi:'Mitä tehdään: suositukset',sv:'Vad gör vi: rekommendationer',en:'What to do: recommendations'},
+  sub:{fi:'Polku Labsin ehdotukset yllä olevan datan pohjalta',sv:'Polku Labs förslag utifrån datan ovan',en:'Polku Labs proposals based on the data above'},
+  note:{fi:'Nämä ovat tiimin ehdotuksia, eivät todistettu vaikutus. Siksi ehdotamme satunnaistettua pilottia ennen laajennusta.',sv:'Detta är teamets förslag, inte bevisad effekt. Därför föreslår vi en randomiserad pilot före utvidgning.',en:'These are team proposals, not proven effects. Hence we propose a randomised pilot before any rollout.'}},
  {id:'goal3', g:'sum', kind:'goal3', tag:'S', src:['team'],
   title:{fi:'Syöpästrategian tavoite 3: mittarit',sv:'Cancerstrategins mål 3: indikatorer',en:'Cancer strategy Goal 3: indicators'},
   sub:{fi:'Kansallinen syöpästrategia 2026–2035',sv:'Nationella cancerstrategin 2026–2035',en:'National Cancer Strategy 2026–2035'}},
@@ -377,7 +382,7 @@ const SOURCES = {
 };
 
 const KEY='keuhkodata-views-v4';
-const PRE={sum:['kpi','pathway','smr','risk'],reg:['smr','region','risk','smokereg','scrcounty'],all:null};
+const PRE={sum:['kpi','pathway','smr','risk','reco'],reg:['smr','region','risk','smokereg','scrcounty'],all:null};
 let selected;
 try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!Array.isArray(selected)) selected=PRE.sum.slice();
@@ -435,6 +440,19 @@ function body(v){
   if(v.kind==='tiles') return `<div class="tiles">${TILES().map(x=>`<div class="tile"><div class="v">${pc(x.v)}</div><div class="l">${L(x.l)}</div><div class="s">${L(x.s)}</div></div>`).join('')}</div>`;
   if(v.kind==='pathway'){const col={true:'var(--hi)',false:'var(--total)',null:'var(--mid)'};const hd={fi:['Vaihe','Mittari','Suomi','Vertailu','Lähde'],sv:['Fas','Mått','Finland','Jämförelse','Källa'],en:['Stage','Measure','Finland','Comparison','Source']}[lang];
     return `<div class="tablewrap" style="max-height:none"><table class="ptable"><thead><tr>${hd.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${PATH.map(p=>p.items.map((it,i)=>`<tr${i===0?' class="first"':''}>${i===0?`<td class="stage" rowspan="${p.items.length}"><span class="dot" style="background:${col[p.gap]}"></span>${L(p.st)}</td>`:''}<td data-l="${hd[1]}">${L(it.m)}</td><td data-l="${hd[2]}"><b>${pc(L(it.f))}</b></td><td data-l="${hd[3]}">${L(it.c)}</td><td data-l="${hd[4]}">${tagHTML(it.tag)}</td></tr>`).join('')).join('')}</tbody></table></div>`;}
+  if(v.kind==='reco'){
+    const hi=D.smr.filter(r=>r[2]>1).map(r=>nm(r[0])).join(', ');
+    const R={
+     fi:[['Seulontabussi','Kohdista alueille, joilla keuhkosyöpäkuolleisuus on merkitsevästi maan tason yläpuolella: '+hi+'. Kohderyhmä: 50–74-vuotiaat tupakoivat ja tupakoineet.','Ida: bussi ei ole halvempi kuin sairaalan TT, ja seulontaerot seuraavat kieltä ja koulutusta enemmän kuin etäisyyttä. Siksi pilotti satunnaistettuna.'],
+         ['Potilassovellus','Näkyvä hoitopolku, tekoälykäännökset ja selkokieli. Kohdistuu vaiheeseen, jossa ero syntyy: oireista ensikäyntiin (potilasviive yli 50 päivää) ja perusterveydenhuolto.','Kieli- ja koulutuserot osallistumisessa viittaavat viestinnän esteisiin, joihin käännökset vastaavat.'],
+         ['Mittarit','Aika oireesta TT:hen; I–II-vaiheessa todettujen osuus (nyt 42 %, tavoite 70 %); seulontaan osallistuminen kielen ja koulutuksen mukaan.','Seurataan alueittain, jotta ero näkyy.']],
+     sv:[['Screeningbuss','Rikta mot områden där lungcancerdödligheten är signifikant över riksnivån: '+hi+'. Målgrupp: rökare och tidigare rökare, 50–74 år.','Ida: bussen är inte billigare än sjukhusets DT, och screeningskillnaderna följer språk och utbildning mer än avstånd. Därför en randomiserad pilot.'],
+         ['Patientapp','Synlig vårdkedja, AI-översättningar och lättläst språk. Riktas mot steget där skillnaden uppstår: från symtom till första besök (patientfördröjning över 50 dagar) och primärvård.','Språk- och utbildningsskillnader i deltagande tyder på kommunikationshinder som översättningar möter.'],
+         ['Mått','Tid från symtom till DT; andel upptäckta i stadium I–II (nu 42 %, mål 70 %); screeningdeltagande per språk och utbildning.','Följs upp per område så att skillnaden syns.']],
+     en:[['Screening bus','Target areas where lung cancer mortality is significantly above the national level: '+hi+'. Target group: current and former smokers aged 50–74.','Ida: the bus is not cheaper than a hospital CT, and screening gaps follow language and education more than distance. Hence a randomised pilot.'],
+         ['Patient app','A visible care pathway, AI translations and plain language. Aimed at the stage where the gap forms: symptoms to first visit (patient delay over 50 days) and primary care.','Language and education gaps in participation point to communication barriers that translations address.'],
+         ['Measures','Time from symptoms to CT; share found at stage I–II (now 42%, target 70%); screening participation by language and education.','Tracked by area so the gap stays visible.']]}[lang];
+    return `<div class="reco">${R.map((r,i)=>`<div class="rc"><h3>${i+1}. ${r[0]}</h3><p>${r[1]}</p><p class="why">${r[2]}</p></div>`).join('')}</div>`;}
   if(v.kind==='goal3') return `<div class="goal">${GOAL3.map(x=>`<div><b>${L(x.b)} ${tagHTML(x.tag)}</b><span>${L(x.s)}</span></div>`).join('')}</div>`;
   return `<div class="chartbox${v.tall?' tall':''}"><canvas id="cv-${v.id}" role="img" aria-label="${L(v.title)}"></canvas></div><div class="tbl hidden" id="tb-${v.id}"></div>`;
 }
