@@ -71,6 +71,29 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
 .tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
 @media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
 @media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
+.menu{position:relative}.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}.menu summary::-webkit-details-marker{display:none}
+.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column;z-index:20}
+.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:16px}.menu-p a:hover{background:var(--bg)}
+/* spacing v2 */
+body{line-height:1.6}
+.wrap{padding:0 24px}
+header .bar{padding:12px 24px;gap:16px;min-height:72px}
+.bar-r{gap:12px}
+section{padding:80px 0}
+.hero{padding:72px 0 64px}
+.lead{margin:20px 0 30px}
+.g2{gap:48px}
+.card{padding:28px}
+form{gap:20px}
+.stats{gap:20px}
+.list{gap:14px;margin-top:20px}
+.faq{padding:18px 0}
+footer{padding:40px 0 56px}
+@media (max-width:780px){.wrap{padding:0 20px}header .bar{padding:12px 20px;gap:12px}.bar-r{display:contents}.logo{order:1;flex:1;font-size:22px}header select{order:2;padding:0 8px;font-size:14px}.menu{order:3}.tabs{order:4;width:100%}header .btn.sm{display:none}section{padding:56px 0}.hero{padding:40px 0 44px}.g2{gap:32px}}
+/* stats-space */
+.stats{margin-top:48px;margin-bottom:80px}
+.stat-cap{margin-bottom:4px}
+@media (max-width:780px){.stats{margin-top:32px;margin-bottom:56px}}
 </style>
 </head>
 <body>
@@ -91,6 +114,9 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
         <option value="uk">Українська</option>
       </select>
       <a class="btn sm" href="#join" data-t="nav"></a>
+      <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
+        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
+      </div></details>
     </div>
   </div>
 </header>
@@ -99,11 +125,10 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
   <div class="hero">
     <div class="wrap hero-g">
       <div>
-        <span class="badge" data-t="badge"></span>
-        <span class="badge" style="background:#E7F6EC;color:#14532D;margin-inline-start:6px" data-t="free"></span>
+        <span class="badge" style="margin-inline-end:6px" data-t="badge"></span>
+        <span class="badge" style="background:#E7F6EC;color:#14532D;margin-inline-start:0" data-t="free"></span>
         <h1 data-t="h1"></h1>
         <p class="lead" data-t="lead"></p>
-        <p data-t="hero_uk" style="margin:-10px 0 24px;padding:12px 16px;border-radius:12px;background:#E7F6EC;color:#14532D;font-weight:600;max-width:36em"></p>
         <a class="btn" href="#join" data-t="cta"></a>
         <p id="mtNote" class="hidden" style="font-size:14px;color:var(--muted);margin-top:14px"></p>
       </div>
@@ -134,27 +159,6 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
       <div class="stat"><b>2019</b><span data-t="s3"></span></div>
     </div>
   </div>
-
-  <section>
-    <div class="wrap g2">
-      <div>
-        <h2 data-t="why_h"></h2>
-        <ul class="list">
-          <li><span class="dot" aria-hidden="true"></span><span data-t="why1"></span></li>
-          <li><span class="dot" aria-hidden="true"></span><span data-t="why2"></span></li>
-          <li><span class="dot" aria-hidden="true"></span><span data-t="why3"></span></li>
-        </ul>
-      </div>
-      <div class="card">
-        <h2 style="font-size:26px" data-t="who_h"></h2>
-        <p data-t="who_p"></p>
-        <div class="warn">
-          <h3 data-t="sym_h"></h3>
-          <p style="margin:0" data-t="sym_p"></p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <section class="uk">
     <div class="wrap">
@@ -218,30 +222,12 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
     </div>
   </section>
 
-  <section id="feedback" style="padding-top:0"><div class="wrap"><div class="card" style="max-width:720px">
-    <h2 style="font-size:26px;margin-bottom:6px" data-t="fb_h"></h2>
-    <p style="color:var(--muted);margin:0 0 14px" data-t="fb_p"></p>
-    <form id="fbf" novalidate>
-      <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="fb_q"></legend>
-        <div class="opts"><label class="opt"><input type="radio" name="fbr" value="1"><span>1</span></label><label class="opt"><input type="radio" name="fbr" value="2"><span>2</span></label><label class="opt"><input type="radio" name="fbr" value="3"><span>3</span></label><label class="opt"><input type="radio" name="fbr" value="4"><span>4</span></label><label class="opt"><input type="radio" name="fbr" value="5"><span>5</span></label></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:6px;max-width:330px"><span data-t="fb_lo"></span><span data-t="fb_hi"></span></div>
-      </fieldset>
-      <div><label for="fbtext" data-t="fb_t"></label><textarea id="fbtext" rows="4" maxlength="1000" style="width:100%;font:inherit;padding:12px 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)"></textarea></div>
-      <div style="position:absolute;left:-9999px" aria-hidden="true"><input id="fbweb" type="text" tabindex="-1" autocomplete="off"></div>
-      <button class="btn" type="submit" data-t="fb_send" style="align-self:flex-start"></button>
-      <div id="fbout" class="msg hidden" role="status" aria-live="polite"></div>
-    </form>
-  </div></div></section>
-  <section id="faq" style="padding-top:0"><div class="wrap"><h2 style="font-size:26px;margin-bottom:12px" data-t="faq_h"></h2><details class="faq"><summary data-t="q1"></summary><p data-t="a1"></p></details><details class="faq"><summary data-t="q2"></summary><p data-t="a2"></p></details><details class="faq"><summary data-t="q3"></summary><p data-t="a3"></p></details><details class="faq"><summary data-t="q4"></summary><p data-t="a4"></p></details></div></section>
-
 </main>
 
 <footer>
   <div class="wrap">
     <p data-t="note"></p>
-    <p data-t="jx" style="margin-top:12px;background:#fff;font-size:15px;color:var(--muted)"></p>
-    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="/sovellus" data-t="app_link">Polku hoitoon -sovellus</a> · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
-    <div style="margin-top:10px;font-size:14px;color:var(--muted)"><a href="/ammattilaisille" data-t="nav_pro"></a> · <a href="/paattajille" data-t="nav_dm"></a> · <a href="/meista" data-t="about"></a> · <a href="/tietosuoja" data-t="priv"></a></div>
+    <div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div>
   </div>
 </footer>
 
@@ -311,12 +297,12 @@ function shareUrl(){ return location.origin + "/?src=share"; }
 function setupShare(){ var b = document.getElementById("waBtn"); if (b) b.href = "https://wa.me/?text=" + encodeURIComponent(T[lang].share_msg + " " + shareUrl()); }
 function whoVal(){ var w = document.querySelector("input[name=who]:checked"); return w ? w.value : "self"; }
 document.querySelectorAll("input[name=who]").forEach(function(r){ r.addEventListener("change", function(){ document.getElementById("relHelp").classList.toggle("hidden", whoVal() !== "relative"); }); });
-document.getElementById("copyBtn").addEventListener("click", async function(){ var btn = this; try { await navigator.clipboard.writeText(shareUrl()); btn.textContent = T[lang].copied; } catch (e) { btn.textContent = shareUrl(); } });
+(document.getElementById("copyBtn") || document.createElement("button")).addEventListener("click", async function(){ var btn = this; try { await navigator.clipboard.writeText(shareUrl()); btn.textContent = T[lang].copied; } catch (e) { btn.textContent = shareUrl(); } });
 setupShare();
 loadCount();
 
 var busy = false;
-document.getElementById("f").addEventListener("submit", async function(ev){
+(document.getElementById("f") || document.createElement("form")).addEventListener("submit", async function(ev){
   ev.preventDefault();
   if (busy) return;
   var t = T[lang];
@@ -349,7 +335,7 @@ document.getElementById("f").addEventListener("submit", async function(ev){
   busy = false;
 });
 var fbBusy = false;
-document.getElementById("fbf").addEventListener("submit", async function(ev){
+(document.getElementById("fbf") || document.createElement("form")).addEventListener("submit", async function(ev){
   ev.preventDefault();
   if (fbBusy) return;
   var t = T[lang], o = document.getElementById("fbout");
@@ -365,6 +351,15 @@ document.getElementById("fbf").addEventListener("submit", async function(ev){
   } catch (e) { o.className = "msg err"; o.textContent = t.err_net; }
   fbBusy = false;
 });
+</script>
+<script>
+(function(){
+  var MT = {"fi": {"pro": "Ammattilaisille", "dm": "Päättäjille", "about": "Tietoa meistä", "fb": "Anna palautetta", "priv": "Tietosuojaseloste", "menu": "Valikko", "faq": "Usein kysyttyä"}, "sv": {"pro": "För vårdpersonal", "dm": "För beslutsfattare", "about": "Om oss", "fb": "Ge respons", "priv": "Dataskyddsbeskrivning", "menu": "Meny", "faq": "Vanliga frågor"}, "en": {"pro": "For professionals", "dm": "For decision-makers", "about": "About us", "fb": "Give feedback", "priv": "Privacy notice", "menu": "Menu", "faq": "Questions"}, "ru": {"pro": "Для специалистов", "dm": "Для руководителей", "about": "О нас", "fb": "Оставьте отзыв", "priv": "Политика конфиденциальности", "menu": "Меню", "faq": "Частые вопросы"}, "et": {"pro": "Spetsialistidele", "dm": "Otsustajatele", "about": "Meist", "fb": "Anna tagasisidet", "priv": "Privaatsusteade", "menu": "Menüü", "faq": "Korduma kippuvad küsimused"}, "ar": {"pro": "للمختصين", "dm": "لصناع القرار", "about": "من نحن", "fb": "شاركنا رأيك", "priv": "إشعار الخصوصية", "menu": "القائمة", "faq": "أسئلة شائعة"}, "so": {"pro": "Xirfadlayaasha", "dm": "Go'aamiyeyaasha", "about": "Nagu saabsan", "fb": "Na sii ra'yigaaga", "priv": "Ogeysiiska asturnaanta", "menu": "Liiska", "faq": "Su'aalaha caadiga ah"}, "uk": {"pro": "Для фахівців", "dm": "Для керівників", "about": "Про нас", "fb": "Залиште відгук", "priv": "Повідомлення про конфіденційність", "menu": "Меню", "faq": "Часті запитання"}};
+  function setMenu(){ var l = document.documentElement.lang; var t = MT[l] || MT.en; document.querySelectorAll("[data-m]").forEach(function(a){ a.textContent = t[a.getAttribute("data-m")]; }); var b = document.getElementById("menuBtn"); if (b) b.setAttribute("aria-label", t.menu); }
+  setMenu();
+  new MutationObserver(setMenu).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+  document.addEventListener("click", function(ev){ var d = document.querySelector("details.menu"); if (d && d.open && !d.contains(ev.target)) d.open = false; });
+})();
 </script>
 </body>
 </html>

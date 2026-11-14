@@ -76,6 +76,26 @@ footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background
 .doc p,.doc li{color:var(--ink)}.doc .upd{color:var(--muted);font-size:15px;margin:0 0 8px}
 .doc ul{padding-inline-start:20px}
 article{display:none}article.on{display:block}
+.menu{position:relative}.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}.menu summary::-webkit-details-marker{display:none}
+.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column;z-index:20}
+.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:16px}.menu-p a:hover{background:var(--bg)}
+/* spacing v2 */
+body{line-height:1.6}
+.wrap{padding:0 24px}
+header .bar{padding:12px 24px;gap:16px;min-height:72px}
+.bar-r{gap:12px}
+section{padding:80px 0}
+.hero{padding:72px 0 64px}
+.lead{margin:20px 0 30px}
+.g2{gap:48px}
+.card{padding:28px}
+form{gap:20px}
+.stats{gap:20px}
+.list{gap:14px;margin-top:20px}
+.faq{padding:18px 0}
+footer{padding:40px 0 56px}
+main.doc{padding:56px 24px 72px}
+@media (max-width:780px){.wrap{padding:0 20px}header .bar{padding:12px 20px;gap:12px}.bar-r{display:contents}.logo{order:1;flex:1;font-size:22px}header select{order:2;padding:0 8px;font-size:14px}.menu{order:3}.tabs{order:4;width:100%}header .btn.sm{display:none}section{padding:56px 0}.hero{padding:40px 0 44px}.g2{gap:32px}main.doc{padding:36px 20px 56px}}
 </style>
 </head>
 <body>
@@ -86,6 +106,9 @@ article{display:none}article.on{display:block}
       <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" id="tb"></a><a class="tab" href="/sovellus" id="ta"></a></nav>
       <label for="lang" class="hidden" id="langLbl">Language</label>
       <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
+      <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
+        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
+      </div></details>
     </div>
   </div>
 </header>
@@ -202,6 +225,15 @@ try { start = localStorage.getItem("vayla-lang") || ""; } catch (e) {}
 if (!start) start = (navigator.language || "fi").slice(0, 2);
 apply(start);
 sel.addEventListener("change", function(){ apply(sel.value); });
+</script>
+<script>
+(function(){
+  var MT = {"fi": {"pro": "Ammattilaisille", "dm": "Päättäjille", "about": "Tietoa meistä", "fb": "Anna palautetta", "priv": "Tietosuojaseloste", "menu": "Valikko", "faq": "Usein kysyttyä"}, "sv": {"pro": "För vårdpersonal", "dm": "För beslutsfattare", "about": "Om oss", "fb": "Ge respons", "priv": "Dataskyddsbeskrivning", "menu": "Meny", "faq": "Vanliga frågor"}, "en": {"pro": "For professionals", "dm": "For decision-makers", "about": "About us", "fb": "Give feedback", "priv": "Privacy notice", "menu": "Menu", "faq": "Questions"}, "ru": {"pro": "Для специалистов", "dm": "Для руководителей", "about": "О нас", "fb": "Оставьте отзыв", "priv": "Политика конфиденциальности", "menu": "Меню", "faq": "Частые вопросы"}, "et": {"pro": "Spetsialistidele", "dm": "Otsustajatele", "about": "Meist", "fb": "Anna tagasisidet", "priv": "Privaatsusteade", "menu": "Menüü", "faq": "Korduma kippuvad küsimused"}, "ar": {"pro": "للمختصين", "dm": "لصناع القرار", "about": "من نحن", "fb": "شاركنا رأيك", "priv": "إشعار الخصوصية", "menu": "القائمة", "faq": "أسئلة شائعة"}, "so": {"pro": "Xirfadlayaasha", "dm": "Go'aamiyeyaasha", "about": "Nagu saabsan", "fb": "Na sii ra'yigaaga", "priv": "Ogeysiiska asturnaanta", "menu": "Liiska", "faq": "Su'aalaha caadiga ah"}, "uk": {"pro": "Для фахівців", "dm": "Для керівників", "about": "Про нас", "fb": "Залиште відгук", "priv": "Повідомлення про конфіденційність", "menu": "Меню", "faq": "Часті запитання"}};
+  function setMenu(){ var l = document.documentElement.lang; var t = MT[l] || MT.en; document.querySelectorAll("[data-m]").forEach(function(a){ a.textContent = t[a.getAttribute("data-m")]; }); var b = document.getElementById("menuBtn"); if (b) b.setAttribute("aria-label", t.menu); }
+  setMenu();
+  new MutationObserver(setMenu).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+  document.addEventListener("click", function(ev){ var d = document.querySelector("details.menu"); if (d && d.open && !d.contains(ev.target)) d.open = false; });
+})();
 </script>
 </body>
 </html>
