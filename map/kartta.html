@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polku hoitoon – Pilottikartta</title>
+<meta name="description" content="Keuhkosyövän TT-seulontapilottien ehdotetut alueet ja bussireitti Lapissa, Kymenlaaksossa ja Satakunnassa. Havaittu data, mallinnetut arviot ja oletukset eroteltu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vendor/leaflet.css">
+<style>
+:root{color-scheme:light;--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange-bg:#FFF3E6;--orange-ink:#8A3B00;
+  --obs:#1F5FD6;--obs-bg:#EAF1FF;--mod:#C2570C;--mod-bg:#FFF3E6;--ass:#7A5A00;--ass-bg:#FFF7DB;--mis:#B42318;--mis-bg:#FEECEA;--hosp:#2A78D6;--bus:#E8731A}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:16px}
+a{color:var(--blue)}a:hover{color:var(--blue-d)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1360px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
+.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select,input[type=password]{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}
+.tab:hover{color:var(--ink)}
+.menu{position:relative;order:3}
+.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}
+.menu summary::-webkit-details-marker{display:none}
+.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column}
+.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500}
+.menu-p a:hover{background:var(--bg)}
+select:focus,.tab:focus,.menu summary:focus,button:focus,input:focus,summary:focus{outline:3px solid #9EC1FF;outline-offset:2px}
+@media (max-width:780px){header{position:static}.bar-r>.tabs{order:3;width:100%;display:grid;grid-template-columns:1fr 1fr}.tab{justify-content:center;padding:0 8px;font-size:14px}.legend .d{display:none}}
+.hero{padding:22px 0 2px}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:10px}
+.hero h1{font-size:clamp(26px,3.6vw,38px)}
+.lead{font-size:16.5px;color:var(--muted);margin:8px 0 14px;max-width:54em}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:6px 0 12px}
+.seg{display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{font:inherit;font-size:15px;font-weight:600;min-height:40px;padding:0 16px;border:0;border-radius:9px;background:none;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+.btn{font:inherit;font-size:15px;font-weight:600;min-height:40px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink);cursor:pointer}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.lockbtn{margin-inline-start:auto}
+.adv{position:relative}
+.adv .pop{position:absolute;inset-inline-end:0;top:48px;z-index:900;width:min(360px,92vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(20,33,61,.16);padding:14px 16px}
+.pop h3{font-family:Inter,sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:12px 0 6px}
+.pop h3:first-child{margin-top:0}
+.pop label{display:flex;gap:8px;align-items:center;font-size:15px;padding:3px 0;cursor:pointer}
+.pop input[type=checkbox]{accent-color:var(--blue);width:16px;height:16px}
+.pop input[type=range]{width:100%;accent-color:var(--blue)}
+.hint{font-size:12.5px;color:var(--muted)}
+.row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13.5px;color:var(--muted);align-items:center;margin-bottom:10px}
+.chip{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;vertical-align:middle;white-space:nowrap}
+.chip.obs{background:var(--obs-bg);color:var(--obs)}.chip.mod{background:var(--mod-bg);color:var(--mod)}.chip.ass{background:var(--ass-bg);color:var(--ass)}
+.chip.mis{background:var(--mis-bg);color:var(--mis);border:1px solid #F3B8B2}
+.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(360px,.95fr);gap:18px;align-items:start;padding-bottom:50px}
+@media (max-width:980px){.layout{grid-template-columns:1fr}}
+.mapcol{position:sticky;top:78px}
+@media (max-width:980px){.mapcol{position:static}}
+#map{height:min(72vh,680px);min-height:420px;border:1px solid var(--line);border-radius:18px;background:#E8EDF5;overflow:hidden}
+@media (max-width:640px){#map{height:62vh;min-height:360px}}
+.leaflet-tile-pane{filter:grayscale(.85) contrast(.92) brightness(1.04)}
+.mapnote{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
+.mapwrap{position:relative}
+.maplegend{position:absolute;z-index:500;inset-inline-start:10px;bottom:10px;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:12px;padding:8px 11px;font-size:12px;max-width:240px;line-height:1.35}
+.maplegend summary{cursor:pointer;font-weight:700;font-size:12px;list-style:none}.maplegend summary::-webkit-details-marker{display:none}
+.maplegend summary::after{content:' ▾';color:var(--muted)}.maplegend:not([open]) summary::after{content:' ▸'}
+.maplegend .row{display:flex;align-items:center;gap:7px;margin:3px 0}
+.sw{display:inline-block;width:11px;height:11px;border-radius:50%;flex:none}.sw.sq{border-radius:2px}.sw.hollow{background:#fff!important;border:2px dashed #14213D}
+.playbar{position:absolute;z-index:500;inset-inline-end:10px;top:10px;display:flex;gap:6px}
+.playbar .btn{min-height:36px;padding:0 12px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;min-width:0}
+.card h2{font-size:19px;margin-bottom:2px}
+.sub{color:var(--muted);font-size:13.5px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:11px 12px;background:#fff}
+.tile .v{font-family:"Space Grotesk",sans-serif;font-size:23px;font-weight:700;color:var(--blue-d);line-height:1.1}
+.tile.m .v{color:var(--mod)}
+.tile .l{font-size:13.5px;margin-top:3px}.tile .s{font-size:12px;color:var(--muted);margin-top:3px}
+.pilot{border-radius:16px;padding:14px 16px;border:1px solid var(--line);background:#fff}
+.pilot.h{border-inline-start:6px solid var(--hosp)}.pilot.b{border-inline-start:6px solid var(--bus)}
+.pilot h2{font-size:18px}
+.pilot h3{font-size:15px;margin:12px 0 4px;font-family:Inter,sans-serif;font-weight:700}
+.notice{border-radius:12px;padding:9px 12px;font-size:14px;margin-top:10px}
+.notice.warn{background:var(--ass-bg);border:1px solid #EBD38A}.notice.info{background:var(--sky)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:6px}
+th,td{text-align:end;padding:6px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th:first-child,td:first-child{text-align:start}th{color:var(--muted);font-weight:600;font-size:12.5px}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--bg)}
+details.fold{border-top:1px solid var(--line);margin-top:12px;padding-top:8px}
+details.fold>summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none;padding:6px 0}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:'▾';margin-inline-start:8px;color:var(--muted)}details.fold[open]>summary::after{content:'▴'}
+.fold ul{margin:4px 0 6px;padding-inline-start:18px;font-size:14px}.fold li{margin:5px 0}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13.5px}.kv span:nth-child(even){text-align:end;font-weight:600}
+.stops{max-height:520px;overflow:auto;margin-top:8px;padding-inline-end:2px}
+.stop{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:#fff}
+.stop>summary{cursor:pointer;list-style:none;padding:9px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.stop>summary::-webkit-details-marker{display:none}
+.stop.active{border-color:var(--bus);box-shadow:0 0 0 2px #FBD9BE}
+.stop.pending{opacity:.45}
+.stop .n{width:24px;height:24px;border-radius:50%;background:var(--bus);color:#fff;font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex:none}
+.stop .n.far{background:#9C2B00}.stop .n.ct{background:#fff;color:var(--bus);border:2px dashed var(--bus)}
+.stop .nm{font-weight:700}.stop .meta{margin-inline-start:auto;font-size:12.5px;color:var(--muted)}
+.stop .body{padding:2px 12px 12px;font-size:13.5px}.stop .body li{margin:4px 0}.stop .body ul{margin:4px 0;padding-inline-start:18px}
+.role{font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 7px}
+.role.far{background:#FDE3D2;color:#8A3B00}.role.ct{background:#E8EDF7;color:#123E91}.role.mid{background:#F1F3F7;color:#4A5872}
+.flag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;background:var(--ass-bg);color:var(--ass);margin-inline-end:4px}
+.num{width:24px;height:24px;border-radius:50%;background:var(--bus);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.num.far{background:#9C2B00}.num.ct{background:#fff;color:var(--bus);border:2px dashed var(--bus)}
+.bus{width:22px;height:22px;border-radius:6px;background:#14213D;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+.ctsq{width:16px;height:16px;border-radius:3px;background:#123E91;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.ctsq.likely{background:#fff;border:2px dashed #123E91;box-shadow:0 0 0 2px #fff}.ctsq.ctx{width:11px;height:11px;opacity:.7}
+.ctlab{font-size:11.5px;font-weight:600;color:#14213D;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
+.leaflet-popup-content{font:14px/1.45 Inter,system-ui,sans-serif;margin:12px 14px}
+.leaflet-popup-content h4{margin:0 0 4px;font-family:"Space Grotesk",sans-serif;font-size:16px}
+footer{padding:26px 0 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);background:#fff}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="/" data-t="brand">Polku hoitoon</a>
+    <div class="bar-r">
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" data-t="nav_bus"></a><a class="tab" href="/sovellus" data-t="nav_app"></a></nav>
+      <label for="lang" class="hidden" id="langLbl">Language</label>
+      <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
+      <details class="menu"><summary aria-label="Menu">&#9776;</summary><div class="menu-p">
+        <a href="/keuhkodata" data-m="data"></a><a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
+      </div></details>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="wrap hero">
+    <span class="badge" data-t="badge"></span>
+    <h1 data-t="h1"></h1>
+    <p class="lead" data-t="lead"></p>
+    <div class="toolbar">
+      <div class="seg" role="group" id="regionSeg"></div>
+      <div class="adv lockbtn" id="adv">
+        <button class="btn" id="advBtn" type="button" aria-expanded="false"><span aria-hidden="true" id="lockIcon">🔒</span> <span id="advLabel"></span></button>
+        <div class="pop hidden" id="advPop"></div>
+      </div>
+    </div>
+    <div class="legend" id="statusLegend"></div>
+  </div>
+  <div class="wrap layout">
+    <div class="mapcol">
+      <div class="mapwrap">
+        <div id="map" role="application" aria-label="Map"></div>
+        <div class="playbar"><button class="btn p" id="playBtn" type="button"></button><button class="btn" id="replayBtn" type="button"></button></div>
+        <details class="maplegend" id="maplegend" open><summary id="lgsum"></summary><div id="lgbody"></div></details>
+      </div>
+      <p class="mapnote" data-t="mapnote"></p>
+    </div>
+    <div class="panel" id="panel"></div>
+  </div>
+</main>
+<footer><div class="wrap"><span data-t="footer"></span></div></footer>
+
+<script src="/vendor/leaflet.js"></script>
+<script>
+const T={
+fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Pilottikartta · konsepti, ei lupausta seulonnasta',
+ h1:'Mistä keuhkosyövän TT-seulontapilotit kannattaisi aloittaa?',
+ lead:'Kaksi pilottityyppiä, kolme ensisijaista aluetta: Lappi, Kymenlaakso ja Satakunta. Sininen alue kutsuttaisiin sairaalan TT:hen, oranssi alue palveltaisiin bussilla. Jokainen luku on merkitty: havaittu julkinen data, mallinnettu arvio, oletus tai puuttuva tieto.',
+ region:'Alue',obs:'Havaittu',mod:'Mallinnettu',ass:'Oletus',mis:'Puuttuu',
+ legend_obs:'havaittu julkinen lähde',legend_mod:'mallinnettu arvio (havaittu data + oletukset)',legend_ass:'oletus, jonka tiimi on valinnut',legend_mis:'tieto puuttuu',
+ mapnote:'Pisteet ovat kuntien pääasutuskeskuksia (OpenStreetMap), eivät rakennuksia. Reitti seuraa OpenStreetMapin tieverkkoa vapaalla ajonopeudella: ei talvea, ei lauttoja. Alueen ääriviiva yhdistää kuntakeskukset, se ei ole hallinnollinen raja. Kartta: © OpenStreetMap.',
+ pop50:'Ikä 50–74',elig:'Arvioitu riskiryhmä',eligs:'tupakointitieto × oletuskerroin; pakkavuosidataa ei ole',
+ deaths:'Keuhkosyöpäkuolemat / vuosi',deathss:'keskiarvo 2021–25; {x} / 100 000 (raaka luku)',
+ smr:'Kuolleisuus ikärakenteeseen nähden',smrs:'SMR, 95 % luottamusväli {lo}–{hi}; sija {rank}/22',
+ inc:'Keuhkosyövän ilmaantuvuus',incs:'miehet / naiset per 100 000, ikävakioitu, 2020–24; koko maa {m} / {w}',
+ newc:'Uusia keuhkosyöpiä / vuosi',newcs:'keskiarvo 2020–24, Syöpärekisteri',src_pop:'Tilastokeskus',pop_t:'Asukkaat {n} ({c})',
+ hosp_h:'Sairaalan TT-pilotti: kutsu nämä alueet',hosp_sub:'Kunnat, joista on enintään {m} min matka lähimpään TT-paikkaan (oletus).',
+ hosp_cnt:'arvioitua riskiryhmäläistä näissä kunnissa',hosp_none:'Ei yhtään kuntaa',
+ hosp_conf:'TT vahvistettu: {t}.',hosp_unc:'TT-paikkaa ei ole vahvistettu: {t}. Vahvista TT:n saatavuus ja vapaa kapasiteetti ennen kutsuja.',hosp_mix:'TT vahvistettu: {c}. Vahvistamatta: {u}.',
+ th_town:'Paikka',th_status:'Tila',th_scn:'Laitteita',th_elig:'Kutsuttavat (malli)',scn_unknown:'ei tiedossa',st_confirmed:'vahvistettu',st_likely:'todennäköinen',
+ cap_ver:'Vahvistettu TT-kapasiteetti',cap_ver_v:'ei saatavilla',cap_mod:'Arvioitu vapaa kapasiteetti',cap_mod_v:'~{n} kuvausta / v',cap_mod_s:'oletus: {c} TT-kuvausta / 1 000 asukasta, {s} % vapaana',
+ cap_need:'Riskiryhmän tarve',cap_need_v:'~{n} kuvausta / v',cap_need_s:'riskiryhmä ÷ seulontaväli ({i} v)',cap_cov:'Sairaalan TT yksin kattaisi',cap_cov_v:'~{p} %',cap_cov_s:'mallinnettu; todellinen kapasiteetti tuntematon',
+ bus_h:'Seulontabussi: reitti ja pysäkit',bus_add:'lisäosallistujaa / v',bus_adds:'{n} kuvausta / v (mallinnettu)',bus_far:'asuu yli 60 min TT:stä',bus_days:'työpäivää / v',bus_kms:'{n} km / v',
+ bus_far_yes:'{p} % lisäosallistujista asuu yli 60 minuutin päässä TT:stä: matka tukee bussia.',
+ bus_far_no:'Vain {p} % lisäosallistujista asuu yli 60 minuutin päässä TT:stä, ja {d} / {t} bussipäivästä on TT-kaupungeissa. Bussi ei tässä ensisijaisesti lyhentäisi matkaa vaan lisäisi kapasiteettia, mikä on oletus.',
+ play:'Toista reitti',pause:'Pysäytä',replay:'Alusta',
+ stops_h:'Pysäkit ja perustelut',role_far:'Kaukana TT:stä',role_ct:'TT-kaupunki: kapasiteetin purku (oletus)',role_mid:'TT:n ulottuvilla',
+ why_elig:'Arvioitu riskiryhmä vaikutusalueella: {n} ({p} % alueesta)',why_tt:'Matka lähimpään TT:hen: {m} min ({town}; TT {st})',
+ why_smr:'Keuhkosyöpäkuolleisuus SMR {smr} (95 % lv {lo}–{hi})',why_barrier:'Muunkielisiä {f} % (koko maa {nf} %) · vain perusaste 55–74-v. {e} % (koko maa {ne} %)',
+ why_add:'Mallinnettu {a} lisäosallistujaa / v, {d} työpäivää / v',why_stab:'Mukana suunnitelmassa {p} %:ssa {n} oletusskenaariosta (päiviä {a}–{b})',
+ fl_unc:'TT vahvistamatta',fl_cap:'Kapasiteettioletus',fl_unst:'Riippuu oletuksista',
+ miss_h:'Mitä puuttuu',
+ miss_cap:'Sairaalakohtainen TT-kapasiteetti: laitemäärä tiedossa {a} / {b} tutkitusta paikasta, ja ne ovat hybridilaitteita (SPECT/PET-TT). Vuosittaisia kuvausmääriä, vapaita aikoja tai jonotusaikoja ei ole ({c} aluetta täytetty).',
+ miss_unc:'TT:n olemassaolo vahvistamatta: {t}.',
+ miss_list:'Matka-ajat huomioivat vain tutkitut {n} TT-kaupunkia; sairaala, jota listalla ei ole, katsotaan paikaksi ilman TT:tä (esim. Satakunnassa Rauma ja Harjavalta: ei selvitetty).',
+ miss_travel:'Matka-aika: OpenStreetMap-tieverkko vapaalla ajonopeudella (ei talvea, ei lauttoja); pisteet ovat kuntien pääasutuskeskuksia, ei koteja. Hamina, Huittinen ja Simo käyttävät kunnan keskipistettä. Digiroad-tietokantaa ei ole käytetty.',
+ miss_pack:'Pakkavuosijakauma: riskiryhmä on arvio tupakointiasteesta ja oletuskertoimesta (ikä 50–74), ei rekisteristä.',
+ miss_muni:'Keuhkosyöpäkuolemat kunnittain: data on vain hyvinvointialueittain, joten kuolleisuus on sama kaikille alueen kunnille.',
+ miss_under:'Koulutus (55–74-v.) ja pienituloisuus ovat kunnittain; yksilötason riskiä ne eivät kerro. Etnisyyttä ei rekisteröidä, kieli on vain välillinen mittari.',
+ miss_path:'Syöpätyyppikohtainen hoitopolkudata: ei ole julkisesti. Tämä on tietopankin tehtävä.',
+ ass_h:'Mallin oletukset',a_k_elig:'Riskiryhmäläisiä per päivittäin tupakoiva',a_ct_per_1000:'TT-kuvauksia / 1 000 asukasta / v',a_spare_share:'Seulontaan vapaa osuus TT:stä',
+ a_d0_fixed:'Matka-ajan vaikutus, sairaala (min)',a_d0_mobile:'Matka-ajan vaikutus, bussi (min)',a_hosp:'Sairaalan kutsualue (min)',a_lam:'Kielipaino',a_gamma:'Kuolleisuuspaino (SMR-potenssi)',a_mu:'Koulutuspaino',a_interval:'Seulontaväli (v)',
+ adv_label:'Lisätyökalut',adv_pw:'Salasana',adv_go:'Avaa',adv_bad:'Väärä salasana',adv_wait:'Liian monta yritystä, yritä myöhemmin',adv_off:'Lisätyökalut eivät ole käytössä tässä palvelussa',adv_err:'Avaaminen epäonnistui',adv_lock:'Lukitse',
+ adv_intro:'Työkalut kartan muokkaamiseen ja oletusten testaamiseen. Suojatut tiedot haetaan palvelimelta vasta salasanan jälkeen.',
+ s_layers:'Tasot',l_bubbles:'Kunnat (kuplat)',l_ct:'TT-paikat',l_likely:'Myös vahvistamattomat',l_ctx:'TT-paikat alueen ulkopuolella',l_hull:'Alueen ääriviiva',
+ s_colour:'Kuntien väri',c_class:'Pilottityypin mukaan',c_elig:'Arvioitu riskiryhmä',c_tt:'Matka-aika TT:hen',c_lang:'Muunkielisten osuus',c_edu:'Vain perusaste (55–74-v.)',
+ s_thresh:'Sairaalan kutsualue (min)',scen_h:'Oletusskenaariot',scen_sub:'81 ennalta laskettua skenaariota. Näet, mitkä pysäkit pysyvät suunnitelmassa.',
+ scen_gamma:'Kuolleisuuspaino',scen_lam:'Kielipaino',scen_mu:'Koulutuspaino',scen_spare:'Vapaa TT-kapasiteetti',scen_res:'Tulos: {s} pysäkkiä, {a} lisäosallistujaa, {d} työpäivää',
+ scen_added:'Lisäksi perusskenaarioon verrattuna',scen_removed:'Pois perusskenaariosta',scen_none:'ei muutoksia',scen_v1:'Aiempi malli (suora etäisyys × 1,3, raaka kuolleisuus)',scen_cor:'Tekijöiden korrelaatio kunnittain (Spearman)',
+ popup_elig:'Arvioitu riskiryhmä',popup_tt:'Matka lähimpään TT:hen',popup_ct:'Lähin TT-paikka',popup_lang:'Muunkielisten osuus',popup_edu:'Vain perusaste 55–74-v.',popup_pov:'Pienituloisuusaste',popup_class:'Suositus',popup_hosp:'Sairaalan TT-pilotin alue',popup_bus:'Bussialue',
+ popup_ev:'Näyttö',popup_site:'Tutkittu lähde',popup_assigned:'Kutsuttavat (malli)',
+ lg_hosp:'Sairaalan TT-pilotin alue (≤ {m} min)',lg_bus:'Bussialue (> {m} min TT:stä)',lg_elig:'Kuplan koko = arvioitu riskiryhmä',lg_ct:'TT vahvistettu',lg_ctl:'TT todennäköinen, ei vahvistettu',lg_stop:'Bussipysäkki (kaukana TT:stä)',lg_stopc:'Pysäkki TT-kaupungissa (kapasiteetti)',lg_route:'Bussin reitti',
+ footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Kartta ei lupaa seulontaa, paikkaa tai jonosijaa. Luvut on laskettu repositorion datasta; lähteet ja tarkistussummat ovat pilot_map.json-tiedostossa.',err:'Datan lataus epäonnistui.'},
+sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Pilotkarta · koncept, inget löfte om screening',
+ h1:'Var kunde piloter för CT-screening av lungcancer börja?',
+ lead:'Två pilottyper, tre prioriterade regioner: Lappland, Kymmenedalen och Satakunta. Det blå området skulle bjudas in till sjukhus-CT, det orangea betjänas av bussen. Varje siffra är märkt: observerade offentliga data, modellerad uppskattning, antagande eller saknad uppgift.',
+ region:'Region',obs:'Observerat',mod:'Modellerat',ass:'Antagande',mis:'Saknas',
+ legend_obs:'observerad offentlig källa',legend_mod:'modellerad uppskattning (observerade data + antaganden)',legend_ass:'antagande som teamet valt',legend_mis:'uppgift saknas',
+ mapnote:'Punkterna är kommunernas huvudorter (OpenStreetMap), inte byggnader. Rutten följer OpenStreetMaps vägnät med fri körhastighet: ingen vinter, inga färjor. Regionens kontur förbinder kommuncentra, den är ingen administrativ gräns. Karta: © OpenStreetMap.',
+ pop50:'Ålder 50–74',elig:'Uppskattad riskgrupp',eligs:'rökningsdata × antagen faktor; inga packår-data finns',
+ deaths:'Dödsfall i lungcancer / år',deathss:'medeltal 2021–25; {x} / 100 000 (rå siffra)',
+ smr:'Dödlighet jämfört med åldersstruktur',smrs:'SMR, 95 % konfidensintervall {lo}–{hi}; rank {rank}/22',
+ inc:'Insjuknande i lungcancer',incs:'män / kvinnor per 100 000, åldersstandardiserat, 2020–24; hela landet {m} / {w}',
+ newc:'Nya lungcancerfall / år',newcs:'medeltal 2020–24, Cancerregistret',src_pop:'Statistikcentralen',pop_t:'Invånare {n} ({c})',
+ hosp_h:'Sjukhus-CT-pilot: bjud in dessa områden',hosp_sub:'Kommuner inom högst {m} min restid från närmaste CT-plats (antagande).',
+ hosp_cnt:'uppskattade i riskgruppen i dessa kommuner',hosp_none:'Inga kommuner',
+ hosp_conf:'CT bekräftad: {t}.',hosp_unc:'CT-platsen är inte bekräftad: {t}. Bekräfta CT-tillgång och ledig kapacitet före inbjudningar.',hosp_mix:'CT bekräftad: {c}. Obekräftad: {u}.',
+ th_town:'Plats',th_status:'Status',th_scn:'Skannrar',th_elig:'Inbjudna (modell)',scn_unknown:'okänt',st_confirmed:'bekräftad',st_likely:'sannolik',
+ cap_ver:'Bekräftad CT-kapacitet',cap_ver_v:'saknas',cap_mod:'Uppskattad ledig kapacitet',cap_mod_v:'~{n} undersökn. / år',cap_mod_s:'antagande: {c} CT-undersökningar / 1 000 invånare, {s} % lediga',
+ cap_need:'Riskgruppens behov',cap_need_v:'~{n} undersökn. / år',cap_need_s:'riskgrupp ÷ screeningintervall ({i} år)',cap_cov:'Sjukhus-CT ensamt skulle täcka',cap_cov_v:'~{p} %',cap_cov_s:'modellerat; verklig kapacitet okänd',
+ bus_h:'Screeningbuss: rutt och hållplatser',bus_add:'extra deltagare / år',bus_adds:'{n} undersökningar / år (modellerat)',bus_far:'bor över 60 min från CT',bus_days:'arbetsdagar / år',bus_kms:'{n} km / år',
+ bus_far_yes:'{p} % av de extra deltagarna bor över 60 minuter från CT: restiden stöder bussen.',
+ bus_far_no:'Bara {p} % av de extra deltagarna bor över 60 minuter från CT, och {d} av {t} bussdagar är i CT-orter. Bussen skulle här främst öka kapaciteten snarare än korta restiden, vilket är ett antagande.',
+ play:'Spela rutten',pause:'Stoppa',replay:'Börja om',
+ stops_h:'Hållplatser och motiveringar',role_far:'Långt från CT',role_ct:'CT-ort: avlastning av kapacitet (antagande)',role_mid:'Inom räckhåll för CT',
+ why_elig:'Uppskattad riskgrupp i upptagningsområdet: {n} ({p} % av regionen)',why_tt:'Restid till närmaste CT: {m} min ({town}; CT {st})',
+ why_smr:'Dödlighet i lungcancer SMR {smr} (95 % KI {lo}–{hi})',why_barrier:'Annat språk {f} % (hela landet {nf} %) · endast grundskola 55–74 år {e} % (hela landet {ne} %)',
+ why_add:'Modellerat {a} extra deltagare / år, {d} arbetsdagar / år',why_stab:'Med i planen i {p} % av {n} antagandescenarier (dagar {a}–{b})',
+ fl_unc:'CT obekräftad',fl_cap:'Kapacitetsantagande',fl_unst:'Beror på antaganden',
+ miss_h:'Vad som saknas',
+ miss_cap:'CT-kapacitet per sjukhus: antalet skannrar känt för {a} av {b} undersökta platser, och de är hybridapparater (SPECT/PET-CT). Inga årliga volymer, lediga tider eller väntetider finns ({c} regioner ifyllda).',
+ miss_unc:'CT-förekomst obekräftad: {t}.',
+ miss_list:'Restiderna beaktar bara de undersökta {n} CT-orterna; ett sjukhus som inte finns på listan räknas som en plats utan CT (t.ex. Raumo och Harjavalta i Satakunta: ej utrett).',
+ miss_travel:'Restid: OpenStreetMaps vägnät med fri hastighet (ingen vinter, inga färjor); punkterna är kommunernas huvudorter, inte hem. Hamina, Huittinen och Simo använder kommunens mittpunkt. Digiroad har inte använts.',
+ miss_pack:'Packårsfördelning: riskgruppen är en uppskattning av rökning och en antagen faktor (ålder 50–74), inte ur ett register.',
+ miss_muni:'Dödsfall i lungcancer per kommun: data finns bara per välfärdsområde, så dödligheten är densamma för alla kommuner i regionen.',
+ miss_under:'Utbildning (55–74 år) och låg inkomst finns per kommun; de säger inget om individuell risk. Etnicitet registreras inte, språk är bara ett indirekt mått.',
+ miss_path:'Vårdkedjedata per cancertyp: finns inte offentligt. Det är databankens uppgift.',
+ ass_h:'Modellens antaganden',a_k_elig:'Riskgrupp per daglig rökare',a_ct_per_1000:'CT-undersökningar / 1 000 invånare / år',a_spare_share:'Andel av CT ledig för screening',
+ a_d0_fixed:'Restidens effekt, sjukhus (min)',a_d0_mobile:'Restidens effekt, buss (min)',a_hosp:'Sjukhusets inbjudningsområde (min)',a_lam:'Språkvikt',a_gamma:'Dödlighetsvikt (SMR-exponent)',a_mu:'Utbildningsvikt',a_interval:'Screeningintervall (år)',
+ adv_label:'Extra verktyg',adv_pw:'Lösenord',adv_go:'Öppna',adv_bad:'Fel lösenord',adv_wait:'För många försök, försök senare',adv_off:'Extra verktyg är inte aktiverade i den här tjänsten',adv_err:'Det gick inte att öppna',adv_lock:'Lås',
+ adv_intro:'Verktyg för att ändra kartan och testa antaganden. Skyddade data hämtas från servern först efter lösenordet.',
+ s_layers:'Lager',l_bubbles:'Kommuner (bubblor)',l_ct:'CT-platser',l_likely:'Även obekräftade',l_ctx:'CT-platser utanför regionen',l_hull:'Regionens kontur',
+ s_colour:'Kommunernas färg',c_class:'Enligt pilottyp',c_elig:'Uppskattad riskgrupp',c_tt:'Restid till CT',c_lang:'Andel annat språk',c_edu:'Endast grundskola (55–74 år)',
+ s_thresh:'Sjukhusets inbjudningsområde (min)',scen_h:'Antagandescenarier',scen_sub:'81 förberäknade scenarier. Se vilka hållplatser som består.',
+ scen_gamma:'Dödlighetsvikt',scen_lam:'Språkvikt',scen_mu:'Utbildningsvikt',scen_spare:'Ledig CT-kapacitet',scen_res:'Resultat: {s} hållplatser, {a} extra deltagare, {d} arbetsdagar',
+ scen_added:'Tillkommer jämfört med grundscenariot',scen_removed:'Bortfaller från grundscenariot',scen_none:'inga ändringar',scen_v1:'Tidigare modell (fågelvägen × 1,3, rå dödlighet)',scen_cor:'Korrelation mellan faktorer per kommun (Spearman)',
+ popup_elig:'Uppskattad riskgrupp',popup_tt:'Restid till närmaste CT',popup_ct:'Närmaste CT-plats',popup_lang:'Andel annat språk',popup_edu:'Endast grundskola 55–74 år',popup_pov:'Andel låginkomsttagare',popup_class:'Rekommendation',popup_hosp:'Sjukhus-CT-pilotens område',popup_bus:'Bussområde',
+ popup_ev:'Belägg',popup_site:'Undersökt källa',popup_assigned:'Inbjudna (modell)',
+ lg_hosp:'Sjukhus-CT-pilotens område (≤ {m} min)',lg_bus:'Bussområde (> {m} min från CT)',lg_elig:'Bubblans storlek = uppskattad riskgrupp',lg_ct:'CT bekräftad',lg_ctl:'CT sannolik, inte bekräftad',lg_stop:'Busshållplats (långt från CT)',lg_stopc:'Hållplats i CT-ort (kapacitet)',lg_route:'Bussens rutt',
+ footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Kartan lovar ingen screening, plats eller köplats. Siffrorna är beräknade ur repositoriets data; källor och kontrollsummor finns i pilot_map.json.',err:'Det gick inte att ladda data.'},
+en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Pilot map · concept, no promise of screening',
+ h1:'Where could lung-cancer CT screening pilots start?',
+ lead:'Two pilot types, three priority regions: Lapland, Kymenlaakso and Satakunta. The blue area would be invited to a hospital CT; the orange area would be served by the bus. Every figure is labelled: observed public data, modelled estimate, assumption, or missing.',
+ region:'Region',obs:'Observed',mod:'Modelled',ass:'Assumption',mis:'Missing',
+ legend_obs:'observed public source',legend_mod:'modelled estimate (observed data + assumptions)',legend_ass:'assumption the team chose',legend_mis:'data missing',
+ mapnote:'Points are the main settlement of each municipality (OpenStreetMap), not buildings. The route follows the OpenStreetMap road network at free-flow speed: no winter, no ferries. The region outline joins municipality centres; it is not the administrative border. Map: © OpenStreetMap.',
+ pop50:'Aged 50–74',elig:'Estimated risk group',eligs:'smoking data × assumed factor; no pack-year data exists',
+ deaths:'Lung-cancer deaths / year',deathss:'mean 2021–25; {x} per 100,000 (crude)',
+ smr:'Mortality vs age structure',smrs:'SMR, 95% CI {lo}–{hi}; rank {rank}/22',
+ inc:'Lung-cancer incidence',incs:'men / women per 100,000, age-standardised, 2020–24; Finland {m} / {w}',
+ newc:'New lung cancers / year',newcs:'mean 2020–24, Cancer Registry',src_pop:'Statistics Finland',pop_t:'Population {n} ({c})',
+ hosp_h:'Hospital CT pilot: invite these areas',hosp_sub:'Municipalities within {m} min travel of the nearest CT site (an assumption).',
+ hosp_cnt:'estimated risk-group people in these municipalities',hosp_none:'No municipalities',
+ hosp_conf:'CT confirmed: {t}.',hosp_unc:'CT site not confirmed: {t}. Confirm that CT is offered and how much capacity is free before sending invitations.',hosp_mix:'CT confirmed: {c}. Not confirmed: {u}.',
+ th_town:'Site',th_status:'Status',th_scn:'Scanners',th_elig:'Invitees (model)',scn_unknown:'unknown',st_confirmed:'confirmed',st_likely:'likely',
+ cap_ver:'Verified CT capacity',cap_ver_v:'not available',cap_mod:'Estimated free capacity',cap_mod_v:'~{n} scans / yr',cap_mod_s:'assumption: {c} CT exams per 1,000 residents, {s}% free',
+ cap_need:'Risk group\'s need',cap_need_v:'~{n} scans / yr',cap_need_s:'risk group ÷ screening interval ({i} yrs)',cap_cov:'Hospital CT alone would cover',cap_cov_v:'~{p}%',cap_cov_s:'modelled; real capacity unknown',
+ bus_h:'Screening bus: route and stops',bus_add:'extra participants / yr',bus_adds:'{n} scans / yr (modelled)',bus_far:'live over 60 min from a CT',bus_days:'working days / yr',bus_kms:'{n} km / yr',
+ bus_far_yes:'{p}% of extra participants live more than 60 minutes from a CT: travel time supports a bus.',
+ bus_far_no:'Only {p}% of extra participants live more than 60 minutes from a CT, and {d} of {t} bus days are in CT towns. Here the bus would mainly add capacity rather than shorten travel, which is an assumption.',
+ play:'Play route',pause:'Stop',replay:'Restart',
+ stops_h:'Stops and why they were chosen',role_far:'Far from a CT',role_ct:'CT town: capacity relief (assumption)',role_mid:'Within reach of a CT',
+ why_elig:'Estimated risk group in the catchment: {n} ({p}% of the region)',why_tt:'Travel to nearest CT: {m} min ({town}; CT {st})',
+ why_smr:'Lung-cancer mortality SMR {smr} (95% CI {lo}–{hi})',why_barrier:'Other language {f}% (Finland {nf}%) · basic education only, 55–74 {e}% (Finland {ne}%)',
+ why_add:'Modelled {a} extra participants / yr, {d} working days / yr',why_stab:'In the plan in {p}% of {n} assumption scenarios (days {a}–{b})',
+ fl_unc:'CT not confirmed',fl_cap:'Capacity assumption',fl_unst:'Depends on assumptions',
+ miss_h:'What is missing',
+ miss_cap:'Hospital-level CT capacity: scanner counts are known for {a} of {b} researched sites, and those are hybrid machines (SPECT/PET-CT). No yearly volumes, free slots or waiting times exist ({c} regions filled in).',
+ miss_unc:'CT presence not confirmed: {t}.',
+ miss_list:'Travel times count only the {n} researched CT towns; a hospital not on the list is treated as having no CT (e.g. Rauma and Harjavalta in Satakunta: not established).',
+ miss_travel:'Travel time: OpenStreetMap road network at free-flow speed (no winter, no ferries); points are the main settlement of each municipality, not homes. Hamina, Huittinen and Simo use the municipality centroid. Digiroad was not used.',
+ miss_pack:'Pack-year distribution: the risk group is an estimate from smoking rates and an assumed factor (age 50–74), not from a register.',
+ miss_muni:'Lung-cancer deaths by municipality: data exists only by wellbeing services county, so mortality is the same for all municipalities in a region.',
+ miss_under:'Education (55–74) and low income exist by municipality; they say nothing about individual risk. Ethnicity is not recorded; language is only an indirect measure.',
+ miss_path:'Pathway data by cancer type: not publicly available. This is what the data bank is for.',
+ ass_h:'Model assumptions',a_k_elig:'Risk-group people per daily smoker',a_ct_per_1000:'CT exams / 1,000 residents / yr',a_spare_share:'Share of CT free for screening',
+ a_d0_fixed:'Travel-time decay, hospital (min)',a_d0_mobile:'Travel-time decay, bus (min)',a_hosp:'Hospital invitation area (min)',a_lam:'Language weight',a_gamma:'Mortality weight (SMR exponent)',a_mu:'Education weight',a_interval:'Screening interval (yrs)',
+ adv_label:'Advanced tools',adv_pw:'Password',adv_go:'Unlock',adv_bad:'Wrong password',adv_wait:'Too many attempts, try again later',adv_off:'Advanced tools are not enabled on this service',adv_err:'Could not unlock',adv_lock:'Lock',
+ adv_intro:'Tools for changing the map and testing assumptions. Protected data is fetched from the server only after the password.',
+ s_layers:'Layers',l_bubbles:'Municipalities (bubbles)',l_ct:'CT sites',l_likely:'Also unconfirmed',l_ctx:'CT sites outside the region',l_hull:'Region outline',
+ s_colour:'Municipality colour',c_class:'By pilot type',c_elig:'Estimated risk group',c_tt:'Travel time to CT',c_lang:'Share with another language',c_edu:'Basic education only (55–74)',
+ s_thresh:'Hospital invitation area (min)',scen_h:'Assumption scenarios',scen_sub:'81 precomputed scenarios. See which stops stay in the plan.',
+ scen_gamma:'Mortality weight',scen_lam:'Language weight',scen_mu:'Education weight',scen_spare:'Free CT capacity',scen_res:'Result: {s} stops, {a} extra participants, {d} working days',
+ scen_added:'Added vs the baseline',scen_removed:'Dropped from the baseline',scen_none:'no changes',scen_v1:'Earlier model (straight line × 1.3, crude mortality)',scen_cor:'Correlation between factors across municipalities (Spearman)',
+ popup_elig:'Estimated risk group',popup_tt:'Travel to nearest CT',popup_ct:'Nearest CT site',popup_lang:'Share with another language',popup_edu:'Basic education only 55–74',popup_pov:'At-risk-of-poverty rate',popup_class:'Recommendation',popup_hosp:'Hospital CT pilot area',popup_bus:'Bus area',
+ popup_ev:'Evidence',popup_site:'Researched source',popup_assigned:'Invitees (model)',
+ lg_hosp:'Hospital CT pilot area (≤ {m} min)',lg_bus:'Bus area (> {m} min from a CT)',lg_elig:'Bubble size = estimated risk group',lg_ct:'CT confirmed',lg_ctl:'CT likely, not confirmed',lg_stop:'Bus stop (far from a CT)',lg_stopc:'Stop in a CT town (capacity)',lg_route:'Bus route',
+ footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. The map does not promise screening, a place or a queue spot. Figures are computed from the repository data; sources and checksums are in pilot_map.json.',err:'Could not load the data.'}};
+const MT={fi:{data:'Keuhkodata',pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',faq:'Usein kysyttyä'},sv:{data:'Lungdata',pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',faq:'Vanliga frågor'},en:{data:'Lung data',pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',faq:'FAQ'}};
+const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
+let lang='fi',D=null,ADV=null,token=null,cur='HVA21',map,G={},A=null,thresh=45,reduce=false;
+const O={bubbles:true,ct:true,likely:true,ctx:true,hull:true,colour:'class'};
+const $=id=>document.getElementById(id);
+const t=(k,v)=>{let s=(T[lang][k]??T.fi[k]??k);if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n0=v=>v==null?'–':Math.round(v).toLocaleString(LOC[lang]);
+const n1=v=>v==null?'–':(+v).toLocaleString(LOC[lang],{maximumFractionDigits:1});
+const n2=v=>v==null?'–':(+v).toLocaleString(LOC[lang],{minimumFractionDigits:2,maximumFractionDigits:2});
+const pc=v=>Math.round(v*100);
+const chip=k=>`<span class="chip ${k}">${t(k)}</span>`;
+const stp=s=>`<span class="chip ${s==='confirmed'?'obs':'ass'}">${t('st_'+s)}</span>`;
+const cname=c=>D.counties[c].names[lang];
+try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.getAttribute('data-t')));
+  document.querySelectorAll('[data-m]').forEach(a=>a.textContent=MT[lang][a.getAttribute('data-m')]);
+  document.title='Polku hoitoon – '+({fi:'Pilottikartta',sv:'Pilotkarta',en:'Pilot map'}[lang]);
+  $('lang').value=lang;try{localStorage.setItem('vayla-lang',lang)}catch(e){}
+  $('statusLegend').innerHTML=['obs','mod','ass','mis'].map(k=>`<span title="${esc(t('legend_'+k))}">${chip(k)}<span class="d"> ${t('legend_'+k)}</span></span>`).join('');
+  $('advLabel').textContent=t('adv_label');
+  $('lockIcon').textContent=token?'🔓':'🔒';
+  $('playBtn').textContent=A&&A.playing?t('pause'):t('play');$('replayBtn').textContent=t('replay');
+  if(D){buildSegs();renderStatic();panel();if(A&&A.done)drawFull();if($('advPop').innerHTML)$('advPop').innerHTML=advPopHTML(),bindAdvPop()}
+}
+function buildSegs(){$('regionSeg').innerHTML=D.meta.priority.map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===cur}">${esc(cname(c))}</button>`).join('')}
+
+/* ---------- map ---------- */
+function ready(){
+  map=L.map('map',{zoomControl:true,scrollWheelZoom:false,minZoom:5,maxZoom:12});
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+  ['hull','bubbles','ct','route','stops','bus'].forEach(k=>G[k]=L.layerGroup().addTo(map));
+  new ResizeObserver(()=>map.invalidateSize()).observe($('map'));
+}
+const lerp=(a,b,u)=>a.map((x,i)=>Math.round(x+(b[i]-x)*u));
+function ramp(stops,u){u=Math.max(0,Math.min(1,u));const k=(stops.length-1)*u,i=Math.min(stops.length-2,Math.floor(k));return 'rgb('+lerp(stops[i],stops[i+1],k-i).join(',')+')'}
+const BLUE=[[198,219,239],[66,146,198],[8,69,148]],ORG=[[254,230,206],[253,141,60],[140,45,4]];
+const munis=()=>D.municipalities.filter(m=>m.county===cur);
+const cls=m=>m.tt_ct_min<=thresh?'hospital':'bus';
+function fill(m){
+  const c=O.colour;
+  if(c==='elig')return ramp(BLUE,Math.sqrt(m.eligible/1700));
+  if(c==='tt')return ramp(ORG,m.tt_ct_min/150);
+  if(c==='lang')return ramp(ORG,m.foreign_share/0.12);
+  if(c==='edu')return ramp(ORG,((m.basic_share||0)-0.08)/0.2);
+  return cls(m)==='hospital'?'#2A78D6':'#E8731A';
+}
+function legend(){
+  const row=(sw,txt,k='')=>`<div class="row"><span class="sw ${k}" style="background:${sw}"></span>${txt}</div>`;
+  let h='';
+  if(O.colour==='class')h+=row('#2A78D6',t('lg_hosp',{m:thresh}))+row('#E8731A',t('lg_bus',{m:thresh}));
+  h+=`<div class="row">${t('lg_elig')}</div>`;
+  h+=row('#123E91',t('lg_ct'),'sq')+row('#fff',t('lg_ctl'),'sq hollow');
+  h+=row('#9C2B00',t('lg_stop'))+row('#fff',t('lg_stopc'),'hollow');
+  h+=`<div class="row"><span style="display:inline-block;width:18px;border-top:3px solid #C2570C"></span>${t('lg_route')}</div>`;
+  $('lgsum').textContent={fi:'Selite',sv:'Teckenförklaring',en:'Legend'}[lang];$('lgbody').innerHTML=h;
+}
+function popMuni(m){
+  const h=cls(m)==='hospital';
+  return `<h4>${esc(m.name)}</h4><div class="kv"><span>${t('popup_class')}</span><span>${h?t('popup_hosp'):t('popup_bus')}</span>
+  <span>${t('popup_elig')} ${chip('mod')}</span><span>${n0(m.eligible)}</span>
+  <span>${t('popup_tt')} ${chip('mod')}</span><span>${n0(m.tt_ct_min)} min</span>
+  <span>${t('popup_ct')}</span><span>${esc(m.nearest_ct)} ${stp(m.ct_status)}</span>
+  <span>${t('popup_lang')} ${chip('obs')}</span><span>${n1(m.foreign_share*100)} %</span>
+  <span>${t('popup_edu')} ${chip('obs')}</span><span>${m.basic_share==null?'–':n1(m.basic_share*100)+' %'}</span>
+  <span>${t('popup_pov')} ${chip('obs')}</span><span>${m.poverty_rate==null?'–':n1(m.poverty_rate)+' %'}</span></div>`;
+}
+function popTown(tw){
+  const inv=munis().filter(m=>m.nearest_ct===tw.town&&cls(m)==='hospital').reduce((s,m)=>s+m.eligible,0);
+  const sites=(tw.sites||[]).map(s=>`<div style="margin-top:8px"><b>${esc(s.facility)}</b><br>${stp(s.status)} ${t('th_scn')}: ${s.scanners||t('scn_unknown')}<br><span class="sub">${t('popup_ev')}: ${esc(s.evidence)}${s.date?` (${esc(s.date)})`:''}</span><br>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">${t('popup_site')}</a>`:''}${s.note?`<br><span class="sub">${esc(s.note)}</span>`:''}</div>`).join('');
+  return `<h4>${esc(tw.town)}</h4><div class="kv"><span>${t('popup_assigned')} ${chip('mod')}</span><span>${n0(inv)}</span></div>${sites}`;
+}
+function hospStats(){
+  const ms=munis(),inv=ms.filter(m=>cls(m)==='hospital'),out=ms.filter(m=>cls(m)==='bus');
+  return {inv,out,ei:inv.reduce((s,m)=>s+m.eligible,0),eo:out.reduce((s,m)=>s+m.eligible,0),ms};
+}
+function hullOf(k){const pts=D.municipalities.filter(m=>m.county===k).map(m=>[m.lon,m.lat]);if(pts.length<3)return null;
+  pts.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];
+  for(const p of pts){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+  for(const p of pts.slice().reverse()){while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+  return lo.slice(0,-1).concat(up.slice(0,-1)).map(p=>[p[1],p[0]])}
+function renderStatic(){
+  ['hull','bubbles','ct'].forEach(k=>G[k].clearLayers());
+  const c=D.counties[cur],ms=munis();
+  if(O.hull)D.meta.priority.forEach(k=>{const h=hullOf(k),me=k===cur;if(!h)return;
+    L.polygon(h,{color:me?'#123E91':'#7C8CA8',weight:me?2.5:1,dashArray:me?null:'4 5',fillColor:me?'#1F5FD6':'#7C8CA8',fillOpacity:me?.05:.02,interactive:!me,bubblingMouseEvents:false}).addTo(G.hull).on('click',()=>{if(!me)setRegion(k)});
+    if(!me)L.marker(h.reduce((a,p)=>[a[0]+p[0]/h.length,a[1]+p[1]/h.length],[0,0]),{icon:L.divIcon({className:'',html:`<span class="ctlab" style="font-size:13px">${esc(cname(k))}</span>`,iconSize:[0,0]}),interactive:false,keyboard:false}).addTo(G.hull)});
+  if(O.bubbles)ms.slice().sort((a,b)=>b.eligible-a.eligible).forEach(m=>{
+    const unc=cls(m)==='hospital'&&m.ct_status!=='confirmed';
+    const cm=L.circleMarker([m.lat,m.lon],{radius:4+Math.sqrt(m.eligible)*.55,color:unc?'#14213D':'#fff',weight:unc?1.6:1.5,dashArray:unc?'3 3':null,fillColor:fill(m),fillOpacity:.8}).addTo(G.bubbles);
+    cm.bindPopup(popMuni(m));cm.bindTooltip(esc(m.name),{direction:'top',offset:[0,-4]})});
+  if(O.ct)D.ct_towns.forEach(tw0=>{
+    const mine=tw0.county===cur;const full=c.hospital.towns.find(x=>x.town===tw0.town)||Object.assign({sites:[]},tw0);
+    if(!mine&&!O.ctx)return; if(tw0.status==='likely'&&!O.likely)return;
+    const cl='ctsq'+(tw0.status==='likely'?' likely':'')+(mine?'':' ctx'),sz=mine?16:11;
+    L.marker([tw0.lat,tw0.lon],{icon:L.divIcon({className:'',html:`<div class="${cl}"></div>${mine?`<span class="ctlab" style="position:absolute;left:20px;top:-1px">${esc(tw0.town)}</span>`:''}`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]}),zIndexOffset:400,title:tw0.town+' – '+t('st_'+tw0.status),keyboard:true}).addTo(G.ct).bindPopup(popTown(full),{maxWidth:330})});
+  legend();
+}
+
+/* ---------- bus route animation ---------- */
+const hav=(a,b)=>{const p=Math.PI/180,x=Math.sin((b[0]-a[0])*p/2)**2+Math.cos(a[0]*p)*Math.cos(b[0]*p)*Math.sin((b[1]-a[1])*p/2)**2;return 12742*Math.asin(Math.sqrt(x))};
+function roleText(s){return t(s.kind==='far'?'role_far':s.kind==='ct_town'?'role_ct':'role_mid')}
+function stopPopup(s){return `<h4>${s.n}. ${esc(s.name)}</h4><div class="sub">${esc(roleText(s))}</div>`}
+function stopMarker(s){
+  const kind=s.kind==='far'?'far':(s.kind==='ct_town'?'ct':'');
+  return L.marker([s.lat,s.lon],{icon:L.divIcon({className:'',html:`<div class="num ${kind}">${s.n}</div>`,iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:700,title:s.name,keyboard:true}).bindPopup(stopPopup(s));
+}
+function stopCards(){document.querySelectorAll('.stop').forEach(el=>{const n=+el.dataset.n,pend=A&&A.playing&&n>A.shown;el.classList.toggle('pending',!!pend);el.classList.toggle('active',!!(A&&A.playing&&n===A.active))})}
+function stopAnim(){if(A){cancelAnimationFrame(A.raf);A.playing=false}}
+function drawFull(){
+  G.route.clearLayers();G.stops.clearLayers();G.bus.clearLayers();
+  const b=D.counties[cur].bus;
+  b.legs.forEach(l=>L.polyline(l.coords,{color:'#C2570C',weight:3,opacity:.9,interactive:false}).addTo(G.route));
+  b.stops.forEach(s=>stopMarker(s).addTo(G.stops));
+}
+function startAnim(){
+  stopAnim();
+  const b=D.counties[cur].bus,n=b.stops.length;
+  if(reduce||!n){drawFull();A={playing:false,shown:n,active:0,done:true,raf:0};$('playBtn').textContent=t('play');stopCards();return}
+  G.route.clearLayers();G.stops.clearLayers();G.bus.clearLayers();
+  const legLen=b.legs.map(l=>{let d=0;for(let i=1;i<l.coords.length;i++)d+=hav(l.coords[i-1],l.coords[i]);return d||.1});
+  const totalL=legLen.reduce((a,x)=>a+x,0),MOVE=Math.min(24,10+n*0.7),DWELL=0.55,segs=[];
+  b.legs.forEach((l,i)=>{segs.push({k:'dwell',i,dur:DWELL});segs.push({k:'move',i,dur:Math.max(.35,MOVE*legLen[i]/totalL)})});
+  const marker=L.marker(b.legs[0].coords[0],{icon:L.divIcon({className:'',html:'<div class="bus">🚌</div>',iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:900,interactive:false}).addTo(G.bus);
+  const live=L.polyline([],{color:'#C2570C',weight:3.5,opacity:.95,interactive:false}).addTo(G.route);
+  A={playing:true,shown:0,active:0,done:false,raf:0,idx:0};
+  const me=A;$('playBtn').textContent=t('pause');
+  const reveal=i=>{if(i<n&&me.shown<i+1){me.shown=i+1;stopMarker(b.stops[i]).addTo(G.stops)}};
+  const t0=performance.now();
+  const step=now=>{
+    if(A!==me||!me.playing)return;
+    const el=(now-t0)/1000;let i=0,acc=0;
+    while(i<segs.length&&el>=acc+segs[i].dur){acc+=segs[i].dur;i++}
+    for(let k=me.idx;k<i;k++){const s=segs[k];if(s.k==='move'){L.polyline(b.legs[s.i].coords,{color:'#C2570C',weight:3,opacity:.9,interactive:false}).addTo(G.route);live.setLatLngs([])}if(s.k==='dwell')reveal(s.i)}
+    me.idx=i;
+    if(i>=segs.length){me.done=true;me.playing=false;me.active=0;drawFull();$('playBtn').textContent=t('play');stopCards();return}
+    const s=segs[i],f=(el-acc)/s.dur;
+    if(s.k==='dwell'){me.active=s.i+1;reveal(s.i);marker.setLatLng(b.legs[s.i].coords[0])}
+    else{
+      const cs=b.legs[s.i].coords,want=f*legLen[s.i];let d=0,j=1;
+      for(;j<cs.length-1;j++){const seg=hav(cs[j-1],cs[j]);if(d+seg>=want)break;d+=seg}
+      const sg=hav(cs[j-1],cs[j])||1e-6,u=Math.min(1,Math.max(0,(want-d)/sg));
+      const pos=[cs[j-1][0]+(cs[j][0]-cs[j-1][0])*u,cs[j-1][1]+(cs[j][1]-cs[j-1][1])*u];
+      marker.setLatLng(pos);live.setLatLngs(cs.slice(0,j).concat([pos]));me.active=s.i+1<=n?s.i+1:0;
+    }
+    stopCards();
+    const act=document.getElementById('stop'+me.active);
+    if(act&&me.lastScrolled!==me.active){me.lastScrolled=me.active;const box=$('stopList');if(box){const top=act.offsetTop-box.offsetTop;box.scrollTo({top:Math.max(0,top-40),behavior:'smooth'})}}
+    me.raf=requestAnimationFrame(step);
+  };
+  me.raf=requestAnimationFrame(step);stopCards();
+}
+
+/* ---------- panel ---------- */
+function tile(v,l,s,k){return `<div class="tile${k==='mod'?' m':''}"><div class="v">${v}</div><div class="l">${l} ${chip(k)}</div><div class="s">${s}</div></div>`}
+function flagText(f){return f==='ct_unconfirmed'?t('fl_unc'):f==='capacity_assumption'?t('fl_cap'):t('fl_unst')}
+function whyList(s,c){
+  const f=c.facts,m=D.meta,nat=m.national_foreign_share_50_74,ne=m.national_basic_share_55_74;
+  return `<ul><li>${t('why_elig',{n:n0(s.catchment_eligible),p:n0(s.catchment_share_of_county*100)})} ${chip('mod')}</li>
+  <li>${t('why_tt',{m:n0(s.tt_ct_min),town:esc(s.nearest_ct),st:t('st_'+s.ct_status)})} ${chip('mod')}</li>
+  <li>${t('why_smr',{smr:n2(f.smr.smr),lo:n2(f.smr.lo),hi:n2(f.smr.hi)})} ${chip('obs')}</li>
+  <li>${t('why_barrier',{f:n1(s.foreign_share*100),nf:n1(nat*100),e:n1(s.basic_share*100),ne:n1(ne*100)})} ${chip('obs')}</li>
+  <li>${t('why_add',{a:n0(s.additional),d:n1(s.days)})} ${chip('mod')}</li>
+  <li>${t('why_stab',{p:n0(s.stability.share*100),n:c.stability.scenarios,a:n1(s.stability.days_min),b:n1(s.stability.days_max)})} ${chip('ass')}</li></ul>
+  <div>${s.flags.map(x=>`<span class="flag">${flagText(x)}</span>`).join('')}</div>`;
+}
+function panel(){
+  const c=D.counties[cur],f=c.facts,m=c.model,b=c.bus,nat=D.meta,H=hospStats();
+  const towns=c.hospital.towns,conf=towns.filter(x=>x.status==='confirmed').map(x=>x.town),unc=towns.filter(x=>x.status!=='confirmed').map(x=>x.town);
+  const far=b.additional?b.additional_far/b.additional:0;
+  let h=`<section class="card"><h2>${esc(cname(cur))}</h2><div class="sub">${t('pop_t',{n:n0(f.pop_all),c:t('src_pop')})}</div>
+  <div class="tiles">${tile(n0(f.pop_50_74),t('pop50'),t('src_pop'),'obs')}${tile('~'+n0(m.eligible),t('elig'),t('eligs'),'mod')}
+  ${tile(n0(f.lung_deaths_per_year),t('deaths'),t('deathss',{x:n0(f.lung_deaths_per100k_crude)}),'obs')}${tile(n2(f.smr.smr),t('smr'),t('smrs',{lo:n2(f.smr.lo),hi:n2(f.smr.hi),rank:f.smr.rank}),'obs')}
+  ${tile(n0(f.lung_asr.men)+' / '+n0(f.lung_asr.women),t('inc'),t('incs',{m:n0(nat.national_lung_asr.men),w:n0(nat.national_lung_asr.women)}),'obs')}${tile(n0(f.lung_cases_2020_24/5),t('newc'),t('newcs'),'obs')}</div></section>`;
+  h+=`<section class="pilot h"><h2>${t('hosp_h')}</h2><div class="sub">${t('hosp_sub',{m:thresh})} ${chip('ass')}</div>
+   <div class="tiles"><div class="tile m"><div class="v">${H.inv.length} / ${H.ms.length}</div><div class="l">${n0(H.ei)} ${t('hosp_cnt')} ${chip('mod')}</div><div class="s">${H.inv.map(x=>esc(x.name)).slice(0,6).join(', ')}${H.inv.length>6?'…':''}</div></div>
+   <div class="tile m"><div class="v">${n0(H.eo)}</div><div class="l">${t('lg_bus',{m:thresh})} ${chip('mod')}</div><div class="s">${H.out.length?H.out.slice().sort((a,b)=>b.eligible-a.eligible).slice(0,3).map(x=>esc(x.name)+' '+n0(x.tt_ct_min)+' min').join(', '):t('hosp_none')}</div></div></div>
+   <div class="notice ${unc.length?'warn':'info'}">${conf.length&&!unc.length?t('hosp_conf',{t:conf.join(', ')}):conf.length?t('hosp_mix',{c:conf.join(', '),u:unc.join(', ')}):t('hosp_unc',{t:unc.join(', ')})}</div>
+   <table><thead><tr><th>${t('th_town')}</th><th>${t('th_status')}</th><th>${t('th_scn')}</th><th>${t('th_elig')}</th></tr></thead><tbody>
+   ${towns.map(x=>{const sc=x.sites.filter(s=>s.scanners).map(s=>s.scanners+(/SPECT|PET|nuclear|isotoop/i.test(s.facility)?' (SPECT/PET)':'')).join(', ');
+     const e=munis().filter(q=>q.nearest_ct===x.town&&cls(q)==='hospital').reduce((s,q)=>s+q.eligible,0);
+     return `<tr class="click" data-fly="${esc(x.town)}"><td>${esc(x.town)}</td><td>${stp(x.status)}</td><td>${sc||t('scn_unknown')}</td><td>${n0(e)}</td></tr>`}).join('')}</tbody></table>
+   <div class="tiles"><div class="tile"><div class="v" style="color:var(--mis)">${t('cap_ver_v')}</div><div class="l">${t('cap_ver')} ${chip('mis')}</div><div class="s">${t('miss_cap',{a:nat.ct_sites_with_scanner_count,b:nat.ct_sites_total,c:nat.ct_waits_known}).split('. ')[0]}.</div></div>
+   <div class="tile m"><div class="v">${t('cap_mod_v',{n:n0(m.spare_scans)})}</div><div class="l">${t('cap_mod')} ${chip('ass')}</div><div class="s">${t('cap_mod_s',{c:nat.planner_assumptions.ct_per_1000,s:Math.round(nat.planner_assumptions.spare_share*100)})}</div></div>
+   <div class="tile m"><div class="v">${t('cap_need_v',{n:n0(m.annual_need)})}</div><div class="l">${t('cap_need')} ${chip('mod')}</div><div class="s">${t('cap_need_s',{i:nat.planner_assumptions.interval})}</div></div>
+   <div class="tile m"><div class="v">${t('cap_cov_v',{p:pc(m.coverage_fixed)})}</div><div class="l">${t('cap_cov')} ${chip('mod')}</div><div class="s">${t('cap_cov_s')}</div></div></div></section>`;
+  h+=`<section class="pilot b"><h2>${t('bus_h')}</h2>
+   <div class="tiles"><div class="tile m"><div class="v">${n0(b.additional)}</div><div class="l">${t('bus_add')} ${chip('mod')}</div><div class="s">${t('bus_adds',{n:n0(b.scans)})}</div></div>
+   <div class="tile m"><div class="v">${n0(b.additional_far)} <span style="font-size:15px">(${pc(far)} %)</span></div><div class="l">${t('bus_far')} ${chip('mod')}</div><div class="s">${n0(b.eligible_in_far_catchments)} ${t('elig').toLowerCase()}</div></div>
+   <div class="tile m"><div class="v">${n0(b.working_days)}</div><div class="l">${t('bus_days')} ${chip('mod')}</div><div class="s">${t('bus_kms',{n:n0(b.km_per_year)})}</div></div></div>
+   <div class="notice ${far>=.25?'info':'warn'}">${far>=.25?t('bus_far_yes',{p:pc(far)}):t('bus_far_no',{p:pc(far),d:n0(b.days_in_ct_towns),t:n0(b.days_total_scanning)})}</div>
+   <h3>${t('stops_h')}</h3><div class="stops" id="stopList">${b.stops.map(s=>`<details class="stop" data-n="${s.n}" id="stop${s.n}"><summary><span class="n ${s.kind==='far'?'far':s.kind==='ct_town'?'ct':''}">${s.n}</span><span class="nm">${esc(s.name)}</span><span class="role ${s.kind==='far'?'far':s.kind==='ct_town'?'ct':'mid'}">${esc(roleText(s))}</span><span class="meta">${n0(s.additional)} · ${n1(s.days)} d</span></summary><div class="body">${whyList(s,c)}</div></details>`).join('')}</div></section>`;
+  const miss=`<li>${t('miss_cap',{a:nat.ct_sites_with_scanner_count,b:nat.ct_sites_total,c:nat.ct_waits_known})} ${chip('mis')}</li>${unc.length?`<li>${t('miss_unc',{t:unc.join(', ')})} ${chip('mis')}</li>`:''}
+   <li>${t('miss_list',{n:nat.ct_towns_total})} ${chip('mis')}</li><li>${t('miss_travel')} ${chip('mis')}</li><li>${t('miss_pack')} ${chip('mis')}</li><li>${t('miss_muni')} ${chip('mis')}</li><li>${t('miss_under')} ${chip('mis')}</li><li>${t('miss_path')} ${chip('mis')}</li>`;
+  const P=nat.planner_assumptions,W=nat.weights;
+  const ass=`<div class="kv"><span>${t('a_k_elig')}</span><span>${P.k_elig}</span><span>${t('a_ct_per_1000')}</span><span>${P.ct_per_1000}</span><span>${t('a_spare_share')}</span><span>${Math.round(P.spare_share*100)} %</span>
+   <span>${t('a_d0_fixed')}</span><span>${P.d0_fixed}</span><span>${t('a_d0_mobile')}</span><span>${P.d0_mobile}</span><span>${t('a_hosp')}</span><span>${nat.thresholds.hospital_invite_min}</span>
+   <span>${t('a_lam')}</span><span>${W.lam}</span><span>${t('a_gamma')}</span><span>${W.gamma} (${W.smr_cap[0]}–${W.smr_cap[1]})</span><span>${t('a_mu')}</span><span>${W.mu}</span><span>${t('a_interval')}</span><span>${P.interval}</span></div>`;
+  h+=`<section class="card"><details class="fold" style="border-top:0;margin-top:0;padding-top:0"><summary>${t('miss_h')} ${chip('mis')}</summary><ul>${miss}</ul></details>
+   <details class="fold"><summary>${t('ass_h')} ${chip('ass')}</summary>${ass}</details></section>`;
+  if(token&&ADV)h+=advCard();
+  $('panel').innerHTML=h;
+  $('panel').querySelectorAll('[data-fly]').forEach(r=>r.addEventListener('click',()=>{
+    const nm=r.getAttribute('data-fly'),p=[...D.ct_towns.map(x=>[x.town,x.lat,x.lon]),...D.municipalities.map(x=>[x.name,x.lat,x.lon])].find(x=>x[0]===nm);
+    if(p)map.flyTo([p[1],p[2]],Math.max(map.getZoom(),9),{duration:.6})}));
+  document.querySelectorAll('[data-s]').forEach(s=>s.addEventListener('change',()=>{scen[s.dataset.s]=+s.value;panel()}));
+  stopCards();
+}
+
+/* ---------- advanced tools (locked) ---------- */
+let scen={gamma:1,lam:0.5,mu:0.15,spare:0.05};
+function advCard(){
+  const g=ADV.grid,sel=k=>`<label class="row2" style="justify-content:space-between"><span>${t('scen_'+k)}</span><select data-s="${k}">${g[k].map(v=>`<option value="${v}" ${v===scen[k]?'selected':''}>${v}</option>`).join('')}</select></label>`;
+  const rec=ADV.scenarios.find(x=>Object.keys(scen).every(k=>x.params[k]===scen[k])),base=ADV.scenarios.find(x=>Object.keys(ADV.base).every(k=>x.params[k]===ADV.base[k]));
+  const r=rec.counties[cur],b0=base.counties[cur],names=r.stops.map(x=>x[0]),bn=b0.stops.map(x=>x[0]);
+  const add=names.filter(x=>!bn.includes(x)),rem=bn.filter(x=>!names.includes(x)),v1=ADV.engine_v1[cur];
+  const cor=Object.entries(ADV.correlations_spearman_municipalities).map(([k,v])=>{const [a,b]=k.split('|');return `<span>${esc(a)} × ${esc(b)}</span><span>${v>0?'+':''}${v}</span>`}).join('');
+  return `<section class="card"><h2>${t('scen_h')} <span class="chip ass">🔓</span></h2><div class="sub">${t('scen_sub')}</div>
+   <div style="margin-top:8px">${sel('gamma')}${sel('lam')}${sel('mu')}${sel('spare')}</div>
+   <div class="notice info">${t('scen_res',{s:r.stops.length,a:n0(r.additional),d:n1(r.days)})}</div>
+   <div class="sub" style="margin-top:8px"><b>${t('scen_added')}:</b> ${add.length?add.map(esc).join(', '):t('scen_none')}<br><b>${t('scen_removed')}:</b> ${rem.length?rem.map(esc).join(', '):t('scen_none')}</div>
+   <div class="sub" style="margin-top:8px"><b>${t('scen_v1')}:</b> ${v1.stops.length} · ${n0(v1.additional)} · ${n1(v1.days)} d<br>${v1.stops.map(x=>esc(x[0])).join(', ')}</div>
+   <details class="fold"><summary>${t('scen_cor')}</summary><div class="kv">${cor}</div><div class="hint">n = ${ADV.n_municipalities_corr}</div></details></section>`;
+}
+function advPopHTML(){
+  if(!token)return `<h3>${t('adv_label')}</h3><p class="hint" style="margin:0 0 8px">${t('adv_intro')}</p>
+   <form id="pwForm" class="row2"><input type="password" id="pw" autocomplete="current-password" placeholder="${t('adv_pw')}" aria-label="${t('adv_pw')}" style="flex:1;min-width:0"><button class="btn p" type="submit">${t('adv_go')}</button></form><div class="hint" id="pwMsg" role="status" style="margin-top:6px"></div>`;
+  return `<h3>${t('s_layers')}</h3>
+   <label><input type="checkbox" data-o="bubbles" ${O.bubbles?'checked':''}>${t('l_bubbles')}</label><label><input type="checkbox" data-o="ct" ${O.ct?'checked':''}>${t('l_ct')}</label>
+   <label><input type="checkbox" data-o="likely" ${O.likely?'checked':''}>${t('l_likely')}</label><label><input type="checkbox" data-o="ctx" ${O.ctx?'checked':''}>${t('l_ctx')}</label><label><input type="checkbox" data-o="hull" ${O.hull?'checked':''}>${t('l_hull')}</label>
+   <h3>${t('s_colour')}</h3><select id="colour" style="width:100%">${['class','elig','tt','lang','edu'].map(k=>`<option value="${k}" ${O.colour===k?'selected':''}>${t('c_'+k)}</option>`).join('')}</select>
+   <h3>${t('s_thresh')} ${chip('ass')}</h3><input type="range" id="thresh" min="15" max="120" step="5" value="${thresh}"><div class="hint"><b id="thresh_v">${thresh} min</b></div>
+   <div style="margin-top:10px"><button class="btn" id="lockNow" type="button">${t('adv_lock')}</button></div>`;
+}
+function bindAdvPop(){
+  const f=$('pwForm');
+  if(f)f.addEventListener('submit',async e=>{e.preventDefault();const msg=$('pwMsg');msg.textContent='…';
+    try{const r=await fetch('/api/map/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('pw').value})});
+      if(r.status===401){msg.textContent=t('adv_bad');return}if(r.status===429){msg.textContent=t('adv_wait');return}if(r.status===503||r.status===404){msg.textContent=t('adv_off');return}
+      if(!r.ok){msg.textContent=t('adv_err');return}
+      const j=await r.json();token=j.token;try{sessionStorage.setItem('polku-map-token',token)}catch(e){}
+      await loadAdv();if(!ADV){msg.textContent=t('adv_err');return}
+      $('lockIcon').textContent='🔓';openAdv(true);panel()}catch(err){msg.textContent=t('adv_err')}});
+  document.querySelectorAll('[data-o]').forEach(c=>c.addEventListener('change',()=>{O[c.dataset.o]=c.checked;renderStatic()}));
+  const col=$('colour');if(col)col.addEventListener('change',()=>{O.colour=col.value;renderStatic()});
+  const th=$('thresh');if(th)th.addEventListener('input',()=>{thresh=+th.value;$('thresh_v').textContent=thresh+' min';renderStatic();panel()});
+  const lk=$('lockNow');if(lk)lk.addEventListener('click',()=>{token=null;ADV=null;try{sessionStorage.removeItem('polku-map-token')}catch(e){}thresh=D.meta.thresholds.hospital_invite_min;Object.assign(O,{bubbles:true,ct:true,likely:true,ctx:true,hull:true,colour:'class'});$('lockIcon').textContent='🔒';renderStatic();panel();openAdv(false)});
+}
+function openAdv(show){const p=$('advPop');p.innerHTML=advPopHTML();p.classList.toggle('hidden',!show);$('advBtn').setAttribute('aria-expanded',show?'true':'false');bindAdvPop()}
+async function loadAdv(){
+  try{const r=await fetch('/api/map/advanced',{headers:{'X-Map-Token':token}});
+    if(!r.ok){token=null;ADV=null;try{sessionStorage.removeItem('polku-map-token')}catch(e){}return}
+    ADV=await r.json()}catch(e){token=null;ADV=null}
+}
+
+/* ---------- orchestration ---------- */
+function fit(){const h=hullOf(cur),ms=munis();map.fitBounds(L.latLngBounds(h||ms.map(m=>[m.lat,m.lon])),{padding:[28,28],maxZoom:9})}
+function setRegion(c){stopAnim();cur=c;buildSegs();renderStatic();panel();fit();startAnim()}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)setRegion(c.getAttribute('data-c'))});
+$('lang').addEventListener('change',e=>{lang=e.target.value;applyLang()});
+$('advBtn').addEventListener('click',()=>{openAdv($('advPop').classList.contains('hidden'))});
+$('playBtn').addEventListener('click',()=>{if(A&&A.playing){stopAnim();drawFull();$('playBtn').textContent=t('play')}else startAnim()});
+$('replayBtn').addEventListener('click',()=>startAnim());
+let start='';try{start=localStorage.getItem('vayla-lang')||''}catch(e){}
+if(T[start])lang=start;
+ready();applyLang();if(innerWidth<700)$('maplegend').removeAttribute('open');
+fetch('/pilot_map.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(async j=>{
+  D=j;thresh=D.meta.thresholds.hospital_invite_min;
+  try{token=sessionStorage.getItem('polku-map-token')}catch(e){}
+  if(token)await loadAdv();
+  applyLang();fit();startAnim();
+}).catch(()=>{$('panel').innerHTML=`<div class="card">${t('err')}</div>`});
+</script>
+</body>
+</html>

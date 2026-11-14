@@ -1,0 +1,93 @@
+diff --git a/landing-page/app.py b/landing-page/app.py
+index a4ce43b..70118b2 100644
+--- a/landing-page/app.py
++++ b/landing-page/app.py
+@@ -1,4 +1,4 @@
+-"""Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + lung cancer data dashboard (/keuhkodata) + sign-up API on Modal.
++"""Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + lung cancer data dashboard (/keuhkodata) + pilot map (/kartta) + sign-up API on Modal.
+ 
+ Deploy:      modal deploy app.py
+ Sign-ups:    python signups.py   (reads the Modal Volume with your own Modal login)
+@@ -16,6 +16,7 @@ from pathlib import Path
+ import modal
+ 
+ HERE = Path(__file__).parent
++MAP = HERE.parent / "map"        # the pilot map lives in ../map (see map/README.md)
+ 
+ image = (
+     modal.Image.debian_slim()
+@@ -31,6 +32,12 @@ image = (
+     .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
+     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
+     .add_local_file(HERE / "regions.json", "/root/regions.json")
++    .add_local_file(MAP / "kartta.html", "/root/kartta.html")
++    .add_local_file(MAP / "pilot_map.json", "/root/pilot_map.json")
++    .add_local_file(MAP / "vendor/leaflet.js", "/root/leaflet.js")
++    .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
++    .add_local_file(MAP / "private/pilot_map_advanced.json", "/root/pilot_map_advanced.json")   # served only through /api/map/advanced after the password check
++    .add_local_file(MAP / "map_gate.py", "/root/map_gate.py")
+ )
+ 
+ app = modal.App("vayla-waitlist")
+@@ -72,6 +79,14 @@ def web():
+     faq_page = Path("/root/ukk.html").read_text(encoding="utf-8")
+     fb_page = Path("/root/palaute.html").read_text(encoding="utf-8")
+     data_page = Path("/root/keuhkodata.html").read_text(encoding="utf-8")
++    map_page = Path("/root/kartta.html").read_text(encoding="utf-8")
++    map_data = Path("/root/pilot_map.json").read_bytes()
++    leaflet_js = Path("/root/leaflet.js").read_bytes()
++    leaflet_css = Path("/root/leaflet.css").read_bytes()
++    import sys
++    sys.path.insert(0, "/root")
++    import map_gate
++    map_gate.register(api, Path("/root/pilot_map_advanced.json").read_bytes())
+     lock = threading.Lock()
+ 
+ 
+@@ -215,6 +230,24 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, sh
+     def data_index():
+         return HTMLResponse(data_page)
+ 
++    @api.get("/kartta", response_class=HTMLResponse)
++    @api.get("/kartta/", response_class=HTMLResponse)
++    @api.get("/map", response_class=HTMLResponse)
++    def map_index():
++        return HTMLResponse(map_page)
++
++    @api.get("/pilot_map.json")
++    def pilot_map_json():
++        return Response(map_data, media_type="application/json", headers={"Cache-Control": "public, max-age=300"})
++
++    @api.get("/vendor/leaflet.js")
++    def leaflet_js_file():
++        return Response(leaflet_js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
++
++    @api.get("/vendor/leaflet.css")
++    def leaflet_css_file():
++        return Response(leaflet_css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
++
+     @api.get("/team.jpg")
+     def team_jpg():
+         return Response(team_img, media_type="image/jpeg", headers={"Cache-Control": "public, max-age=86400"})
+diff --git a/landing-page/keuhkodata.html b/landing-page/keuhkodata.html
+index 8f4a952..5d61a73 100644
+--- a/landing-page/keuhkodata.html
++++ b/landing-page/keuhkodata.html
+@@ -213,7 +213,7 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
+       <label for="lang" class="hidden" id="langLbl">Language</label>
+       <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
+       <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
+-        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
++        <a href="/kartta" data-m="map"></a><a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
+       </div></details>
+     </div>
+   </div>
+@@ -259,7 +259,7 @@ const T = {
+  sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer upptäcks för sent i Finland, och mest hos dem som vården når sämst',lead:'En lägesbild ur öppna data för beslutsfattare: var skillnaden finns, var i vårdkedjan den uppstår och vad man kan göra.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
+  en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer is found too late in Finland, most of all among people care reaches worst',lead:'A picture built from open data for decision-makers: where the gap is, where on the care pathway it forms and what can be done.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
+ };
+-const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
++const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{map:'Pilotkarta',pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{map:'Pilot map',pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
+ const t = k => T[lang][k];
+ 
+ const GROUPS = {
