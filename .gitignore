@@ -31,3 +31,6 @@ data/raw/
 
 # Pilot map: advanced scenario data is generated, not committed (public repo)
 map/private/
+
+# Local website runs (uvicorn app:local_api)
+landing-page/.local-data/

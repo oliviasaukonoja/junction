@@ -17,48 +17,55 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
-import modal
+try:
+    import modal
+except ImportError:  # local run without Modal: see local_api() at the end
+    modal = None
 
 HERE = Path(__file__).parent
 MAP = HERE.parent / "map"
 REPO = HERE.parent
 ADVANCED = MAP / "private/pilot_map_advanced.json"
-if not ADVANCED.exists():
+if (modal is None or modal.is_local()) and not ADVANCED.exists():   # inside the container the file lives under /root/map
     raise SystemExit(f"Missing {ADVANCED}. Run: python3 ct-sim/docs/analysis/build_pilot_map_data.py (from the repo root), then deploy again.")
 
-image = (
-    modal.Image.debian_slim()
-    .pip_install("fastapi[standard]", "anthropic")
-    .add_local_file(HERE / "index.html", "/root/index.html")
-    .add_local_file(HERE / "tietosuoja.html", "/root/tietosuoja.html")
-    .add_local_file(HERE / "meista.html", "/root/meista.html")
-    .add_local_file(HERE / "ukk.html", "/root/ukk.html")
-    .add_local_file(HERE / "palaute.html", "/root/palaute.html")
-    .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
-    .add_local_file(HERE / "layout.js", "/root/layout.js")
-    .add_local_file(MAP / "kartta.html", "/root/kartta.html")
-    .add_local_file(MAP / "pilot_map.json", "/root/pilot_map.json")
-    .add_local_file(MAP / "vendor/leaflet.js", "/root/leaflet.js")
-    .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
-    .add_local_file(HERE / "team.jpg", "/root/team.jpg")
-    .add_local_file(HERE / "regions.json", "/root/regions.json")
-    .add_local_file(HERE / "vendor/chart.umd.js", "/root/chart.umd.js")
-    .add_local_dir(HERE / "fonts", "/root/fonts")
-    # map API (same layout as the repo, so map/route_engine.py finds ct-sim/ and landing-page/regions.json)
-    .add_local_file(MAP / "map_server.py", "/root/map/map_server.py")
-    .add_local_file(MAP / "route_engine.py", "/root/map/route_engine.py")
-    .add_local_file(MAP / "map_gate.py", "/root/map/map_gate.py")
-    .add_local_file(ADVANCED, "/root/map/private/pilot_map_advanced.json")
-    .add_local_file(HERE / "regions.json", "/root/landing-page/regions.json")
-    .add_local_dir(REPO / "ct-sim/src/ctsim", "/root/ct-sim/src/ctsim", ignore=["**/__pycache__/**"])
-    .add_local_dir(REPO / "ct-sim/data/routing", "/root/ct-sim/data/routing")
-    .add_local_dir(REPO / "ct-sim/data/area", "/root/ct-sim/data/area")
-    .add_local_dir(REPO / "ct-sim/data/ct_sites", "/root/ct-sim/data/ct_sites")
-    .add_local_dir(REPO / "ct-sim/data/model", "/root/ct-sim/data/model")
-)
+if modal:
+    image = (
+        modal.Image.debian_slim()
+        .pip_install("fastapi[standard]", "anthropic")
+        .add_local_file(HERE / "index.html", "/root/index.html")
+        .add_local_file(HERE / "tietosuoja.html", "/root/tietosuoja.html")
+        .add_local_file(HERE / "meista.html", "/root/meista.html")
+        .add_local_file(HERE / "ukk.html", "/root/ukk.html")
+        .add_local_file(HERE / "palaute.html", "/root/palaute.html")
+        .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
+        .add_local_file(HERE / "layout.js", "/root/layout.js")
+        .add_local_file(MAP / "kartta.html", "/root/kartta.html")
+        .add_local_file(MAP / "pilot_map.json", "/root/pilot_map.json")
+        .add_local_file(MAP / "vendor/leaflet.js", "/root/leaflet.js")
+        .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
+        .add_local_file(HERE / "team.jpg", "/root/team.jpg")
+        .add_local_file(HERE / "regions.json", "/root/regions.json")
+        .add_local_file(HERE / "vendor/chart.umd.js", "/root/chart.umd.js")
+        .add_local_dir(HERE / "fonts", "/root/fonts")
+        # map API (same layout as the repo, so map/route_engine.py finds ct-sim/ and landing-page/regions.json)
+        .add_local_file(MAP / "map_server.py", "/root/map/map_server.py")
+        .add_local_file(MAP / "route_engine.py", "/root/map/route_engine.py")
+        .add_local_file(MAP / "map_gate.py", "/root/map/map_gate.py")
+        .add_local_file(ADVANCED, "/root/map/private/pilot_map_advanced.json")
+        .add_local_file(HERE / "regions.json", "/root/landing-page/regions.json")
+        .add_local_dir(REPO / "ct-sim/src/ctsim", "/root/ct-sim/src/ctsim", ignore=["**/__pycache__/**"])
+        .add_local_dir(REPO / "ct-sim/data/routing", "/root/ct-sim/data/routing")
+        .add_local_dir(REPO / "ct-sim/data/area", "/root/ct-sim/data/area")
+        .add_local_dir(REPO / "ct-sim/data/ct_sites", "/root/ct-sim/data/ct_sites")
+        .add_local_dir(REPO / "ct-sim/data/model", "/root/ct-sim/data/model")
+    )
 
-app = modal.App("vayla-waitlist")
-vol = modal.Volume.from_name("vayla-signups", create_if_missing=True)
+    app = modal.App("vayla-waitlist")
+    vol = modal.Volume.from_name("vayla-signups", create_if_missing=True)
+else:
+    vol = None
+
 DATA = Path("/data/signups.jsonl")
 FEEDBACK = Path("/data/feedback.jsonl")
 
@@ -70,42 +77,35 @@ SMOKE = {"now", "former", "never"}
 PRODUCTS = {"bus", "app"}
 
 
-@app.function(
-    image=image,
-    volumes={"/data": vol},
-    secrets=[modal.Secret.from_name("polku-ai")],  # ANTHROPIC_API_KEY (analyst, map chat), MAP_PASSWORD (map tools)
-    max_containers=1,  # one writer keeps the file consistent
-)
-@modal.concurrent(max_inputs=50)
-@modal.asgi_app()
-def web():
+def build_api(src):
+    """The website. src(name) gives the path of a bundled file: the image copy on Modal, the repo file locally."""
     from fastapi import Body, FastAPI, HTTPException
     from fastapi.responses import HTMLResponse, RedirectResponse, Response
 
     api = FastAPI(docs_url=None, redoc_url=None)
-    page = Path("/root/index.html").read_text(encoding="utf-8")
-    priv_page = Path("/root/tietosuoja.html").read_text(encoding="utf-8")
-    team_img = Path("/root/team.jpg").read_bytes()
-    regions = json.loads(Path("/root/regions.json").read_text(encoding="utf-8"))
+    page = src("index.html").read_text(encoding="utf-8")
+    priv_page = src("tietosuoja.html").read_text(encoding="utf-8")
+    team_img = src("team.jpg").read_bytes()
+    regions = json.loads(src("regions.json").read_text(encoding="utf-8"))
     ai_cache = {}
     ai_calls = []
-    about_page = Path("/root/meista.html").read_text(encoding="utf-8")
-    faq_page = Path("/root/ukk.html").read_text(encoding="utf-8")
-    fb_page = Path("/root/palaute.html").read_text(encoding="utf-8")
-    data_page = Path("/root/keuhkodata.html").read_text(encoding="utf-8")
-    layout_script = Path("/root/layout.js").read_text(encoding="utf-8")
-    map_page = Path("/root/kartta.html").read_text(encoding="utf-8")
-    map_data = Path("/root/pilot_map.json").read_bytes()
-    leaflet_js = Path("/root/leaflet.js").read_bytes()
-    leaflet_css = Path("/root/leaflet.css").read_bytes()
-    chart_js = Path("/root/chart.umd.js").read_bytes()
-    fonts = {f.name: f.read_bytes() for f in Path("/root/fonts").iterdir() if f.suffix in (".woff2", ".css")}
+    about_page = src("meista.html").read_text(encoding="utf-8")
+    faq_page = src("ukk.html").read_text(encoding="utf-8")
+    fb_page = src("palaute.html").read_text(encoding="utf-8")
+    data_page = src("keuhkodata.html").read_text(encoding="utf-8")
+    layout_script = src("layout.js").read_text(encoding="utf-8")
+    map_page = src("kartta.html").read_text(encoding="utf-8")
+    map_data = src("pilot_map.json").read_bytes()
+    leaflet_js = src("leaflet.js").read_bytes()
+    leaflet_css = src("leaflet.css").read_bytes()
+    chart_js = src("chart.umd.js").read_bytes()
+    fonts = {f.name: f.read_bytes() for f in src("fonts").iterdir() if f.suffix in (".woff2", ".css")}
     lock = threading.Lock()
 
     import sys
-    sys.path.insert(0, "/root/map")
+    sys.path.insert(0, str(src("map")))
     import map_server
-    map_server.register_api(api, json.loads(map_data), Path("/root/map/private/pilot_map_advanced.json").read_bytes())
+    map_server.register_api(api, json.loads(map_data), src("map/private/pilot_map_advanced.json").read_bytes())
 
 
     def read_all():
@@ -317,7 +317,8 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's recommen
             DATA.parent.mkdir(parents=True, exist_ok=True)
             with DATA.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-            vol.commit()
+            if vol:
+                vol.commit()
         return {"ok": True}
 
 
@@ -342,7 +343,8 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's recommen
             FEEDBACK.parent.mkdir(parents=True, exist_ok=True)
             with FEEDBACK.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-            vol.commit()
+            if vol:
+                vol.commit()
         return {"ok": True}
 
     @api.get("/api/count")
@@ -356,3 +358,39 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's recommen
 
 
     return api
+
+
+if modal:
+    @app.function(
+        image=image,
+        volumes={"/data": vol},
+        secrets=[modal.Secret.from_name("polku-ai")],  # ANTHROPIC_API_KEY (analyst, map chat), MAP_PASSWORD (map tools)
+        max_containers=1,  # one writer keeps the file consistent
+    )
+    @modal.concurrent(max_inputs=50)
+    @modal.asgi_app()
+    def web():
+        return build_api(lambda name: Path("/root") / name)
+
+
+LOCAL = {  # bundled name -> repo file, for local_api()
+    "kartta.html": MAP / "kartta.html", "pilot_map.json": MAP / "pilot_map.json",
+    "leaflet.js": MAP / "vendor/leaflet.js", "leaflet.css": MAP / "vendor/leaflet.css",
+    "chart.umd.js": HERE / "vendor/chart.umd.js", "map": MAP,
+}
+
+
+def local_api():
+    """Run the same website without Modal, reading the repo files. Sign-ups and feedback go to POLKU_DATA_DIR
+    (default landing-page/.local-data, git-ignored). From landing-page/:  uvicorn app:local_api --factory --port 8000"""
+    global DATA, FEEDBACK
+    d = Path(os.environ.get("POLKU_DATA_DIR", HERE / ".local-data"))
+    DATA, FEEDBACK = d / "signups.jsonl", d / "feedback.jsonl"
+
+    def src(name):
+        if name in LOCAL:
+            return LOCAL[name]
+        if name.startswith("map/"):
+            return MAP / name[4:]
+        return HERE / name
+    return build_api(src)
