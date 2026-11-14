@@ -2,6 +2,15 @@
 
 Judging is Sunday 14:00. Weights: Actionability 30, Insight 25, Data quality and transparency 20, Execution 15, Clarity 10. A decision-maker must get the message in under two minutes, and the demo must work live.
 
+## One story (say this first, 20 seconds)
+"Finnish lung-cancer patients wait 155 days from first symptom to treatment; Danes wait 67. The time is lost before diagnosis: patients delay, health centres miss repeat visits, and nobody holds the whole picture. **Polku hoitoon** is three fixes on that pathway, and every one starts as a measured pilot rather than a purchase:
+1. **Health centre (Ammattilaisille):** flag a smoker's third respiratory visit and send them straight to imaging. Metric: days from first visit to imaging.
+2. **Patient (Sovellus):** symptom tracking in the patient's own language, plus a care path they can see. Metric: time from symptoms to first visit.
+3. **People with no symptoms (bus + this planner):** low-dose CT for the high-risk group. The planner shows where a unit would reach people that hospital CTs miss, and the randomised-invitation pilot measures whether those scans are really additional before anyone buys a truck.
+The Päättäjille page puts all three on one slider, and this planner is the evidence behind step 3."
+
+Rule for the whole pitch: say what we would measure, never that screening or a slot is coming.
+
 ## Before you present (10 minutes)
 1. Start the local app: `cd ct-sim`, `export PYTHONPATH=src`, `.venv/bin/python -m ctsim serve`. Open http://127.0.0.1:8000/gap and http://127.0.0.1:8000/.
 2. If you want the deployed copy as a backup: `PYTHONPATH=src modal deploy api/modal_app.py`, open its URL, run one scenario to warm it. Stop it after: `modal app stop ctsim`.
