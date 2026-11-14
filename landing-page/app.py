@@ -121,8 +121,10 @@ def web():
 POSSIBLE ACTIONS (Polku hoitoon concept, not yet piloted, no measured effect):
 A) Flag + direct imaging referral in primary care when a smoker visits a third time with respiratory symptoms. Metric: days from first visit to imaging.
 B) App: continuous symptom tracking in the patient's own language and a visible care path. Metric: time from symptoms to first visit, also by language group.
-C) Risk-group (55-74, smokers/ex-smokers) low-dose CT screening bus for high-mortality, long-distance areas. Metric: share diagnosed at stage 1-2.
-RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, shown on the page: if the region's SMR is significantly above 1 (CI lower bound above 1), prioritise it for a risk-group screening pilot (C) and introduce flags (A); if the difference is not significant, start with flags (A) and the app (B); if significantly below 1, no extra measures, follow the metrics. Your job is to explain the gap and the evidence. Do not propose actions of your own; if asked what to do, restate the team's rule for this region and say it is the team's recommendation."""
+C) Risk-group low-dose CT screening bus (age 50-74, heavy smokers), started as a pilot with randomised invitations so it measures whether the bus reaches people a hospital CT would not. Metric: share diagnosed at stage 1-2.
+- Estimated risk group about 120,000 people nationally (7% of 50-74-year-olds): smoking rates times an assumed factor, because Finnish pack-year data does not exist. [Polku Labs estimate from THL Sotkanet; assumption]
+- In Finnish cancer screening (breast, colorectal, cervical 2024), participation is about 20 points lower for people whose native language is not Finnish, Swedish or Sami, and lower with basic education; the gap follows language and education more than distance. [Finnish Cancer Registry screening statistics 2024]
+RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, shown on the page: if the region's SMR is significantly above 1 (CI lower bound above 1), prioritise it for the risk-group screening bus pilot (C) and offer the app (B); if the difference is not significant, start with the app (B) and do not prioritise the bus; if significantly below 1, no extra measures, follow the metrics. Your job is to explain the gap and the evidence. Do not propose actions of your own; if asked what to do, restate the team's rule for this region and say it is the team's recommendation."""
 
     @api.get("/api/regions")
     def api_regions():
