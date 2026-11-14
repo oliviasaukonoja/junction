@@ -1,4 +1,4 @@
-"""Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + sign-up API on Modal.
+"""Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + lung cancer data dashboard (/keuhkodata) + sign-up API on Modal.
 
 Deploy:      modal deploy app.py
 Sign-ups:    python signups.py   (reads the Modal Volume with your own Modal login)
@@ -28,6 +28,7 @@ image = (
     .add_local_file(HERE / "meista.html", "/root/meista.html")
     .add_local_file(HERE / "ukk.html", "/root/ukk.html")
     .add_local_file(HERE / "palaute.html", "/root/palaute.html")
+    .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
     .add_local_file(HERE / "regions.json", "/root/regions.json")
 )
@@ -70,6 +71,7 @@ def web():
     about_page = Path("/root/meista.html").read_text(encoding="utf-8")
     faq_page = Path("/root/ukk.html").read_text(encoding="utf-8")
     fb_page = Path("/root/palaute.html").read_text(encoding="utf-8")
+    data_page = Path("/root/keuhkodata.html").read_text(encoding="utf-8")
     lock = threading.Lock()
 
 
@@ -202,6 +204,12 @@ RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's rule, sh
     @api.get("/feedback", response_class=HTMLResponse)
     def fb_index():
         return HTMLResponse(fb_page)
+
+    @api.get("/keuhkodata", response_class=HTMLResponse)
+    @api.get("/keuhkodata/", response_class=HTMLResponse)
+    @api.get("/data", response_class=HTMLResponse)
+    def data_index():
+        return HTMLResponse(data_page)
 
     @api.get("/team.jpg")
     def team_jpg():

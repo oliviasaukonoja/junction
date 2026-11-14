@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polku hoitoon – Keuhkodata</title>
+<meta name="description" content="Keuhkosyöpä Suomessa julkisista tietolähteistä koottuna.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{color-scheme:light;--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange-bg:#FFF3E6;--orange-ink:#8A3B00;
+  --grid:#EDF0F5; --men:#2a78d6; --women:#eb6834; --total:#1baf7a; --neutral:#a8a7a1; --neutral2:#7c7b76; --neutral3:#52514e;
+  --edu-low:#184f95; --edu-mid:#3987e5; --edu-high:#86b6ef; --bar:#2a78d6; --hi:#e34948; --lo:#2a78d6; --mid:#a8a7a1}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px}
+a{color:var(--blue)}a:hover{color:var(--blue-d)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+/* top bar: same as polkuhoitoon.fi */
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
+.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer}
+.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
+.menu{position:relative;order:3}
+.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}
+.menu summary::-webkit-details-marker{display:none}
+.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column;z-index:20}
+.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:16px}
+.menu-p a:hover{background:var(--bg)}
+select:focus,.tab:focus,.menu summary:focus,button:focus{outline:3px solid #9EC1FF;outline-offset:2px}
+@media (max-width:780px){.tabs{order:3;width:100%;display:grid;grid-template-columns:1fr 1fr}.tab{justify-content:center;padding:0 8px;font-size:14px}}
+/* page */
+.hero{padding:30px 0 6px}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:12px}
+.hero h1{font-size:clamp(28px,4vw,42px)}
+.lead{font-size:17px;color:var(--muted);margin:10px 0 18px;max-width:46em}
+.ptabs{display:inline-flex;margin-bottom:18px}
+main{padding-bottom:60px}
+.picker{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:22px}
+.picker-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.picker-head h2{font-size:18px}
+.btns button{font:inherit;font-size:14px;border:1px solid #C9D2E0;background:#fff;color:var(--ink);border-radius:10px;padding:6px 12px;cursor:pointer;margin-inline-start:6px}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.group h3{font-family:Inter,sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 6px;font-weight:700}
+.group label{display:flex;gap:8px;align-items:flex-start;font-size:15px;padding:3px 0;cursor:pointer}
+.group input{margin-top:5px;accent-color:var(--blue);width:16px;height:16px;flex:none}
+.legendtags{margin-top:12px;font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:18px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 20px 14px;display:flex;flex-direction:column;min-width:0}
+.card.wide{grid-column:1/-1}
+.card h2{font-size:19px}
+.card .sub{color:var(--muted);font-size:14px;margin:4px 0 12px}
+.chartbox{position:relative;height:300px}
+.chartbox.tall{height:580px}
+.foot{display:flex;justify-content:space-between;gap:10px;align-items:flex-end;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.foot button{font:inherit;font-size:12.5px;border:1px solid #C9D2E0;background:#fff;color:var(--muted);border-radius:8px;padding:4px 9px;cursor:pointer;white-space:nowrap}
+.note{font-size:13.5px;color:var(--ink);background:var(--bg);border-radius:10px;padding:9px 12px;margin-top:10px}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin-inline-start:8px;vertical-align:middle;font-family:Inter,sans-serif}
+.tag.S{background:var(--sky);color:var(--blue-d)}.tag.N{background:#FFF7DB;color:#7A5A00}.tag.A{background:var(--orange-bg);color:var(--orange-ink)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:6px}
+th,td{text-align:end;padding:6px 8px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:start}
+th{color:var(--muted);font-weight:600}
+.tablewrap{max-height:280px;overflow:auto}
+.ptable td,.ptable th{text-align:start;vertical-align:top}
+.stage{font-weight:700;white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:5px;margin-inline-end:6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.tile .v{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;color:var(--blue-d);line-height:1.15}
+.tile .l{font-size:14px;color:var(--ink);margin-top:4px}
+.tile .s{font-size:12px;color:var(--muted);margin-top:6px}
+.goal{display:flex;flex-direction:column;gap:10px}
+.goal div{border-inline-start:3px solid var(--blue);padding:4px 12px}
+.goal b{display:block}
+.goal span{font-size:14px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:60px 0}
+.sources{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 28px;max-width:920px}
+.sources h2{font-size:20px;margin:18px 0 6px}
+.sources h2:first-child{margin-top:0}
+.sources li{margin:5px 0}
+footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);background:#fff}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="/" data-t="brand">Polku hoitoon</a>
+    <div class="bar-r">
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" data-t="nav_bus"></a><a class="tab" href="/sovellus" data-t="nav_app"></a></nav>
+      <label for="lang" class="hidden" id="langLbl">Language</label>
+      <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
+      <details class="menu"><summary id="menuBtn" aria-label="Menu">&#9776;</summary><div class="menu-p">
+        <a href="/ammattilaisille" data-m="pro"></a><a href="/paattajille" data-m="dm"></a><a href="/meista" data-m="about"></a><a href="/ukk" data-m="faq"></a><a href="/palaute" data-m="fb"></a><a href="/tietosuoja" data-m="priv"></a>
+      </div></details>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="wrap hero">
+    <span class="badge" data-t="badge"></span>
+    <h1 data-t="h1"></h1>
+    <p class="lead" data-t="lead"></p>
+    <nav class="tabs ptabs" role="tablist">
+      <button class="tab on" role="tab" aria-selected="true" data-tab="dash" data-t="tab_dash"></button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="src" data-t="tab_src"></button>
+    </nav>
+  </div>
+  <div class="wrap">
+    <section id="tab-dash">
+      <div class="picker">
+        <div class="picker-head">
+          <h2 data-t="pick_h"></h2>
+          <div class="btns"><button id="all" data-t="all"></button><button id="none" data-t="none"></button></div>
+        </div>
+        <div class="groups" id="groups"></div>
+        <div class="legendtags" id="legendtags"></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="empty hidden" id="empty" data-t="empty"></div>
+    </section>
+    <section id="tab-src" class="hidden"><div class="sources" id="sources"></div></section>
+  </div>
+</main>
+<footer><div class="wrap" data-t="footer"></div></footer>
+<script>
+const D = {"trend": {"years": ["1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [156, 145.7, 151.5, 143.6, 138.6, 158.1, 151.1, 152.4, 156.7, 156.8, 155.3, 139.6, 147.9, 138.6, 141.8, 131.3, 128.3, 124.1, 117.2, 120.4, 109.6, 119.1, 112.3, 102.9, 104.6, 101.9, 98.8, 95.3, 89.2, 87.6, 89, 83.7, 83.1, 78.2, 78.9, 79.8, 76.9, 71, 71, 74.3, 67.1, 64.9, 66.1, 60.9, 62.3, 62.1, 61.2, 57.9, 58.7, 53.7, 55.4, 53.7, 46.7, 49.4, 47.5], "women": [10.6, 11, 8.9, 9.6, 10, 12, 11.9, 11.7, 12.1, 15.2, 13.2, 13.1, 12.1, 14.2, 15.7, 14.7, 14.5, 15, 15.6, 15.8, 15.5, 16.9, 15.7, 16.6, 15.9, 17.1, 16.8, 19.3, 17.3, 18.6, 19.4, 18.6, 20.2, 18.9, 19.9, 20, 20.6, 22, 20.9, 23.2, 23, 24.5, 23.9, 25.1, 24.6, 24.5, 23.7, 24.4, 25, 25.3, 24.7, 25.5, 24.8, 23.3, 23.8], "total": [66.7, 62.9, 63.3, 61.4, 58.8, 66.9, 64.4, 64.6, 66.1, 67.7, 65.8, 60.1, 62, 59.9, 61.8, 57.4, 56.6, 55.2, 53.2, 54.4, 50.3, 54.5, 51.4, 49.1, 49.2, 49.1, 47.5, 48.4, 45.2, 45.1, 45.9, 43.5, 44.7, 42.4, 43, 43.5, 43.1, 41.6, 41.2, 44.3, 41.2, 41.4, 41.6, 39.8, 40.4, 40.1, 39.5, 38.8, 39.3, 37.3, 37.9, 37.9, 34.4, 34.8, 34]}, "share": {"years": ["1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [38.6, 38.3, 38.1, 37.9, 35.9, 38.3, 39.0, 37.8, 39.3, 38.3, 38.6, 36.7, 37.1, 35.1, 35.8, 34.6, 34.3, 33.0, 31.4, 32.5, 30.4, 31.9, 30.5, 29.2, 29.7, 28.3, 28.7, 28.1, 26.9, 27.2, 27.1, 26.3, 26.8, 25.6, 26.1, 26.1, 26.2, 25.0, 25.3, 26.0, 24.1, 23.7, 24.4, 22.4, 23.1, 22.9, 22.8, 22.4, 22.2, 20.8, 21.4, 22.1, 18.7, 20.3, 19.5], "women": [4.6, 4.8, 3.9, 4.4, 4.7, 5.6, 5.6, 5.3, 5.5, 6.8, 6.2, 6.1, 5.6, 6.5, 7.2, 6.6, 6.7, 7.0, 7.1, 7.4, 7.4, 7.9, 7.2, 8.2, 7.7, 8.5, 8.0, 9.5, 8.8, 9.2, 9.9, 9.7, 10.4, 10.0, 10.6, 10.9, 11.2, 11.7, 11.6, 12.3, 12.3, 13.3, 13.0, 13.8, 13.7, 13.4, 13.3, 13.9, 14.2, 14.4, 14.4, 14.9, 14.5, 13.9, 14.4]}, "c34": {"years": ["1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [1463, 1389, 1390, 1410, 1381, 1401, 1374, 1410, 1464, 1458, 1383, 1431, 1546, 1435, 1434, 1502, 1381, 1456, 1486, 1493, 1458, 1508, 1412, 1490, 1492, 1313, 1425, 1376], "women": [459, 417, 452, 484, 465, 521, 491, 534, 539, 572, 610, 595, 666, 671, 730, 722, 771, 775, 776, 769, 805, 835, 868, 856, 907, 887, 843, 877]}, "age": {"ages": ["40 – 44", "45 – 49", "50 – 54", "55 – 59", "60 – 64", "65 – 69", "70 – 74", "75 – 79", "80 – 84", "85 – 89", "90 – 94", "95+"], "men": [3, 6, 21, 45, 111, 192, 270, 327, 231, 112, 46, 11], "women": [1, 6, 15, 39, 59, 116, 153, 216, 129, 101, 32, 8]}, "region": [["HVA21", 62.1, 547], ["HVA10", 61.2, 488], ["HVA06", 57.7, 613], ["HVA20", 56.0, 197], ["HVA12", 55.1, 359], ["HVA09", 53.4, 547], ["HVA01", 50.3, 249], ["HVA14", 49.5, 402], ["HVA07", 49.1, 417], ["HVA11", 45.7, 287], ["HVA16", 45.5, 434], ["HVA05", 43.5, 1063], ["HVA19", 39.8, 829], ["HVA13", 39.2, 487], ["HVA17", 38.5, 341], ["HVA18", 38.3, 130], ["HVA02", 38.2, 391], ["HVA15", 36.9, 504], ["HVA08", 35.9, 962], ["HVA03", 35.0, 858], ["HVA90", 33.7, 1131], ["HVA04", 29.5, 417]], "region_fi": 41.9, "smoke_edu": {"years": ["2018", "2019", "2020", "2022", "2024"], "low": [17.6, 15.2, 15.4, 13.8, 14.1], "mid": [10.7, 8.9, 8.5, 8.0, 6.4], "high": [5.9, 7.0, 5.3, 5.8, 4.4]}, "smoke_reg": [["HVA06", 12.5], ["HVA04", 12.5], ["HVA10", 12.0], ["HVA21", 11.4], ["HVA01", 10.7], ["HVA05", 10.2], ["HVA07", 10.2], ["HVA11", 10.1], ["HVA14", 10.0], ["HVA09", 9.9], ["HVA19", 9.5], ["HVA02", 9.3], ["HVA13", 9.0], ["HVA20", 8.9], ["HVA18", 8.7], ["HVA03", 8.0], ["HVA17", 7.7], ["HVA16", 7.6], ["HVA15", 7.6], ["HVA08", 7.4], ["HVA12", 7.2], ["HVA90", 6.8], ["HVA91", 6.8]], "smoke_fi": 9.1, "smr": [["HVA21", 1.29, 1.19, 1.41, 547, 422.8], ["HVA01", 1.18, 1.04, 1.34, 249, 211.0], ["HVA10", 1.15, 1.05, 1.26, 488, 423.5], ["HVA06", 1.14, 1.05, 1.23, 613, 539.9], ["HVA09", 1.06, 0.98, 1.16, 547, 514.1], ["HVA19", 1.05, 0.98, 1.13, 829, 785.9], ["HVA20", 1.05, 0.9, 1.2, 197, 188.4], ["HVA90", 1.04, 0.98, 1.1, 1131, 1092.3], ["HVA02", 1.03, 0.93, 1.14, 391, 378.7], ["HVA03", 1.03, 0.96, 1.1, 858, 836.3], ["HVA07", 1.02, 0.92, 1.12, 417, 409.7], ["HVA05", 1.0, 0.94, 1.07, 1063, 1059.5], ["HVA14", 0.99, 0.89, 1.09, 402, 407.3], ["HVA04", 0.96, 0.87, 1.06, 417, 432.6], ["HVA16", 0.95, 0.87, 1.05, 434, 454.9], ["HVA12", 0.94, 0.85, 1.05, 359, 380.6], ["HVA17", 0.91, 0.81, 1.01, 341, 376.0], ["HVA08", 0.89, 0.83, 0.95, 962, 1080.8], ["HVA11", 0.89, 0.79, 1.0, 287, 323.1], ["HVA18", 0.87, 0.73, 1.04, 130, 149.0], ["HVA15", 0.84, 0.77, 0.92, 504, 597.7], ["HVA13", 0.82, 0.75, 0.9, 487, 591.6]], "names": {"HVA01": {"fi": "Itä-Uudenmaan", "sv": "Östra Nylands", "en": "East Uusimaa"}, "HVA02": {"fi": "Keski-Uudenmaan", "sv": "Mellersta Nylands", "en": "Central Uusimaa"}, "HVA03": {"fi": "Länsi-Uudenmaan", "sv": "Västra Nylands", "en": "West Uusimaa"}, "HVA04": {"fi": "Vantaan ja Keravan", "sv": "Vanda och Kervo", "en": "Vantaa and Kerava"}, "HVA05": {"fi": "Varsinais-Suomen", "sv": "Egentliga Finlands", "en": "Southwest Finland"}, "HVA06": {"fi": "Satakunnan", "sv": "Satakunta", "en": "Satakunta"}, "HVA07": {"fi": "Kanta-Hämeen", "sv": "Egentliga Tavastlands", "en": "Kanta-Häme"}, "HVA08": {"fi": "Pirkanmaan", "sv": "Birkalands", "en": "Pirkanmaa"}, "HVA09": {"fi": "Päijät-Hämeen", "sv": "Päijänne-Tavastlands", "en": "Päijät-Häme"}, "HVA10": {"fi": "Kymenlaakson", "sv": "Kymmenedalens", "en": "Kymenlaakso"}, "HVA11": {"fi": "Etelä-Karjalan", "sv": "Södra Karelens", "en": "South Karelia"}, "HVA12": {"fi": "Etelä-Savon", "sv": "Södra Savolax", "en": "South Savo"}, "HVA13": {"fi": "Pohjois-Savon", "sv": "Norra Savolax", "en": "North Savo"}, "HVA14": {"fi": "Pohjois-Karjalan", "sv": "Norra Karelens", "en": "North Karelia"}, "HVA15": {"fi": "Keski-Suomen", "sv": "Mellersta Finlands", "en": "Central Finland"}, "HVA16": {"fi": "Etelä-Pohjanmaan", "sv": "Södra Österbottens", "en": "South Ostrobothnia"}, "HVA17": {"fi": "Pohjanmaan", "sv": "Österbottens", "en": "Ostrobothnia"}, "HVA18": {"fi": "Keski-Pohjanmaan", "sv": "Mellersta Österbottens", "en": "Central Ostrobothnia"}, "HVA19": {"fi": "Pohjois-Pohjanmaan", "sv": "Norra Österbottens", "en": "North Ostrobothnia"}, "HVA20": {"fi": "Kainuun", "sv": "Kajanalands", "en": "Kainuu"}, "HVA21": {"fi": "Lapin", "sv": "Lapplands", "en": "Lapland"}, "HVA90": {"fi": "Helsingin kaupunki", "sv": "Helsingfors stad", "en": "Helsinki"}, "HVA91": {"fi": "Ahvenanmaa", "sv": "Åland", "en": "Åland"}}, "scr_lang": {"breast": {"file": "breast_11.csv", "Domestic": 83.2, "Other/missing": 60.8}, "colorectal": {"file": "colorectal_10.csv", "Domestic": 74.5, "Other/missing": 53.4}, "cervical": {"file": "cervix_31.csv", "Domestic": 76.2, "Other/missing": 56.3}}, "scr_edu": {"breast": {"file": "breast_21.csv", "Primary education/unknown": 63.5, "Intermediate/secondary": 81.2, "Tertiary/higher education": 85.9}, "colorectal": {"file": "colorectal_13.csv", "Primary education/unknown": 61.5, "Intermediate/secondary": 73.0, "Tertiary/higher education": 79.3}}, "scr_nat": {"breast": 81.6, "colorectal": 73.5}, "scr_county": [["HVA91", null, null, 80.2], ["HVA90", 74.3, 69.6, 72.2], ["HVA03", 76.1, 71.5, 74.6], ["HVA04", 76.7, 71.3, 72.1], ["HVA01", 79.8, 72.0, 76.5], ["HVA02", 80.5, 74.0, 77.0], ["HVA09", 81.8, 75.2, 68.9], ["HVA10", 82.0, 70.0, 77.3], ["HVA12", 82.2, 76.9, 82.3], ["HVA05", 82.7, 73.5, 77.8], ["HVA11", 83.2, 74.0, 77.0], ["HVA07", 83.4, 74.3, 70.4], ["HVA08", 83.5, 74.3, 71.5], ["HVA21", 83.8, 73.7, 79.9], ["HVA20", 84.1, 76.5, 78.5], ["HVA14", 84.2, 73.2, 68.0], ["HVA17", 84.9, 75.9, 72.4], ["HVA06", 84.9, 72.6, 72.1], ["HVA16", 85.0, 74.6, 82.3], ["HVA15", 85.1, 76.5, 70.6], ["HVA13", 85.1, 75.4, 70.0], ["HVA18", 85.4, 73.3, 69.2], ["HVA19", 85.6, 75.6, 73.6]], "risk": [["HVA05", 11588, 148611, 143.1, 12.0, 6.3, ["Turku"]], ["HVA90", 9374, 175327, 129.0, 7.1, 5.9, ["Helsinki"]], ["HVA08", 9168, 154873, 124.2, 7.4, 7.4, ["Sastamala", "Tampere", "Valkeakoski"]], ["HVA03", 8849, 140818, 121.9, 8.7, 6.2, ["Espoo", "Lohja"]], ["HVA19", 8539, 117971, 140.5, 10.5, 6.9, ["Kuusamo", "Oulainen", "Oulu", "Raahe"]], ["HVA04", 7282, 75758, 110.1, 13.6, 8.8, ["Vantaa"]], ["HVA06", 6809, 69574, 176.2, 15.1, 8.3, ["Pori"]], ["HVA13", 5566, 81401, 119.7, 11.0, 5.4, ["Iisalmi", "Kuopio", "Varkaus"]], ["HVA09", 5235, 68271, 160.2, 13.1, 4.7, ["Lahti"]], ["HVA21", 5213, 58881, 185.8, 12.9, 8.8, ["Kemi", "Rovaniemi"]], ["HVA10", 5123, 55654, 175.4, 14.6, 7.3, ["Kotka", "Kouvola"]], ["HVA15", 4887, 82736, 121.8, 8.6, 5.7, ["Jyväskylä"]], ["HVA02", 4561, 64676, 120.9, 11.0, 4.8, ["Hyvinkää"]], ["HVA07", 4526, 56999, 146.3, 12.1, 6.8, ["Hämeenlinna", "Riihimäki"]], ["HVA14", 4091, 53892, 149.2, 11.3, 7.4, ["Joensuu"]], ["HVA16", 3548, 60923, 142.5, 9.3, 4.6, ["Seinäjoki"]], ["HVA11", 3315, 42416, 135.3, 12.3, 6.4, ["Lappeenranta"]], ["HVA17", 3030, 50556, 134.9, 8.6, 5.8, ["Pietarsaari", "Vaasa"]], ["HVA01", 2864, 33414, 149.0, 11.4, 9.5, ["Porvoo"]], ["HVA12", 2745, 47905, 149.9, 8.5, 5.6, ["Mikkeli", "Savonlinna"]], ["HVA20", 1710, 24902, 158.2, 10.5, 6.4, ["Kajaani"]], ["HVA18", 1372, 19906, 130.6, 9.4, 7.5, ["Kokkola"]], ["HVA91", 529, 9927, 139.0, 7.5, 5.3, ["Maarianhamina - Mariehamn"]]], "risk_nat": 119924, "nordsurv": {"title": "Lung cancer five-year relative survival, %", "men": {"Finland": 17, "Denmark": 27, "Sweden": 29, "Norway": 30}, "women": {"Finland": 29, "Denmark": 35, "Sweden": 37, "Norway": 37}, "tag": "N", "source": "IHE Cancer Dashboard Finland 2026 via team notes; not re-verified. NORDCAN is the primary source to check."}};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let lang='fi';
+const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
+const fmt = v => v==null ? '–' : (typeof v==='number' ? v.toLocaleString(LOC[lang]) : v);
+const L = o => (o && typeof o==='object' && !Array.isArray(o)) ? (o[lang] ?? o.fi) : o;
+const nm = c => D.names[c][lang];
+const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
+
+const T = {
+ fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä Suomessa julkisen datan valossa',lead:'Kuolleisuus, alue-erot, viiveet, riskiryhmä ja eriarvoisuus yhdessä paikassa. Valitse alta, mitä haluat katsoa. Jokaisen luvun lähde näkyy kuvaajan alla.',tab_dash:'Dashboard',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse, mitä haluat katsoa',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
+ sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer i Finland i ljuset av öppna data',lead:'Dödlighet, regionala skillnader, fördröjningar, riskgrupp och ojämlikhet på ett ställe. Välj nedan vad du vill se. Källan till varje siffra visas under diagrammet.',tab_dash:'Dashboard',tab_src:'Källor och begränsningar',pick_h:'Välj vad du vill se',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
+ en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer in Finland through public data',lead:'Mortality, regional gaps, delays, the risk group and inequality in one place. Choose below what you want to see. The source of every figure is shown under its chart.',tab_dash:'Dashboard',tab_src:'Sources and limitations',pick_h:'Choose what you want to see',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
+};
+const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
+const t = k => T[lang][k];
+
+const GROUPS = {
+ sum:{fi:'Yhteenveto',sv:'Sammanfattning',en:'Summary'},
+ mort:{fi:'Kuolleisuus (Tilastokeskus)',sv:'Dödlighet (Statistikcentralen)',en:'Mortality (Statistics Finland)'},
+ delay:{fi:'Viiveet hoitopolulla',sv:'Fördröjningar i vårdkedjan',en:'Delays on the care pathway'},
+ risk:{fi:'Riskiryhmä ja tupakointi',sv:'Riskgrupp och rökning',en:'Risk group and smoking'},
+ eq:{fi:'Eriarvoisuus (Syöpärekisteri)',sv:'Ojämlikhet (Cancerregistret)',en:'Inequality (Cancer Registry)'},
+ scr:{fi:'Syöpäseulonnat: kuka jää pois',sv:'Cancerscreening: vem faller bort',en:'Cancer screening: who is missed'},
+ intl:{fi:'Kansainvälinen vertailu',sv:'Internationell jämförelse',en:'International comparison'}
+};
+const SRC = {
+ st11ay:[{fi:'Tilastokeskus, kuolemansyyt (11ay)',sv:'Statistikcentralen, dödsorsaker (11ay)',en:'Statistics Finland, causes of death (11ay)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_11ay.px/'],
+ st11be:[{fi:'Tilastokeskus, kuolemansyyt (11be)',sv:'Statistikcentralen, dödsorsaker (11be)',en:'Statistics Finland, causes of death (11be)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_11be.px/'],
+ st13u5:[{fi:'Tilastokeskus, kuolemansyyt (13u5)',sv:'Statistikcentralen, dödsorsaker (13u5)',en:'Statistics Finland, causes of death (13u5)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_13u5.px/'],
+ smr:[{fi:'Polku Labs -laskelma Tilastokeskuksen taulukoista 13u5, 11az, 11s1',sv:'Polku Labs beräkning från Statistikcentralens tabeller 13u5, 11az, 11s1',en:'Polku Labs calculation from Statistics Finland tables 13u5, 11az, 11s1'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/'],
+ mot:[{fi:'Yle MOT 2026 (Kuittinen ym., julkaisematon)',sv:'Yle MOT 2026 (Kuittinen m.fl., opublicerad)',en:'Yle MOT 2026 (Kuittinen et al., unpublished)'},'https://yle.fi/a/74-20251023'],
+ sotk:[{fi:'THL Sotkanet (ind. 4408–4410)',sv:'THL Sotkanet (ind. 4408–4410)',en:'THL Sotkanet (ind. 4408–4410)'},'https://sotkanet.fi'],
+ sotk4404:[{fi:'THL Sotkanet (ind. 4404)',sv:'THL Sotkanet (ind. 4404)',en:'THL Sotkanet (ind. 4404)'},'https://sotkanet.fi'],
+ risk:[{fi:'Polku Labs -arvio: THL Sotkanet 4405/4406 (2024) × oletettu kerroin',sv:'Polku Labs uppskattning: THL Sotkanet 4405/4406 (2024) × antagen faktor',en:'Polku Labs estimate: THL Sotkanet 4405/4406 (2024) × assumed factor'},'https://sotkanet.fi'],
+ ohj:[{fi:'Syöpärekisteri, Syöpä 2022 – Valtakunnallinen keuhkosyöpäohjelma 2026–2035',sv:'Cancerregistret, Cancer 2022 – Nationella lungcancerprogrammet 2026–2035',en:'Finnish Cancer Registry, Cancer 2022 – National Lung Cancer Programme 2026–2035'},'https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf'],
+ oecd:[{fi:'ECIS 2022 -arvio – OECD/EU Syöpäprofiilit 2025',sv:'ECIS-uppskattning 2022 – OECD/EU cancerprofiler 2025',en:'ECIS 2022 estimate – OECD/EU Country Cancer Profiles 2025'},'https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf'],
+ ihe:[{fi:'IHE Cancer Dashboard Finland 2026 (tiimin muistiinpanot)',sv:'IHE Cancer Dashboard Finland 2026 (teamets anteckningar)',en:'IHE Cancer Dashboard Finland 2026 (team notes)'},'https://ihe.se/'],
+ scr:[{fi:'Syöpärekisterin seulontatilastot 2024',sv:'Cancerregistrets screeningstatistik 2024',en:'Finnish Cancer Registry screening statistics 2024'},'https://stats.cancerregistry.fi/'],
+ team:[{fi:'Polku Labs, ct-sim-analyysi (tiimin muistiinpanot ja kansallinen syöpästrategia)',sv:'Polku Labs, ct-sim-analys (teamets anteckningar och nationella cancerstrategin)',en:'Polku Labs, ct-sim analysis (team notes and the national cancer strategy)'},'https://stm.fi/']
+};
+const src = keys => keys.map(k=>`<a href="${SRC[k][1]}">${L(SRC[k][0])}</a>`).join(' · ');
+
+const line = (labels, sets, unit, extra={}) => ({type:'line', unit, data:{labels, datasets:sets.map(s=>({label:s.label,data:s.data,borderColor:css(s.c),backgroundColor:css(s.c),borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2}))}, ...extra});
+const bar = (labels, sets, unit, extra={}) => ({type:'bar', unit, data:{labels, datasets:sets.map(s=>({label:s.label,data:s.data,backgroundColor:s.colors||css(s.c),borderRadius:4,borderSkipped:'start',maxBarThickness:34}))}, ...extra});
+const SCRN = {breast:{fi:'Rintasyöpä',sv:'Bröstcancer',en:'Breast'},colorectal:{fi:'Suolistosyöpä',sv:'Tarmcancer',en:'Colorectal'},cervical:{fi:'Kohdunkaulansyöpä',sv:'Livmoderhalscancer',en:'Cervical'}};
+
+const VIEWS = [
+ {id:'kpi', g:'sum', wide:true, kind:'tiles', title:{fi:'Avainluvut',sv:'Nyckeltal',en:'Key figures'}},
+ {id:'pathway', g:'sum', wide:true, kind:'pathway', tag:'N', src:['team','mot'],
+  title:{fi:'Missä kohtaa hoitopolkua ero syntyy',sv:'Var i vårdkedjan uppstår skillnaden',en:'Where on the care pathway the gap emerges'},
+  sub:{fi:'Polku Labsin kooste: punainen = ero syntyy tässä, vihreä = pääosin ajallaan',sv:'Polku Labs sammanställning: rött = skillnaden uppstår här, grönt = mestadels i tid',en:'Polku Labs summary: red = the gap forms here, green = mostly on time'},
+  note:{fi:'Ero syntyy pääosin ennen diagnoosia, perusterveydenhuollossa. Diagnoosista hoitoon päästään useimmiten ajallaan.',sv:'Skillnaden uppstår främst före diagnos, i primärvården. Från diagnos till behandling går det oftast i tid.',en:'The gap forms mostly before diagnosis, in primary care. Diagnosis to treatment is mostly on time.'}},
+ {id:'goal3', g:'sum', kind:'goal3', tag:'S', src:['team'],
+  title:{fi:'Syöpästrategian tavoite 3: mittarit',sv:'Cancerstrategins mål 3: indikatorer',en:'Cancer strategy Goal 3: indicators'},
+  sub:{fi:'Kansallinen syöpästrategia 2026–2035',sv:'Nationella cancerstrategin 2026–2035',en:'National Cancer Strategy 2026–2035'}},
+ {id:'trend', g:'mort', tag:'S', src:['st11ay'],
+  title:{fi:'Keuhkosyöpäkuolleisuus 1971–2025',sv:'Lungcancerdödlighet 1971–2025',en:'Lung cancer mortality 1971–2025'},
+  sub:{fi:'Ikävakioitu kuolleisuus / 100 000 asukasta (C32–C34)',sv:'Åldersstandardiserad dödlighet / 100 000 invånare (C32–C34)',en:'Age-standardised mortality / 100,000 population (C32–C34)'},
+  chart:()=>line(D.trend.years,[{label:t('men'),data:D.trend.men,c:'--men'},{label:t('women'),data:D.trend.women,c:'--women'},{label:t('total'),data:D.trend.total,c:'--total'}],'/100 000'),
+  note:{fi:'Miesten kuolleisuus on pudonnut 1970-luvun tasosta (156) alle kolmannekseen (47,5 vuonna 2025). Naisten kuolleisuus yli kaksinkertaistui vuosina 1971–2020 (10,6 → 25,3) ja on sen jälkeen tasaantunut.',sv:'Männens dödlighet har sjunkit från 1970-talets nivå (156) till under en tredjedel (47,5 år 2025). Kvinnornas dödlighet mer än fördubblades 1971–2020 (10,6 → 25,3) och har sedan planat ut.',en:'Mortality in men has fallen from the 1970s level (156) to under a third (47.5 in 2025). Mortality in women more than doubled in 1971–2020 (10.6 → 25.3) and has since levelled off.'}},
+ {id:'count', g:'mort', tag:'S', src:['st11be'],
+  title:{fi:'Keuhkosyöpäkuolemat vuosittain',sv:'Lungcancerdödsfall per år',en:'Lung cancer deaths per year'},
+  sub:{fi:'Kuolleiden lukumäärä, keuhkosyöpä (C34), 1998–2025',sv:'Antal döda, lungcancer (C34), 1998–2025',en:'Number of deaths, lung cancer (C34), 1998–2025'},
+  chart:()=>line(D.c34.years,[{label:t('men'),data:D.c34.men,c:'--men'},{label:t('women'),data:D.c34.women,c:'--women'}],'')},
+ {id:'share', g:'mort', tag:'S', src:['st11ay'],
+  title:{fi:'Keuhkosyövän osuus syöpäkuolemista',sv:'Lungcancerns andel av cancerdödsfallen',en:'Lung cancer share of cancer deaths'},
+  sub:{fi:'% syöpäkuolemista (C32–C34 / C00–C97), 1971–2025',sv:'% av cancerdödsfallen (C32–C34 / C00–C97), 1971–2025',en:'% of cancer deaths (C32–C34 / C00–C97), 1971–2025'},
+  chart:()=>line(D.share.years,[{label:t('men'),data:D.share.men,c:'--men'},{label:t('women'),data:D.share.women,c:'--women'}],'%')},
+ {id:'age', g:'mort', tag:'S', src:['st11be'],
+  title:{fi:'Keuhkosyöpäkuolemat ikäryhmittäin 2025',sv:'Lungcancerdödsfall per åldersgrupp 2025',en:'Lung cancer deaths by age group, 2025'},
+  sub:{fi:'Kuolleiden lukumäärä, keuhkosyöpä (C34)',sv:'Antal döda, lungcancer (C34)',en:'Number of deaths, lung cancer (C34)'},
+  chart:()=>bar(D.age.ages,[{label:t('men'),data:D.age.men,c:'--men'},{label:t('women'),data:D.age.women,c:'--women'}],'')},
+ {id:'smr', g:'mort', tag:'S', src:['smr'], tall:true, kind:'smr',
+  title:{fi:'Ikävakioitu kuolleisuussuhde (SMR) hyvinvointialueittain',sv:'Åldersstandardiserad dödlighetskvot (SMR) per välfärdsområde',en:'Age-standardised mortality ratio (SMR) by wellbeing services county'},
+  sub:{fi:'Havaitut / odotetut keuhkosyöpäkuolemat 2021–2025 (C32–C34), 95 %:n luottamusväli. 1,0 = maan taso',sv:'Observerade / förväntade lungcancerdödsfall 2021–2025 (C32–C34), 95 % konfidensintervall. 1,0 = riksnivå',en:'Observed / expected lung cancer deaths 2021–2025 (C32–C34), 95% confidence interval. 1.0 = national level'},
+  note:{fi:'SMR huomioi alueen ikärakenteen, joten se on karkeaa kuolleisuutta reilumpi vertailu. Punainen = merkitsevästi yli maan tason, sininen = merkitsevästi alle, harmaa = ei merkitsevää eroa.',sv:'SMR tar hänsyn till områdets åldersstruktur och är därför en rättvisare jämförelse än rå dödlighet. Rött = signifikant över riksnivån, blått = signifikant under, grått = ingen signifikant skillnad.',en:'SMR accounts for each area\'s age structure, so it is a fairer comparison than crude mortality. Red = significantly above the national level, blue = significantly below, grey = no significant difference.'}},
+ {id:'region', g:'mort', tag:'S', src:['st13u5'], tall:true,
+  title:{fi:'Karkea kuolleisuus hyvinvointialueittain',sv:'Rå dödlighet per välfärdsområde',en:'Crude mortality by wellbeing services county'},
+  sub:{fi:'Ikävakioimaton kuolleisuus / 100 000 asukasta, keskiarvo 2021–2025 (C32–C34)',sv:'Ej åldersstandardiserad dödlighet / 100 000 invånare, medeltal 2021–2025 (C32–C34)',en:'Crude mortality / 100,000 population, mean 2021–2025 (C32–C34)'},
+  chart:()=>bar(D.region.map(r=>nm(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,ref:D.region_fi,refLabel:t('national')}),
+  note:{fi:'Luku ei ole ikävakioitu. Reiluun vertailuun käytä SMR-näkymää.',sv:'Talet är inte åldersstandardiserat. Använd SMR-vyn för en rättvis jämförelse.',en:'Not age-standardised. Use the SMR view for a fair comparison.'}},
+ {id:'delay', g:'delay', tag:'N', src:['mot'],
+  title:{fi:'Viive oireista hoidon alkuun',sv:'Fördröjning från symtom till behandlingsstart',en:'Delay from symptoms to start of treatment'},
+  sub:{fi:'Keskimääräiset päivät, keuhkosyöpä',sv:'Genomsnittligt antal dagar, lungcancer',en:'Average days, lung cancer'},
+  chart:()=>bar([{fi:'Suomi',sv:'Finland',en:'Finland'}[lang],{fi:'Ruotsi',sv:'Sverige',en:'Sweden'}[lang],{fi:'Tanska',sv:'Danmark',en:'Denmark'}[lang]],[{label:t('days'),colors:[css('--men'),css('--neutral'),css('--neutral')],data:[155,107,67]}],t('days')),
+  note:{fi:'Suomen luku perustuu julkaisemattomaan tutkimukseen neljästä sairaalasta (Kuopio, Tampere, Turku, Rovaniemi).',sv:'Finlands siffra bygger på en opublicerad studie från fyra sjukhus (Kuopio, Tammerfors, Åbo, Rovaniemi).',en:'Finland\'s figure is from an unpublished study in four hospitals (Kuopio, Tampere, Turku, Rovaniemi).'}},
+ {id:'delayphase', g:'delay', tag:'N', src:['mot'],
+  title:{fi:'Suomen viive vaiheittain',sv:'Finlands fördröjning per fas',en:'Finland\'s delay by phase'},
+  sub:{fi:'Päivää, keuhkosyöpä',sv:'Dagar, lungcancer',en:'Days, lung cancer'},
+  chart:()=>bar([{fi:'Potilas (oireista ensikäyntiin)',sv:'Patient (symtom till första besök)',en:'Patient (symptoms to first visit)'}[lang],{fi:'Perusterveydenhuolto',sv:'Primärvård',en:'Primary care'}[lang],{fi:'Erikoissairaanhoito',sv:'Specialiserad sjukvård',en:'Specialist care'}[lang]],[{label:t('days'),data:[50,41,58],c:'--bar'}],t('days'),{horizontal:true}),
+  note:{fi:'Potilasviive on "yli 50 pv", joten pylväs näyttää alarajan. Osien summa on alle 155 pv, koska kaikkea aikaa ei ole jaettu vaiheisiin. Satakunnassa suurin viive oli erikoissairaanhoidossa (Mattila 2025), eli pullonkaula vaihtelee alueittain.',sv:'Patientfördröjningen är "över 50 dagar", så stapeln visar nedre gränsen. Delarna summerar till under 155 dagar eftersom all tid inte är fördelad på faser. I Satakunta var den största fördröjningen i specialiserad sjukvård (Mattila 2025), så flaskhalsen varierar regionalt.',en:'Patient delay is "over 50 days", so the bar shows the lower bound. The parts sum to less than 155 days because not all time is assigned to a phase. In Satakunta the largest delay was in specialist care (Mattila 2025), so the bottleneck varies by region.'}},
+ {id:'risk', g:'risk', tag:'A', src:['risk'], tall:true,
+  title:{fi:'Arvioitu riskiryhmä hyvinvointialueittain',sv:'Uppskattad riskgrupp per välfärdsområde',en:'Estimated high-risk group by wellbeing services county'},
+  sub:{fi:'50–74-vuotiaat, ≥20 askivuotta, tupakoi tai lopetti alle 15 v sitten (henkilöä)',sv:'50–74 år, ≥20 paketår, röker eller slutade för under 15 år sedan (personer)',en:'Age 50–74, ≥20 pack-years, current smoker or quit within 15 years (people)'},
+  chart:()=>bar(D.risk.map(r=>nm(r[0])),[{label:{fi:'Arvioitu riskiryhmä',sv:'Uppskattad riskgrupp',en:'Estimated risk group'}[lang],data:D.risk.map(r=>r[1]),c:'--bar'}],'',{horizontal:true,riskTable:true}),
+  note:{fi:`Koko maassa noin ${fmt(D.risk_nat)} henkilöä (7 % 50–74-vuotiaista). Arvio = alueen tupakointiosuus × oletettu kerroin 0,8 (vaihteluväli 0,55–1,1), koska suomalaista askivuosidataa ei löytynyt. Taulukossa myös CT-paikkakunnat (tiimin selvittämä lista, ei virallinen rekisteri).`,sv:`I hela landet cirka ${fmt(D.risk_nat)} personer (7 % av 50–74-åringarna). Uppskattning = områdets rökningsandel × antagen faktor 0,8 (intervall 0,55–1,1), eftersom finländska paketårsdata inte hittades. Tabellen visar också orter med CT (teamets egen lista, inget officiellt register).`,en:`About ${fmt(D.risk_nat)} people nationally (7% of those aged 50–74). Estimate = the area's smoking rate × an assumed factor of 0.8 (range 0.55–1.1), because no Finnish pack-year data was found. The table also lists CT towns (the team's researched list, not an official register).`}},
+ {id:'smokeedu', g:'risk', tag:'S', src:['sotk'],
+  title:{fi:'Päivittäin tupakoivat koulutusasteittain',sv:'Dagligrökare per utbildningsnivå',en:'Daily smokers by education'},
+  sub:{fi:'% 20 vuotta täyttäneistä, koko maa',sv:'% av personer 20 år och äldre, hela landet',en:'% of people aged 20+, whole country'},
+  chart:()=>line(D.smoke_edu.years,[{label:{fi:'Matala koulutus',sv:'Låg utbildning',en:'Low education'}[lang],data:D.smoke_edu.low,c:'--edu-low'},{label:{fi:'Keskitaso',sv:'Mellannivå',en:'Intermediate'}[lang],data:D.smoke_edu.mid,c:'--edu-mid'},{label:{fi:'Korkea koulutus',sv:'Hög utbildning',en:'High education'}[lang],data:D.smoke_edu.high,c:'--edu-high'}],'%',{points:true}),
+  note:{fi:'Tupakointi on keuhkosyövän tärkein riskitekijä: arviolta 80–90 % keuhkosyövistä liittyy siihen (keuhkosyöpäohjelma).',sv:'Rökning är den viktigaste riskfaktorn för lungcancer: uppskattningsvis 80–90 % av lungcancerfallen är kopplade till den (lungcancerprogrammet).',en:'Smoking is the main risk factor for lung cancer: an estimated 80–90% of lung cancers are linked to it (lung cancer programme).'}},
+ {id:'smokereg', g:'risk', tag:'S', src:['sotk4404'], tall:true,
+  title:{fi:'Päivittäin tupakoivat hyvinvointialueittain 2024',sv:'Dagligrökare per välfärdsområde 2024',en:'Daily smokers by wellbeing services county, 2024'},
+  sub:{fi:'% väestöstä',sv:'% av befolkningen',en:'% of population'},
+  chart:()=>bar(D.smoke_reg.map(r=>nm(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,ref:D.smoke_fi,refLabel:t('national')})},
+ {id:'edu', g:'eq', tag:'S', src:['ohj'],
+  title:{fi:'Koulutus, ilmaantuvuus ja kuolleisuus',sv:'Utbildning, incidens och dödlighet',en:'Education, incidence and mortality'},
+  sub:{fi:'Tapauksia / 100 000, 2018–2022, perusaste vs. korkea-aste',sv:'Fall / 100 000, 2018–2022, grundnivå vs. högre nivå',en:'Cases / 100,000, 2018–2022, basic vs. higher education'},
+  chart:()=>{const a={fi:['Ilmaantuvuus, miehet','Ilmaantuvuus, naiset','Kuolleisuus, miehet','Kuolleisuus, naiset'],sv:['Incidens, män','Incidens, kvinnor','Dödlighet, män','Dödlighet, kvinnor'],en:['Incidence, men','Incidence, women','Mortality, men','Mortality, women']}[lang];return bar(a,[{label:{fi:'Perusaste',sv:'Grundnivå',en:'Basic'}[lang],data:[128.7,76.4,108.1,55.5],c:'--edu-low'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Higher'}[lang],data:[48.5,32.0,39.2,20.4],c:'--edu-high'}],'/100 000');},
+  note:{fi:'Perusasteen koulutuksen saaneilla keuhkosyöpään sairastutaan ja kuollaan noin 2,5–2,8 kertaa yleisemmin kuin korkeasti koulutetuilla.',sv:'Personer med grundutbildning insjuknar och dör i lungcancer cirka 2,5–2,8 gånger oftare än högutbildade.',en:'People with basic education get and die of lung cancer about 2.5–2.8 times as often as the highly educated.'}},
+ {id:'survedu', g:'eq', tag:'S', src:['ohj'],
+  title:{fi:'Elossaolo koulutuksen mukaan',sv:'Överlevnad efter utbildning',en:'Survival by education'},
+  sub:{fi:'5 vuoden elossaolo %, 2020–2022 (pyöristetyt arvot)',sv:'5-årsöverlevnad %, 2020–2022 (avrundade värden)',en:'5-year survival %, 2020–2022 (rounded values)'},
+  chart:()=>bar([t('men'),t('women')],[{label:{fi:'Perusaste',sv:'Grundnivå',en:'Basic'}[lang],data:[13,20],c:'--edu-low'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Higher'}[lang],data:[18,30],c:'--edu-high'}],'%')},
+ {id:'survage', g:'eq', tag:'S', src:['ohj'],
+  title:{fi:'Naisten elossaolo iän mukaan',sv:'Kvinnors överlevnad efter ålder',en:'Survival in women by age'},
+  sub:{fi:'5 vuoden elossaolo %, keuhkosyöpä',sv:'5-årsöverlevnad %, lungcancer',en:'5-year survival %, lung cancer'},
+  chart:()=>bar({fi:['alle 55 v','55–74 v','yli 75 v'],sv:['under 55 år','55–74 år','över 75 år'],en:['under 55','55–74','over 75']}[lang],[{label:'%',data:[48,25,17],c:'--women'}],'%')},
+ {id:'scrlang', g:'scr', tag:'S', src:['scr'],
+  title:{fi:'Seulontaan osallistuminen äidinkielen mukaan',sv:'Deltagande i screening efter modersmål',en:'Screening participation by native language'},
+  sub:{fi:'% kutsutuista, 2024',sv:'% av de inbjudna, 2024',en:'% of those invited, 2024'},
+  chart:()=>{const k=['breast','colorectal','cervical'];return bar(k.map(x=>L(SCRN[x])),[{label:{fi:'Suomi, ruotsi tai saame',sv:'Finska, svenska eller samiska',en:'Finnish, Swedish or Sámi'}[lang],data:k.map(x=>D.scr_lang[x]['Domestic']),c:'--men'},{label:{fi:'Muu tai puuttuu',sv:'Annat eller saknas',en:'Other or missing'}[lang],data:k.map(x=>D.scr_lang[x]['Other/missing']),c:'--women'}],'%');},
+  note:{fi:'Keuhkosyövälle ei ole Suomessa seulontaohjelmaa. Nämä kolme ohjelmaa näyttävät, kenet seulonta nykyään tavoittaa huonoiten: vieraskieliset ja vähän koulutetut.',sv:'Finland har inget screeningprogram för lungcancer. De tre programmen visar vem screening når sämst i dag: personer med annat modersmål och lågutbildade.',en:'Finland has no lung cancer screening programme. These three programmes show who screening reaches worst today: people with another native language and people with less education.'}},
+ {id:'scredu', g:'scr', tag:'S', src:['scr'],
+  title:{fi:'Seulontaan osallistuminen koulutuksen mukaan',sv:'Deltagande i screening efter utbildning',en:'Screening participation by education'},
+  sub:{fi:'% kutsutuista, 2024',sv:'% av de inbjudna, 2024',en:'% of those invited, 2024'},
+  chart:()=>{const k=['breast','colorectal'];return bar(k.map(x=>L(SCRN[x])),[{label:{fi:'Perusaste tai tuntematon',sv:'Grundnivå eller okänd',en:'Primary or unknown'}[lang],data:k.map(x=>D.scr_edu[x]['Primary education/unknown']),c:'--edu-low'},{label:{fi:'Keskiaste',sv:'Mellannivå',en:'Intermediate'}[lang],data:k.map(x=>D.scr_edu[x]['Intermediate/secondary']),c:'--edu-mid'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Tertiary'}[lang],data:k.map(x=>D.scr_edu[x]['Tertiary/higher education']),c:'--edu-high'}],'%');}},
+ {id:'scrcounty', g:'scr', tag:'S', src:['scr'], tall:true,
+  title:{fi:'Seulontaan osallistuminen hyvinvointialueittain',sv:'Deltagande i screening per välfärdsområde',en:'Screening participation by wellbeing services county'},
+  sub:{fi:'% kutsutuista, 2024. Katkoviiva = tavoite 80 %',sv:'% av de inbjudna, 2024. Streckad linje = mål 80 %',en:'% of those invited, 2024. Dashed line = 80% target'},
+  chart:()=>bar(D.scr_county.map(r=>nm(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,ref:80,refLabel:t('target'),xmin:50}),
+  note:{fi:'Matalimmat osallistumisasteet ovat pääkaupunkiseudulla (Helsinki, Vantaa–Kerava, Länsi-Uusimaa). Ero seuraa kieltä, koulutusta ja suurkaupunkia enemmän kuin syrjäisyyttä.',sv:'Det lägsta deltagandet finns i huvudstadsregionen (Helsingfors, Vanda–Kervo, Västra Nyland). Skillnaden följer språk, utbildning och storstad mer än avlägsenhet.',en:'Participation is lowest in the capital region (Helsinki, Vantaa–Kerava, West Uusimaa). The gap follows language, education and metropolitan areas more than remoteness.'}},
+ {id:'nordsurv', g:'intl', tag:'N', src:['ihe'],
+  title:{fi:'Keuhkosyövän elossaolo Pohjoismaissa',sv:'Lungcanceröverlevnad i Norden',en:'Lung cancer survival in the Nordics'},
+  sub:{fi:'5 vuoden suhteellinen elossaolo, %',sv:'Relativ 5-årsöverlevnad, %',en:'5-year relative survival, %'},
+  chart:()=>{const c=['Finland','Denmark','Sweden','Norway'],n={fi:['Suomi','Tanska','Ruotsi','Norja'],sv:['Finland','Danmark','Sverige','Norge'],en:c}[lang],cols=['--men','--neutral','--neutral2','--neutral3'];return bar([t('men'),t('women')],c.map((x,i)=>({label:n[i],data:[D.nordsurv.men[x],D.nordsurv.women[x]],c:cols[i]})),'%');},
+  note:{fi:'Lähteet eroavat: keuhkosyöpäohjelma (NORDCAN) antaa Suomen naisille noin 26 % ja Norjan miehille noin 27 %. NORDCAN on ensisijainen lähde tarkistettavaksi.',sv:'Källorna skiljer sig: lungcancerprogrammet (NORDCAN) anger cirka 26 % för finländska kvinnor och cirka 27 % för norska män. NORDCAN är primärkällan att kontrollera.',en:'Sources differ: the lung cancer programme (NORDCAN) gives about 26% for Finnish women and about 27% for Norwegian men. NORDCAN is the primary source to check.'}},
+ {id:'eu', g:'intl', tag:'S', src:['oecd'],
+  title:{fi:'Suomi vs. EU: ilmaantuvuus',sv:'Finland vs. EU: incidens',en:'Finland vs. EU: incidence'},
+  sub:{fi:'Ikävakioitu ilmaantuvuus / 100 000, ECIS:n arvio 2022',sv:'Åldersstandardiserad incidens / 100 000, ECIS-uppskattning 2022',en:'Age-standardised incidence / 100,000, ECIS estimate 2022'},
+  chart:()=>bar([t('men'),t('women')],[{label:{fi:'Suomi',sv:'Finland',en:'Finland'}[lang],data:[65,35],c:'--men'},{label:'EU27',data:[95,44],c:'--neutral'}],'/100 000'),
+  note:{fi:'Suomessa keuhkosyövän ilmaantuvuus on molemmilla sukupuolilla EU:n keskiarvoa matalampi.',sv:'I Finland är lungcancerincidensen lägre än EU-genomsnittet för båda könen.',en:'Lung cancer incidence in Finland is below the EU average for both sexes.'}}
+];
+
+const TILES = () => [
+ {v:'155 '+t('days'), l:{fi:'oireista hoidon alkuun (Ruotsi 107, Tanska 67)',sv:'från symtom till behandling (Sverige 107, Danmark 67)',en:'from symptoms to treatment (Sweden 107, Denmark 67)'}, s:'Yle MOT 2026'},
+ {v:'~'+fmt(3000), l:{fi:'uutta keuhkosyöpää vuodessa',sv:'nya lungcancerfall per år',en:'new lung cancers a year'}, s:{fi:'Syöpärekisteri, 2022',sv:'Cancerregistret, 2022',en:'Cancer Registry, 2022'}},
+ {v:fmt(D.c34.men.at(-1)+D.c34.women.at(-1)), l:{fi:'keuhkosyöpäkuolemaa 2025',sv:'lungcancerdödsfall 2025',en:'lung cancer deaths in 2025'}, s:{fi:'Tilastokeskus',sv:'Statistikcentralen',en:'Statistics Finland'}},
+ {v:'21 %', l:{fi:'5 vuoden suhteellinen elossaolo',sv:'relativ 5-årsöverlevnad',en:'5-year relative survival'}, s:{fi:'2020–2022, Syöpärekisteri',sv:'2020–2022, Cancerregistret',en:'2020–2022, Cancer Registry'}},
+ {v:'27 %', l:{fi:'sai parantavaa hoitoa',sv:'fick kurativ behandling',en:'received curative treatment'}, s:{fi:'2019–2023, keuhkosyöpäraportti',sv:'2019–2023, lungcancerrapporten',en:'2019–2023, lung cancer report'}},
+ {v:'~'+fmt(Math.round(D.risk_nat/1000)*1000), l:{fi:'arvioitu riskiryhmä (50–74 v)',sv:'uppskattad riskgrupp (50–74 år)',en:'estimated high-risk group (50–74)'}, s:{fi:'Polku Labs -arvio [A]',sv:'Polku Labs uppskattning [A]',en:'Polku Labs estimate [A]'}}
+];
+
+const PATH = [
+ {gap:true, st:{fi:'Toteaminen',sv:'Upptäckt',en:'Detection'}, items:[
+   {m:{fi:'Syövistä levinneisyys kirjattu',sv:'Cancerfall med registrerat stadium',en:'Cancers with stage recorded'},f:'42 %',c:{fi:'tavoite 70 % todettuna vaiheessa I–II, ei mitattavissa nyt',sv:'mål 70 % upptäckta i stadium I–II, kan inte mätas i dag',en:'target 70% found at stage I–II, cannot be measured today'},tag:'N'},
+   {m:{fi:'Keuhkosyöpä todettu vaiheessa IV',sv:'Lungcancer upptäckt i stadium IV',en:'Lung cancer found at stage IV'},f:{fi:'59 % (yksi keskus, 2007–2019)',sv:'59 % (ett center, 2007–2019)',en:'59% (one centre, 2007–2019)'},c:{fi:'ei kansallista lukua',sv:'ingen nationell siffra',en:'no national figure'},tag:'N'},
+   {m:{fi:'Seulontaan osallistuminen, muu äidinkieli vs. kotimainen (rinta)',sv:'Screeningdeltagande, annat modersmål vs. inhemskt (bröst)',en:'Screening participation, other native language vs. domestic (breast)'},f:{fi:'60,8 % / 83,2 %',sv:'60,8 % / 83,2 %',en:'60.8% / 83.2%'},c:{fi:'tavoite 80 % joka alueella',sv:'mål 80 % i varje område',en:'target 80% in every county'},tag:'S'}]},
+ {gap:true, st:{fi:'Perusterveydenhuolto → erikoissairaanhoito',sv:'Primärvård → specialiserad sjukvård',en:'Primary → specialist care'}, items:[
+   {m:{fi:'Keuhko: aika oirevastaanotolle',sv:'Lunga: tid till symtombesök',en:'Lung: time to symptom appointment'},f:{fi:'14 pv',sv:'14 dagar',en:'14 days'},c:{fi:'2–7 pv muissa Pohjoismaissa',sv:'2–7 dagar i övriga Norden',en:'2–7 days in the other Nordics'},tag:'N'},
+   {m:{fi:'Keuhko: erikoislääkärin konsultaatio',sv:'Lunga: specialistkonsultation',en:'Lung: specialist consultation'},f:{fi:'2–4 vk',sv:'2–4 veckor',en:'2–4 weeks'},c:{fi:'1–2 vk muualla',sv:'1–2 veckor på andra håll',en:'1–2 weeks elsewhere'},tag:'N'}]},
+ {gap:null, st:{fi:'Diagnoosi',sv:'Diagnos',en:'Diagnosis'}, items:[
+   {m:{fi:'Aika oireista diagnoosiin alueittain',sv:'Tid från symtom till diagnos per region',en:'Time from symptoms to diagnosis by region'},f:{fi:'ei tiedossa',sv:'okänt',en:'not known'},c:{fi:'suomalaista dataa ei löytynyt',sv:'inga finländska data hittades',en:'no Finnish data found'},tag:'N'}]},
+ {gap:false, st:{fi:'Hoidon aloitus',sv:'Behandlingsstart',en:'Treatment start'}, items:[
+   {m:{fi:'Diagnoosista hoitoon, mediaani',sv:'Från diagnos till behandling, median',en:'Diagnosis to treatment, median'},f:{fi:'36–38 pv',sv:'36–38 dagar',en:'36–38 days'},c:{fi:'raja 180 pv; alle 2 % ylitti sen 2024',sv:'gräns 180 dagar; under 2 % överskred den 2024',en:'limit 180 days; under 2% exceeded it in 2024'},tag:'N'}]}
+];
+const GOAL3 = [
+ {b:{fi:'Huonoennusteisten syöpien elossaolo pohjoismaiselle tasolle',sv:'Överlevnaden i cancer med dålig prognos når nordisk nivå',en:'Survival in poor-prognosis cancers reaches the Nordic level'},s:{fi:'Keuhkosyöpä +14 %-yksikköä vuoden 2023 NORDCAN-tasosta (Ruotsin ja Norjan keskiarvo).',sv:'Lungcancer +14 procentenheter jämfört med NORDCAN-nivån 2023 (medeltal för Sverige och Norge).',en:'Lung cancer +14 percentage points versus the 2023 NORDCAN level (average of Sweden and Norway).'},tag:'S'},
+ {b:{fi:'Syöpäkuolleisuus laskee 10 %',sv:'Cancerdödligheten sjunker med 10 %',en:'Cancer mortality falls 10%'},s:{fi:'Noin 13 300 kuolemasta vuodessa, eli noin 1 330 vähemmän.',sv:'Från cirka 13 300 dödsfall per år, alltså cirka 1 330 färre.',en:'From about 13,300 deaths a year, so about 1,330 fewer.'},tag:'S'},
+ {b:{fi:'Potilaat pääsevät hoitoon tavoiteajoissa',sv:'Patienterna får behandling inom målen',en:'Patients reach treatment within target times'},s:{fi:'Diagnoosista hoitoon mediaani 36–38 pv (2018–2022). Viive syntyy pääosin ennen diagnoosia.',sv:'Från diagnos till behandling median 36–38 dagar (2018–2022). Fördröjningen uppstår främst före diagnos.',en:'Median diagnosis to treatment 36–38 days (2018–2022). The delay forms mostly before diagnosis.'},tag:'N'}
+];
+
+const SOURCES = {
+ fi:`<h2>Mistä data tulee</h2><ul>
+ <li><b>Tilastokeskus, kuolemansyytilasto</b>: taulukot 11ay, 11be ja 13u5, haettu suoraan rajapinnasta.</li>
+ <li><b>Ikävakioitu SMR</b>: Polku Labsin laskelma Tilastokeskuksen taulukoista 13u5, 11az ja 11s1 (epäsuora ikävakiointi kansallisilla ikäryhmäkohtaisilla kuolleisuuksilla).</li>
+ <li><b>THL Sotkanet</b>: tupakointi-indikaattorit 4404–4410, haettu suoraan rajapinnasta.</li>
+ <li><b>Syöpärekisterin seulontatilastot 2024</b>: osallistuminen alueittain, kielen ja koulutuksen mukaan, luettu suoraan tilastotaulukoista (Polku Labs, ct-sim).</li>
+ <li><b>Riskiryhmäarvio</b>: Polku Labsin arvio, THL Sotkanet 4405/4406 × oletettu kerroin. CT-paikkakunnat ovat tiimin selvittämä lista (36 paikkakuntaa, 24 vahvistettu), eivät virallinen rekisteri.</li>
+ <li><b>Syöpärekisteri</b>: Syöpä 2022 ja keuhkosyöpäraportti, luvut <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">Valtakunnallisesta keuhkosyöpäohjelmasta 2026–2035</a>.</li>
+ <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">viive oireista hoitoon</a> (julkaisematon tutkimus neljästä sairaalasta).</li>
+ <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Syöpäprofiilit 2025 – Suomi</a>.</li>
+ <li><b>IHE Cancer Dashboard Finland 2026</b>: pohjoismainen elossaolo tiimin muistiinpanojen kautta, ei tarkistettu uudelleen.</li></ul>
+ <h2>Merkinnät</h2><ul><li><span class="tag S">S</span> julkinen lähde</li><li><span class="tag N">N</span> tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen</li><li><span class="tag A">A</span> oletus tai välillinen arvio</li></ul>
+ <h2>Rajoitukset</h2><ul>
+ <li>Tilastokeskuksen aikasarja ja alueluvut käyttävät ryhmää C32–C34 (sisältää kurkunpään syövän). Lukumäärät ja ikäryhmät ovat pelkkää keuhkosyöpää (C34).</li>
+ <li>Alueellisia tietoja levinneisyydestä, oireista diagnoosiin kuluvasta ajasta tai CT-jonoista ei ole julkisesti saatavilla.</li>
+ <li>Riskiryhmäarvio perustuu oletettuun kertoimeen, koska suomalaista askivuosidataa ei löytynyt.</li>
+ <li>Syöpärekisterin, ECIS:n ja NORDCANin sovelluksia ei voitu hakea suoraan; luvut on poimittu julkaistuista raporteista.</li></ul>`,
+ sv:`<h2>Varifrån data kommer</h2><ul>
+ <li><b>Statistikcentralen, dödsorsaksstatistik</b>: tabellerna 11ay, 11be och 13u5, hämtade direkt via API.</li>
+ <li><b>Åldersstandardiserad SMR</b>: Polku Labs beräkning från Statistikcentralens tabeller 13u5, 11az och 11s1 (indirekt åldersstandardisering med nationella åldersspecifika dödstal).</li>
+ <li><b>THL Sotkanet</b>: rökindikatorerna 4404–4410, hämtade direkt via API.</li>
+ <li><b>Cancerregistrets screeningstatistik 2024</b>: deltagande per område, språk och utbildning, läst direkt ur statistiktabellerna (Polku Labs, ct-sim).</li>
+ <li><b>Uppskattad riskgrupp</b>: Polku Labs uppskattning, THL Sotkanet 4405/4406 × antagen faktor. Orterna med CT är teamets egen lista (36 orter, 24 bekräftade), inget officiellt register.</li>
+ <li><b>Cancerregistret</b>: Cancer 2022 och lungcancerrapporten, siffror ur <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">Nationella lungcancerprogrammet 2026–2035</a>.</li>
+ <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">fördröjning från symtom till behandling</a> (opublicerad studie från fyra sjukhus).</li>
+ <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Cancerprofiler 2025 – Finland</a>.</li>
+ <li><b>IHE Cancer Dashboard Finland 2026</b>: nordisk överlevnad via teamets anteckningar, inte omkontrollerat.</li></ul>
+ <h2>Märkningar</h2><ul><li><span class="tag S">S</span> offentlig källa</li><li><span class="tag N">N</span> teamets anteckningar eller expertintervju, inte omkontrollerat</li><li><span class="tag A">A</span> antagande eller indirekt uppskattning</li></ul>
+ <h2>Begränsningar</h2><ul>
+ <li>Statistikcentralens tidsserie och regionala siffror använder gruppen C32–C34 (inkluderar struphuvudcancer). Antal och åldersgrupper gäller enbart lungcancer (C34).</li>
+ <li>Regionala data om stadium, tid från symtom till diagnos eller CT-köer finns inte offentligt.</li>
+ <li>Riskgruppsuppskattningen bygger på en antagen faktor, eftersom finländska paketårsdata inte hittades.</li>
+ <li>Cancerregistrets, ECIS och NORDCANs applikationer kunde inte läsas direkt; siffrorna kommer ur publicerade rapporter.</li></ul>`,
+ en:`<h2>Where the data comes from</h2><ul>
+ <li><b>Statistics Finland, causes of death</b>: tables 11ay, 11be and 13u5, read directly from the API.</li>
+ <li><b>Age-standardised SMR</b>: Polku Labs calculation from Statistics Finland tables 13u5, 11az and 11s1 (indirect standardisation with national age-specific rates).</li>
+ <li><b>THL Sotkanet</b>: smoking indicators 4404–4410, read directly from the API.</li>
+ <li><b>Finnish Cancer Registry screening statistics 2024</b>: participation by county, language and education, read directly from the statistics tables (Polku Labs, ct-sim).</li>
+ <li><b>High-risk group estimate</b>: Polku Labs estimate, THL Sotkanet 4405/4406 × an assumed factor. CT towns are the team's researched list (36 towns, 24 confirmed), not an official register.</li>
+ <li><b>Finnish Cancer Registry</b>: Cancer 2022 and the lung cancer report, figures from the <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">National Lung Cancer Programme 2026–2035</a>.</li>
+ <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">delay from symptoms to treatment</a> (unpublished study in four hospitals).</li>
+ <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Country Cancer Profile 2025 – Finland</a>.</li>
+ <li><b>IHE Cancer Dashboard Finland 2026</b>: Nordic survival via team notes, not re-verified.</li></ul>
+ <h2>Tags</h2><ul><li><span class="tag S">S</span> public source</li><li><span class="tag N">N</span> team notes or expert interview, not re-verified</li><li><span class="tag A">A</span> assumption or indirect estimate</li></ul>
+ <h2>Limitations</h2><ul>
+ <li>The Statistics Finland time series and regional figures use group C32–C34 (includes laryngeal cancer). Counts and age groups are lung cancer only (C34).</li>
+ <li>Regional data on stage, symptom-to-diagnosis time or CT queues is not publicly available.</li>
+ <li>The high-risk group estimate relies on an assumed factor, because no Finnish pack-year data was found.</li>
+ <li>The Cancer Registry, ECIS and NORDCAN applications could not be read directly; figures come from published reports.</li></ul>`
+};
+
+const KEY='keuhkodata-views-v3';
+let selected;
+try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!Array.isArray(selected)) selected=['kpi','pathway','smr','delay','delayphase','risk','edu','scrlang','nordsurv'];
+const charts={};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(selected))}catch(e){}}
+
+function buildPicker(){
+  const groups={};
+  VIEWS.forEach(v=>(groups[v.g]=groups[v.g]||[]).push(v));
+  document.getElementById('groups').innerHTML=Object.entries(groups).map(([g,vs])=>`<div class="group"><h3>${L(GROUPS[g])}</h3>${vs.map(v=>`<label><input type="checkbox" value="${v.id}" ${selected.includes(v.id)?'checked':''}><span>${L(v.title)}</span></label>`).join('')}</div>`).join('');
+  document.querySelectorAll('#groups input').forEach(i=>i.addEventListener('change',()=>{selected=VIEWS.map(v=>v.id).filter(id=>document.querySelector(`#groups input[value="${id}"]`).checked);save();render();}));
+  document.getElementById('legendtags').innerHTML=['S','N','A'].map(k=>`<span><span class="tag ${k}" style="margin:0 4px 0 0">${k}</span>${t('tag'+k).slice(4)}</span>`).join('');
+}
+document.getElementById('all').onclick=()=>{selected=VIEWS.map(v=>v.id);buildPicker();save();render();};
+document.getElementById('none').onclick=()=>{selected=[];buildPicker();save();render();};
+
+const refLine={id:'refLine',afterDatasetsDraw(c){const cfg=c.config.options.plugins.refLine;if(!cfg||cfg.value==null)return;const x=c.scales.x.getPixelForValue(cfg.value);const {top,bottom}=c.chartArea;const ctx=c.ctx;ctx.save();ctx.strokeStyle=css('--muted');ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=css('--ink');ctx.font='600 12px Inter';ctx.textAlign='left';ctx.fillText(`${cfg.label} ${cfg.value.toLocaleString(LOC[lang])}`,x+5,top-4);ctx.restore();}};
+
+function smrSpec(){
+  const col=r=>r[2]>1?css('--hi'):(r[3]<1?css('--lo'):css('--mid'));
+  return {type:'bar',unit:'',horizontal:true,ref:1,refLabel:t('natlevel'),smrTable:true,xmin:0.6,xmax:1.5,
+    data:{labels:D.smr.map(r=>nm(r[0])),datasets:[
+      {type:'bar',label:t('ci'),data:D.smr.map(r=>[r[2],r[3]]),backgroundColor:D.smr.map(col),barThickness:3,borderRadius:2,order:2},
+      {type:'line',label:'SMR',data:D.smr.map(r=>r[1]),showLine:false,pointRadius:6,pointHoverRadius:8,pointBackgroundColor:D.smr.map(col),pointBorderColor:'#fff',pointBorderWidth:2,order:1}]}};
+}
+function makeChart(canvas,spec){
+  const h=!!spec.horizontal, many=spec.data.datasets.length>1&&!spec.smrTable, grid=css('--grid'), t2=css('--muted');
+  return new Chart(canvas,{type:spec.type,data:spec.data,plugins:[refLine],options:{
+    maintainAspectRatio:false, indexAxis:h?'y':'x', locale:LOC[lang],
+    layout:{padding:{top:spec.ref!=null?18:0,right:8}},
+    interaction:{mode:'index',intersect:false},
+    elements:{point:{radius:spec.points?4:0}},
+    plugins:{legend:{display:many,position:'top',align:'start',labels:{color:t2,usePointStyle:true,boxWidth:8,font:{family:'Inter',size:12}}},
+      tooltip:{callbacks:{label:c=>{const r=c.raw;if(Array.isArray(r))return ` ${c.dataset.label}: ${r[0].toLocaleString(LOC[lang])}–${r[1].toLocaleString(LOC[lang])}`;return ` ${c.dataset.label}: ${c.parsed[h?'x':'y'].toLocaleString(LOC[lang])} ${spec.unit}`;}}},
+      refLine:spec.ref!=null?{value:spec.ref,label:spec.refLabel}:null},
+    scales:{x:{grid:{display:h,color:grid},ticks:{color:t2,maxTicksLimit:h?7:12,font:{family:'Inter',size:11}},border:{display:false},beginAtZero:spec.xmin==null,min:spec.xmin,max:spec.xmax},
+            y:{grid:{display:!h,color:grid},ticks:{color:t2,autoSkip:false,font:{family:'Inter',size:11}},border:{display:false},beginAtZero:true}}
+  }});
+}
+function tableHTML(v,spec){
+  if(v.kind==='smr') return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th><th>SMR</th><th>95 %</th><th>${t('deaths')}</th><th>${t('expected')}</th></tr></thead><tbody>${D.smr.map(r=>`<tr><td>${nm(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}–${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${fmt(r[5])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(v.id==='risk'){const h={fi:['Riskiryhmä','50–74-v.','Tupakoi 20–64 v %','CT-paikkakunnat'],sv:['Riskgrupp','50–74 år','Röker 20–64 år %','Orter med CT'],en:['Risk group','Aged 50–74','Smoking 20–64 %','CT towns']}[lang];
+    return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${D.risk.map(r=>`<tr><td>${nm(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td>${fmt(r[4])}</td><td style="text-align:start">${r[6].join(', ')||'–'}</td></tr>`).join('')}</tbody></table></div>`;}
+  const ds=spec.data.datasets;
+  return `<div class="tablewrap"><table><thead><tr><th></th>${ds.map(d=>`<th>${d.label}</th>`).join('')}</tr></thead><tbody>${spec.data.labels.map((l,i)=>`<tr><td>${l}</td>${ds.map(d=>`<td>${fmt(d.data[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+const tagHTML = k => k?`<span class="tag ${k}" title="${t('tag'+k)}">${k}</span>`:'';
+function body(v){
+  if(v.kind==='tiles') return `<div class="tiles">${TILES().map(x=>`<div class="tile"><div class="v">${pc(x.v)}</div><div class="l">${L(x.l)}</div><div class="s">${L(x.s)}</div></div>`).join('')}</div>`;
+  if(v.kind==='pathway'){const col={true:'var(--hi)',false:'var(--total)',null:'var(--mid)'};const hd={fi:['Vaihe','Mittari','Suomi','Vertailu',''],sv:['Fas','Mått','Finland','Jämförelse',''],en:['Stage','Measure','Finland','Comparison','']}[lang];
+    return `<div class="tablewrap" style="max-height:none"><table class="ptable"><thead><tr>${hd.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${PATH.map(p=>p.items.map((it,i)=>`<tr>${i===0?`<td class="stage" rowspan="${p.items.length}"><span class="dot" style="background:${col[p.gap]}"></span>${L(p.st)}</td>`:''}<td>${L(it.m)}</td><td><b>${pc(L(it.f))}</b></td><td>${L(it.c)}</td><td>${tagHTML(it.tag)}</td></tr>`).join('')).join('')}</tbody></table></div>`;}
+  if(v.kind==='goal3') return `<div class="goal">${GOAL3.map(x=>`<div><b>${L(x.b)} ${tagHTML(x.tag)}</b><span>${L(x.s)}</span></div>`).join('')}</div>`;
+  return `<div class="chartbox${v.tall?' tall':''}"><canvas id="cv-${v.id}" role="img" aria-label="${L(v.title)}"></canvas></div><div class="tbl hidden" id="tb-${v.id}"></div>`;
+}
+function render(){
+  Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
+  const grid=document.getElementById('grid');
+  const vs=VIEWS.filter(v=>selected.includes(v.id));
+  document.getElementById('empty').classList.toggle('hidden',vs.length>0);
+  grid.innerHTML=vs.map(v=>{
+    const charty=!v.kind||v.kind==='smr';
+    return `<div class="card${(v.wide||v.tall)?' wide':''}"><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
+  }).join('');
+  vs.filter(v=>!v.kind||v.kind==='smr').forEach(v=>{const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);});
+  grid.querySelectorAll('button[data-t2]').forEach(b=>b.onclick=()=>{const v=VIEWS.find(x=>x.id===b.dataset.t2);const tb=document.getElementById('tb-'+v.id);const show=tb.classList.contains('hidden');tb.innerHTML=show?tableHTML(v,v._spec):'';tb.classList.toggle('hidden',!show);b.textContent=show?t('hide'):t('show');});
+}
+function apply(l){
+  lang=T[l]?l:'en';
+  document.documentElement.lang=lang;
+  document.title=T[lang].brand+' – '+{fi:'Keuhkodata',sv:'Lungdata',en:'Lung data'}[lang];
+  document.querySelectorAll('[data-t]').forEach(e=>{const k=e.getAttribute('data-t');if(T[lang][k]!=null)e.textContent=T[lang][k];});
+  document.querySelectorAll('[data-m]').forEach(a=>a.textContent=MT[lang][a.getAttribute('data-m')]);
+  document.getElementById('menuBtn').setAttribute('aria-label',MT[lang].menu);
+  document.getElementById('sources').innerHTML=SOURCES[lang];
+  try{localStorage.setItem('vayla-lang',lang)}catch(e){}
+  buildPicker(); render();
+}
+document.querySelectorAll('.ptabs .tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ptabs .tab').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});document.getElementById('tab-dash').classList.toggle('hidden',b.dataset.tab!=='dash');document.getElementById('tab-src').classList.toggle('hidden',b.dataset.tab!=='src');});
+document.addEventListener('click',ev=>{const d=document.querySelector('details.menu');if(d&&d.open&&!d.contains(ev.target))d.open=false;});
+const sel=document.getElementById('lang'); let start='';
+try{start=localStorage.getItem('vayla-lang')||''}catch(e){}
+if(!start) start=(navigator.language||'fi').slice(0,2);
+if(!T[start]) start='en';
+sel.value=start; apply(start);
+sel.addEventListener('change',()=>apply(sel.value));
+</script>
+</body>
+</html>
