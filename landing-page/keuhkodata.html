@@ -660,6 +660,7 @@ function buildNav(pg){
   const sn=document.getElementById('subnav'),many=pg.subs&&pg.subs.length>1;
   sn.classList.toggle('hidden',!many);
   sn.innerHTML=many?pg.subs.map(x=>`<button role="tab" class="st${x.id===cur.s?' on':''}" aria-selected="${x.id===cur.s}" data-sub="${x.id}">${L(x.t)}</button>`).join(''):'';
+  {const mn=document.getElementById('mainnav'),on=mn.querySelector('.mt.on');if(on)mn.scrollLeft=on.offsetLeft-mn.offsetLeft-16;}
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
   sn.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{cur.s=b.dataset.sub;render();});
 }
