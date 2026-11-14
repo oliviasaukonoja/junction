@@ -21,7 +21,21 @@ lens=new Lens($('lens'));
 voice.setMuted(!!S.muted);
 
 // ---------------------------------------------------------------- screens
-function show(id){for(const s of ['home','picker','setup','session'])$(s).hidden=s!==id;window.scrollTo(0,0);}
+let screen='home';
+function show(id){
+  for(const s of ['home','picker','setup','session'])$(s).hidden=s!==id;window.scrollTo(0,0);
+  if(id!==screen&&id!=='home')history.pushState({s:id},'');screen=id;
+  $('backBtn').hidden=id==='picker'&&!Object.keys(S.progress).length;
+}
+// Back: session → stop the round; setup → picker; picker → home.
+function goBack(){
+  if(screen==='home'){renderPicker();return;}
+  if(screen==='session'){if(round)stopRound(true);else renderHome();return;}
+  if(screen==='setup'){renderPicker();return;}
+  if(!P()){S.current=Object.keys(S.progress)[0]||null;save();}
+  if(S.current&&P())renderHome();
+}
+window.addEventListener('popstate',()=>{if(screen!=='home')goBack();});
 function notice(t){$('notice').textContent=t||'';$('notice').hidden=!t;}
 
 function renderHome(){
@@ -402,6 +416,8 @@ window.StepCloserCallbacks={event(e){
     case 'armed':if(e.token===token)armed=true;break;
     case 'frameResult':delivery.acknowledge(e,performance.now());break;
     case 'message':notice(e.message);break;
+    case 'interruption':lensReady=false;armed=false;notice(e.message||'Glasses connection interrupted.');if(round)stopRound(true);break;
+    case 'registration':notice('Meta registration: '+e.state);break;
     case 'speech':voice.heard(e.text);break;
     case 'speechPartial':voice.partial(e.text);break;
     case 'speechState':voice.nativeState(e.state);if(e.state==='NEEDS_PERMISSION')native?.enableVoice?.();break;
@@ -412,7 +428,7 @@ function loop(now){
   if(round||lens.visible){
     const r=round,t=r?.started?(performance.now()-r.started)/1000:now/1000;
     if(scene?.visible)scene.render(t,(lens.s.source&&scene.plan?.speed)||1);
-    lens.render(now/1000);
+    lens.render(now/1000);simFrame(now);
     if(S.out==='display'&&native&&armed&&lens.visible){
       const q=delivery.begin(now);
       if(q){const ok=native.submitFrame(lens.capture(delivery.options.size,delivery.options.quality),q.token,q.sequence,q.capturedAtMs);if(ok!==true)delivery.rejected(q.sequence);}
@@ -421,13 +437,35 @@ function loop(now){
   }
   requestAnimationFrame(loop);
 }
+// ---------------------------------------------------------------- glasses simulator
+// Meta's Mock Device Kit doesn't simulate display glasses, so we simulate here: the exact
+// JPEG the phone sends to the glasses (same size/quality as FrameDelivery), drawn over your
+// webcam with additive "screen" blending, like the waveguide (black = see-through).
+let sim=false,simStream=null,simLast=0;
+async function setSim(on){
+  sim=on;$('stage').classList.toggle('sim',on);$('simFrame').hidden=!on;$('lens').style.opacity=on?0:1;
+  $('simBtn').textContent=on?'👓 Simulating glasses':'👓 Simulate glasses';
+  $('stageTag').textContent=on?'Simulated lens · '+delivery.options.size+'px JPEG over your camera':'What your glasses show';
+  if(on&&!simStream){try{simStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});$('room').srcObject=simStream;$('room').hidden=false;}
+    catch{notice('No camera: showing the lens on black. Black is see-through on the glasses.');}}
+  if(!on&&simStream){simStream.getTracks().forEach(t=>t.stop());simStream=null;$('room').hidden=true;}
+  try{localStorage.setItem('calmsight-sim',on?'1':'');}catch{}
+}
+$('simBtn').onclick=()=>setSim(!sim);
+function simFrame(now){
+  if(!sim||now-simLast<1000/delivery.options.fps)return;simLast=now;
+  $('simFrame').src='data:image/jpeg;base64,'+lens.capture(delivery.options.size,delivery.options.quality);
+}
+try{if(localStorage.getItem('calmsight-sim'))setSim(true);}catch{}
 // ---------------------------------------------------------------- wiring
 $('focusSwitch').onclick=renderPicker;
+$('backBtn').onclick=goBack;
 $('startStep').onclick=()=>startRound(P().step);
 $('realBtn').onclick=()=>startRound(realStepIndex(S.current));
 $('nameInput').onchange=()=>{S.name=$('nameInput').value.trim();save();choosePhobia(S.current);};
 $('muteInput').onchange=()=>{S.muted=$('muteInput').checked;save();voice.setMuted(S.muted);};
 $('outPhone').onclick=()=>{S.out='phone';save();renderHome();};
+$('registerBtn').onclick=()=>{if(native)native.register();else notice('Registration happens in the Android app on the phone paired with the glasses.');};
 $('outGlasses').onclick=()=>{S.out='display';save();renderHome();};
 $('resetPhobia').onclick=()=>renderSetup(S.current);
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&round)stopRound(true);});

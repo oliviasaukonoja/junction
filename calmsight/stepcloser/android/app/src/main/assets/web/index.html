@@ -2,8 +2,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self' blob: https://*.modal.run; connect-src https://*.modal.run; object-src 'none'; base-uri 'none'">
 <meta name="theme-color" content="#0d1f1c"><title>Calmsight · phobia coach</title>
-<link rel="stylesheet" href="styles.css"><script type="module" src="app.mjs"></script></head><body>
+<link rel="stylesheet" href="styles.css"><script type="module" src="app.mjs?v=4"></script></head><body>
 <header class="top">
+  <button id="backBtn" class="chip back" hidden aria-label="Back">←</button>
   <div class="brand"><span class="logo">◐</span><div><strong>Calmsight</strong><small>Your phobia coach</small></div></div>
   <button id="micBtn" class="chip mic" aria-pressed="false">🎙 <span id="micLabel">Talk</span></button>
 </header>
@@ -52,6 +53,7 @@
     <label class="field">Your first name<input id="nameInput" maxlength="30" placeholder="Optional"></label>
     <div class="seg"><button id="outPhone">Phone preview</button><button id="outGlasses">Meta Display glasses</button></div>
     <p id="glassesState" class="muted"></p>
+    <button id="registerBtn" class="secondary">Register with Meta AI (first time only)</button>
     <label class="check"><input id="muteInput" type="checkbox"> Mute the coach’s voice</label>
     <button id="resetPhobia" class="quiet">Restart this ladder</button>
   </details>
@@ -86,7 +88,7 @@
 <!-- SESSION -->
 <main id="session" class="screen" hidden>
   <div class="session-head"><span id="sessEyebrow" class="eyebrow">STEP 3 · PREDICT</span><span id="sessTimer" class="timer"></span></div>
-  <div class="stage"><canvas id="lens" width="600" height="600" aria-label="What your glasses show"></canvas><span class="stage-tag">What your glasses show</span></div>
+  <div id="stage" class="stage"><video id="room" autoplay muted playsinline hidden></video><canvas id="lens" width="600" height="600" aria-label="What your glasses show"></canvas><img id="simFrame" alt="Simulated glasses frame" hidden><span id="stageTag" class="stage-tag">What your glasses show</span><button id="simBtn" class="chip sim-btn">👓 Simulate glasses</button></div>
   <canvas id="scene" width="600" height="600" hidden></canvas>
   <div class="phases" id="phases"><span data-p="predict">Predict</span><span data-p="expose">Face it</span><span data-p="check">Check</span></div>
   <section class="ask">
