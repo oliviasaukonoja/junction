@@ -388,7 +388,8 @@ function boundsOf(k){const r=routeOf(k);const pts=[];if(r)r.legs.forEach(l=>l.co
   if(k!=='custom')munis(k).forEach(m=>pts.push([m.lat,m.lon]));return pts.length?L.latLngBounds(pts):null}
 function select(k,o={}){
   sel=k;
-  try{const u=new URL(location.href);if(k&&D.meta.priority.includes(k))u.searchParams.set('county',k);else u.searchParams.delete('county');history.replaceState(null,'',u)}catch(e){}   // shareable link; Back still leaves the pagedrawStatic();const keys=[...D.meta.priority,...(CUSTOM?['custom']:[])];
+  try{const u=new URL(location.href);if(k&&D.meta.priority.includes(k))u.searchParams.set('county',k);else u.searchParams.delete('county');history.replaceState(null,'',u)}catch(e){}   // shareable link; Back still leaves the page
+  drawStatic();const keys=[...D.meta.priority,...(CUSTOM?['custom']:[])];
   keys.forEach(x=>{if(x!==k)drawRoute(x)});
   if(k===null){map.flyToBounds(FIN,{duration:.7});animate(keys)}
   else{const b=boundsOf(k);if(b&&!o.keepView)map.flyToBounds(b,{padding:[30,30],maxZoom:9,duration:.7});animate([k])}
