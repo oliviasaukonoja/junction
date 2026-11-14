@@ -175,6 +175,10 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .reco-card .rc{background:#fff;color:var(--ink);border:0}
 .reco-card .tag{background:#fff}
 .chartbox.tall{height:520px}
+
+@media(max-width:780px){.hl{display:grid;grid-template-columns:auto 1fr;column-gap:14px;align-items:center;padding:14px 16px}.hl .v{font-size:30px;grid-row:span 2}.hl .l{margin:0;font-size:14px}.hl .s{margin-top:4px}.headline{gap:10px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.seg button{padding:8px 6px!important;font-size:13px!important}
+.myarea{width:100%}.myarea select{flex:1}.hero h1{font-size:25px}.hero{padding-top:20px}}
 </style>
 </head>
 <body>
@@ -238,6 +242,8 @@ const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
 const fmt = v => v==null ? '–' : (typeof v==='number' ? v.toLocaleString(LOC[lang]) : v);
 const L = o => (o && typeof o==='object' && !Array.isArray(o)) ? (o[lang] ?? o.fi) : o;
 const nm = c => D.names[c][lang];
+const NOM={fi:{HVA01:'Itä-Uusimaa',HVA02:'Keski-Uusimaa',HVA03:'Länsi-Uusimaa',HVA04:'Vantaa–Kerava',HVA05:'Varsinais-Suomi',HVA06:'Satakunta',HVA07:'Kanta-Häme',HVA08:'Pirkanmaa',HVA09:'Päijät-Häme',HVA10:'Kymenlaakso',HVA11:'Etelä-Karjala',HVA12:'Etelä-Savo',HVA13:'Pohjois-Savo',HVA14:'Pohjois-Karjala',HVA15:'Keski-Suomi',HVA16:'Etelä-Pohjanmaa',HVA17:'Pohjanmaa',HVA18:'Keski-Pohjanmaa',HVA19:'Pohjois-Pohjanmaa',HVA20:'Kainuu',HVA21:'Lappi',HVA90:'Helsinki',HVA91:'Ahvenanmaa'},sv:{HVA01:'Östra Nyland',HVA02:'Mellersta Nyland',HVA03:'Västra Nyland',HVA04:'Vanda och Kervo',HVA05:'Egentliga Finland',HVA06:'Satakunta',HVA07:'Egentliga Tavastland',HVA08:'Birkaland',HVA09:'Päijänne-Tavastland',HVA10:'Kymmenedalen',HVA11:'Södra Karelen',HVA12:'Södra Savolax',HVA13:'Norra Savolax',HVA14:'Norra Karelen',HVA15:'Mellersta Finland',HVA16:'Södra Österbotten',HVA17:'Österbotten',HVA18:'Mellersta Österbotten',HVA19:'Norra Österbotten',HVA20:'Kajanaland',HVA21:'Lappland',HVA90:'Helsingfors',HVA91:'Åland'}};
+const nmN = c => (NOM[lang]&&NOM[lang][c])||nm(c);
 const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
 
 const T = {
@@ -315,7 +321,7 @@ const VIEWS = [
  {id:'region', g:'mort', tag:'S', src:['st13u5'], tall:true,
   title:{fi:'Karkea kuolleisuus hyvinvointialueittain',sv:'Rå dödlighet per välfärdsområde',en:'Crude mortality by wellbeing services county'},
   sub:{fi:'Ikävakioimaton kuolleisuus / 100 000 asukasta, keskiarvo 2021–2025 (C32–C34)',sv:'Ej åldersstandardiserad dödlighet / 100 000 invånare, medeltal 2021–2025 (C32–C34)',en:'Crude mortality / 100,000 population, mean 2021–2025 (C32–C34)'},
-  chart:()=>bar(D.region.map(r=>nm(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,codes:D.region.map(r=>r[0]),ref:D.region_fi,refLabel:t('national')}),
+  chart:()=>bar(D.region.map(r=>nmN(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,codes:D.region.map(r=>r[0]),ref:D.region_fi,refLabel:t('national')}),
   note:{fi:'Luku ei ole ikävakioitu. Reiluun vertailuun käytä SMR-näkymää.',sv:'Talet är inte åldersstandardiserat. Använd SMR-vyn för en rättvis jämförelse.',en:'Not age-standardised. Use the SMR view for a fair comparison.'}},
  {id:'delay', g:'delay', tag:'N', src:['mot'],
   title:{fi:'Viive oireista hoidon alkuun',sv:'Fördröjning från symtom till behandlingsstart',en:'Delay from symptoms to start of treatment'},
@@ -330,7 +336,7 @@ const VIEWS = [
  {id:'risk', g:'risk', tag:'A', src:['risk'], tall:true,
   title:{fi:'Arvioitu riskiryhmä hyvinvointialueittain',sv:'Uppskattad riskgrupp per välfärdsområde',en:'Estimated high-risk group by wellbeing services county'},
   sub:{fi:'% 50–74-vuotiaista: ≥20 askivuotta, tupakoi tai lopetti alle 15 v sitten. Henkilömäärät taulukossa',sv:'% av 50–74-åringar: ≥20 paketår, röker eller slutade för under 15 år sedan. Antal personer i tabellen',en:'% of 50–74-year-olds: ≥20 pack-years, current smoker or quit within 15 years. Headcounts in the table'},
-  chart:()=>{const rs=D.risk.slice().sort((a,b)=>b[1]/b[2]-a[1]/a[2]);return bar(rs.map(r=>nm(r[0])),[{label:{fi:'Riskiryhmän osuus 50–74-vuotiaista',sv:'Riskgruppens andel av 50–74-åringar',en:'Risk group share of 50–74-year-olds'}[lang],data:rs.map(r=>Math.round(r[1]/r[2]*1000)/10),c:'--bar'}],'%',{horizontal:true,codes:rs.map(r=>r[0]),riskTable:true});},
+  chart:()=>{const rs=D.risk.slice().sort((a,b)=>b[1]/b[2]-a[1]/a[2]);return bar(rs.map(r=>nmN(r[0])),[{label:{fi:'Riskiryhmän osuus 50–74-vuotiaista',sv:'Riskgruppens andel av 50–74-åringar',en:'Risk group share of 50–74-year-olds'}[lang],data:rs.map(r=>Math.round(r[1]/r[2]*1000)/10),c:'--bar'}],'%',{horizontal:true,codes:rs.map(r=>r[0]),riskTable:true});},
   note:{fi:`Koko maassa noin ${fmt(D.risk_nat)} henkilöä (7 % 50–74-vuotiaista). Arvio = alueen tupakointiosuus × oletettu kerroin 0,8 (vaihteluväli 0,55–1,1), koska suomalaista askivuosidataa ei löytynyt. Taulukossa myös CT-paikkakunnat (tiimin selvittämä lista, ei virallinen rekisteri).`,sv:`I hela landet cirka ${fmt(D.risk_nat)} personer (7 % av 50–74-åringarna). Uppskattning = områdets rökningsandel × antagen faktor 0,8 (intervall 0,55–1,1), eftersom finländska paketårsdata inte hittades. Tabellen visar också orter med CT (teamets egen lista, inget officiellt register).`,en:`About ${fmt(D.risk_nat)} people nationally (7% of those aged 50–74). Estimate = the area's smoking rate × an assumed factor of 0.8 (range 0.55–1.1), because no Finnish pack-year data was found. The table also lists CT towns (the team's researched list, not an official register).`}},
  {id:'smokeedu', g:'risk', tag:'S', src:['sotk'],
   title:{fi:'Päivittäin tupakoivat koulutusasteittain',sv:'Dagligrökare per utbildningsnivå',en:'Daily smokers by education'},
@@ -340,7 +346,7 @@ const VIEWS = [
  {id:'smokereg', g:'risk', tag:'S', src:['sotk4404'], tall:true,
   title:{fi:'Päivittäin tupakoivat hyvinvointialueittain 2024',sv:'Dagligrökare per välfärdsområde 2024',en:'Daily smokers by wellbeing services county, 2024'},
   sub:{fi:'% väestöstä',sv:'% av befolkningen',en:'% of population'},
-  chart:()=>bar(D.smoke_reg.map(r=>nm(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,codes:D.smoke_reg.map(r=>r[0]),ref:D.smoke_fi,refLabel:t('national')})},
+  chart:()=>bar(D.smoke_reg.map(r=>nmN(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,codes:D.smoke_reg.map(r=>r[0]),ref:D.smoke_fi,refLabel:t('national')})},
  {id:'edu', g:'eq', tag:'S', src:['ohj'],
   title:{fi:'Koulutus, ilmaantuvuus ja kuolleisuus',sv:'Utbildning, incidens och dödlighet',en:'Education, incidence and mortality'},
   sub:{fi:'Tapauksia / 100 000, 2018–2022, perusaste vs. korkea-aste',sv:'Fall / 100 000, 2018–2022, grundnivå vs. högre nivå',en:'Cases / 100,000, 2018–2022, basic vs. higher education'},
@@ -366,7 +372,7 @@ const VIEWS = [
  {id:'scrcounty', g:'scr', tag:'S', src:['scr'], tall:true,
   title:{fi:'Seulontaan osallistuminen hyvinvointialueittain',sv:'Deltagande i screening per välfärdsområde',en:'Screening participation by wellbeing services county'},
   sub:{fi:'% kutsutuista, 2024. Katkoviiva = tavoite 80 %',sv:'% av de inbjudna, 2024. Streckad linje = mål 80 %',en:'% of those invited, 2024. Dashed line = 80% target'},
-  chart:()=>bar(D.scr_county.map(r=>nm(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,codes:D.scr_county.map(r=>r[0]),ref:80,refLabel:t('target'),xmin:50}),
+  chart:()=>bar(D.scr_county.map(r=>nmN(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,codes:D.scr_county.map(r=>r[0]),ref:80,refLabel:t('target'),xmin:50}),
   note:{fi:'Matalimmat osallistumisasteet ovat pääkaupunkiseudulla (Helsinki, Vantaa–Kerava, Länsi-Uusimaa). Ero seuraa kieltä, koulutusta ja suurkaupunkia enemmän kuin syrjäisyyttä.',sv:'Det lägsta deltagandet finns i huvudstadsregionen (Helsingfors, Vanda–Kervo, Västra Nyland). Skillnaden följer språk, utbildning och storstad mer än avlägsenhet.',en:'Participation is lowest in the capital region (Helsinki, Vantaa–Kerava, West Uusimaa). The gap follows language, education and metropolitan areas more than remoteness.'}},
  {id:'nordsurv', g:'intl', tag:'N', src:['ihe'],
   title:{fi:'Keuhkosyövän elossaolo Pohjoismaissa',sv:'Lungcanceröverlevnad i Norden',en:'Lung cancer survival in the Nordics'},
@@ -492,7 +498,7 @@ const refLine={id:'refLine',afterDatasetsDraw(c){const cfg=c.config.options.plug
 function smrSpec(){
   const col=r=>r[2]>1?css('--hi'):(r[3]<1?css('--lo'):css('--mid'));
   return {type:'bar',unit:'',horizontal:true,codes:D.smr.map(r=>r[0]),ref:1,refLabel:t('natlevel'),smrTable:true,xmin:0.6,xmax:1.5,
-    data:{labels:D.smr.map(r=>nm(r[0])),datasets:[
+    data:{labels:D.smr.map(r=>nmN(r[0])),datasets:[
       {type:'bar',label:t('ci'),data:D.smr.map(r=>[r[2],r[3]]),backgroundColor:D.smr.map(col),barThickness:3,borderRadius:2,order:2},
       {type:'line',label:'SMR',data:D.smr.map(r=>r[1]),showLine:false,pointRadius:6,pointHoverRadius:8,pointBackgroundColor:D.smr.map(col),pointBorderColor:'#fff',pointBorderWidth:2,order:1}]}};
 }
@@ -529,9 +535,9 @@ function makeChart(canvas,spec){
   }});
 }
 function tableHTML(v,spec){
-  if(v.kind==='smr') return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th><th>SMR</th><th>95 %</th><th>${t('deaths')}</th><th>${t('expected')}</th></tr></thead><tbody>${D.smr.map(r=>`<tr><td>${nm(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}–${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${fmt(r[5])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(v.kind==='smr') return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th><th>SMR</th><th>95 %</th><th>${t('deaths')}</th><th>${t('expected')}</th></tr></thead><tbody>${D.smr.map(r=>`<tr><td>${nmN(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}–${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${fmt(r[5])}</td></tr>`).join('')}</tbody></table></div>`;
   if(v.id==='risk'){const h={fi:['Riskiryhmä','50–74-v.','Tupakoi 20–64 v %','CT-paikkakunnat'],sv:['Riskgrupp','50–74 år','Röker 20–64 år %','Orter med CT'],en:['Risk group','Aged 50–74','Smoking 20–64 %','CT towns']}[lang];
-    return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${D.risk.map(r=>`<tr><td>${nm(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td>${fmt(r[4])}</td><td style="text-align:start">${r[6].join(', ')||'–'}</td></tr>`).join('')}</tbody></table></div>`;}
+    return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${D.risk.map(r=>`<tr><td>${nmN(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td>${fmt(r[4])}</td><td style="text-align:start">${r[6].join(', ')||'–'}</td></tr>`).join('')}</tbody></table></div>`;}
   const ds=spec.data.datasets;
   return `<div class="tablewrap"><table><thead><tr><th></th>${ds.map(d=>`<th>${d.label}</th>`).join('')}</tr></thead><tbody>${spec.data.labels.map((l,i)=>`<tr><td>${l}</td>${ds.map(d=>`<td>${fmt(d.data[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
@@ -542,7 +548,7 @@ function body(v){
     const ST={true:['gap',{fi:'Ero syntyy tässä',sv:'Skillnaden uppstår här',en:'The gap forms here'}],false:['ok',{fi:'Pääosin ajallaan',sv:'Mestadels i tid',en:'Mostly on time'}],null:['na',{fi:'Ei dataa',sv:'Inga data',en:'No data'}]};
     return `<ol class="steps">${PATH.map((p,i)=>{const st=ST[p.gap];return `<li class="step ${st[0]}"><div class="sh"><span class="sn">${i+1}</span><span class="stl">${L(st[1])}</span></div><h3>${L(p.st)}</h3>${p.items.map(it=>`<div class="si"><div class="sv">${(()=>{const f=pc(L(it.f)),k=f.indexOf(" (");return k<0?f:f.slice(0,k)+`<small>${f.slice(k)}</small>`})()}${tagHTML(it.tag)}</div><div class="sm">${L(it.m)}</div><div class="sc">${L(it.c)}</div></div>`).join('')}</li>`}).join('')}</ol>`;}
   if(v.kind==='reco'){
-    const hi=D.smr.filter(r=>r[2]>1).map(r=>nm(r[0])).join(', ');
+    const hi=D.smr.filter(r=>r[2]>1).map(r=>nmN(r[0])).join(', ');
     const R={
      fi:[['Seulontabussi','Kohdista alueille, joilla keuhkosyöpäkuolleisuus on merkitsevästi maan tason yläpuolella: '+hi+'. Kohderyhmä: 50–74-vuotiaat tupakoivat ja tupakoineet.','Ida: bussi ei ole halvempi kuin sairaalan TT, ja seulontaerot seuraavat kieltä ja koulutusta enemmän kuin etäisyyttä. Siksi pilotti satunnaistettuna.'],
          ['Potilassovellus','Näkyvä hoitopolku, tekoälykäännökset ja selkokieli. Kohdistuu vaiheeseen, jossa ero syntyy: oireista ensikäyntiin (potilasviive yli 50 päivää) ja perusterveydenhuolto.','Kieli- ja koulutuserot osallistumisessa viittaavat viestinnän esteisiin, joihin käännökset vastaavat.'],
@@ -586,8 +592,8 @@ function MSG(v){
 }
 function buildArea(){
   const el=document.getElementById('area');
-  const codes=Object.keys(D.names).sort((a,b)=>nm(a).localeCompare(nm(b),LOC[lang]));
-  el.innerHTML=`<option value="">${t('area_none')}</option>`+codes.map(c=>`<option value="${c}"${c===myArea?' selected':''}>${nm(c)}</option>`).join('');
+  const codes=Object.keys(D.names).sort((a,b)=>nmN(a).localeCompare(nmN(b),LOC[lang]));
+  el.innerHTML=`<option value="">${t('area_none')}</option>`+codes.map(c=>`<option value="${c}"${c===myArea?' selected':''}>${nmN(c)}</option>`).join('');
   el.onchange=()=>{myArea=el.value;try{localStorage.setItem('keuhkodata-area',myArea)}catch(e){}render();};
 }
 const REGNAME=c=>c==='HVA90'?'Helsingin kaupunki':(D.names[c]&&c!=='HVA91'?D.names[c].fi+' hyvinvointialue':null);
@@ -621,7 +627,7 @@ function snapHTML(){
   if(K) li.push(`${lab[2]}: <b>${f1(K[1])} %</b> (${t('national')}: ${f1(D.smoke_fi)} %)`);
   if(C) li.push(`${lab[3]}: <b>${[C[1],C[2],C[3]].map(x=>x==null?'–':f1(x)+' %').join(' / ')}</b>`);
   if(R) li.push(`${lab[4]}: ${R[6].join(', ')||'–'}`);
-  box.innerHTML=`<b>${nm(c)}</b><ul>${li.map(x=>`<li>${lang==='en'?x.replace(/ %/g,'%'):x}</li>`).join('')}</ul>`;
+  box.innerHTML=`<b>${nmN(c)}</b><ul>${li.map(x=>`<li>${lang==='en'?x.replace(/ %/g,'%'):x}</li>`).join('')}</ul>`;
   box.classList.remove('hidden');
 }
 function headline(){
