@@ -5,104 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Polku hoitoon – tietosuojaseloste</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/site.css" rel="stylesheet">
 <style>
-:root{--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange:#D9730D;--orange-bg:#FFF3E6;--orange-ink:#8A3B00}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:17px}
-a{color:var(--blue)}a:hover{color:var(--blue-d)}
-h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
-.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
-.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
-.btn:hover{background:var(--blue-d);color:#fff}
-.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
-.hero{background:var(--bg);padding:56px 0 48px}
-.hero-g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
-.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:16px}
-.hero h1{font-size:clamp(34px,5vw,54px)}
-.lead{font-size:19px;color:var(--muted);margin:18px 0 26px;max-width:36em}
-.bus{width:100%;height:auto}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:-28px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(20,33,61,.05)}
-.faq{border-bottom:1px solid var(--line);padding:14px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq p{margin:8px 0 0;color:var(--muted)}
-.stat-cap{grid-column:1/-1;justify-self:start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--muted)}
-.stat b{display:block;font-family:"Space Grotesk",sans-serif;font-size:34px;color:var(--blue-d)}
-.stat span{font-size:15px;color:var(--muted)}
-section{padding:56px 0}
-.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
-.list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
-.list li{display:flex;gap:12px;align-items:flex-start}
-.dot{flex:none;width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:9px}
-.uk{background:var(--ink);color:#fff}
-.uk h2{color:#fff}
-.uk p{color:#DCE3F0}
-.uk .src{font-size:14px;color:#AAB6CC}
-.uk a{color:#9EC1FF}
-.warn{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:18px;padding:22px 24px;color:var(--orange-ink)}
-.warn h3{color:var(--orange-ink);font-size:22px;margin-bottom:6px}
-form{display:flex;flex-direction:column;gap:16px}
-label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
-input[type=text],input[type=tel]{width:100%;font:inherit;min-height:48px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)}
-input:focus,select:focus,.btn:focus,.opt:focus-within{outline:3px solid #9EC1FF;outline-offset:2px}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;font-weight:500;cursor:pointer}
-.opt input{width:18px;height:18px;accent-color:var(--blue)}
-.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:15px}
-.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}
-.msg{padding:14px 16px;border-radius:12px;font-size:16px}
-.msg.ok{background:var(--sky);color:var(--blue-d)}
-.msg.err{background:#FDECEC;color:#9B1C1C}
-.msg.demo{background:var(--orange-bg);color:var(--orange-ink)}
-.team{background:var(--bg)}
-table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
-footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
-footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;color:var(--ink)}
-.hidden{display:none}
-[dir=rtl] .list li,[dir=rtl] .consent{flex-direction:row}
-@media (max-width:780px){.hero-g,.g2{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr);margin-top:20px}.hero{padding:36px 0}.bus{max-width:360px}}
-.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
-@media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
-@media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
-.doc{max-width:760px;padding:40px 0 64px}
-.doc h1{font-size:40px;margin-bottom:6px}.doc h2{font-size:22px;margin:28px 0 8px}
-.doc p,.doc li{color:var(--ink)}.doc .upd{color:var(--muted);font-size:15px;margin:0 0 8px}
-.doc ul{padding-inline-start:20px}
+/* /tietosuoja: page styles on top of /site.css */
 article{display:none}article.on{display:block}
-.menu{position:relative}.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}.menu summary::-webkit-details-marker{display:none}
-.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column;z-index:20}
-.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:16px}.menu-p a:hover{background:var(--bg)}
-/* spacing v2 */
-body{line-height:1.6}
-.wrap{padding:0 24px}
-header .bar{padding:12px 24px;gap:16px;min-height:72px}
-.bar-r{gap:12px}
-section{padding:80px 0}
-.hero{padding:72px 0 64px}
-.lead{margin:20px 0 30px}
-.g2{gap:48px}
-.card{padding:28px}
-form{gap:20px}
-.stats{gap:20px}
-.list{gap:14px;margin-top:20px}
-.faq{padding:18px 0}
-footer{padding:40px 0 56px}
-main.doc{padding:56px 24px 72px}
-@media (max-width:780px){.wrap{padding:0 20px}header .bar{padding:12px 20px;gap:12px}.bar-r{display:contents}.logo{order:1;flex:1;font-size:22px}header select{order:2;padding:0 8px;font-size:14px}.menu{order:3}.tabs{order:4;width:100%}header .btn.sm{display:none}section{padding:56px 0}.hero{padding:40px 0 44px}.g2{gap:32px}main.doc{padding:36px 20px 56px}}
+.doc{max-width:68ch;padding:var(--s8) 0 var(--s10)}
+.doc h2{font-size:21px;line-height:1.3;margin:var(--s6) 0 var(--s1)}
+.doc h2:first-child{margin-top:0}
+.doc p,.doc li{color:var(--ink)}
+.doc p{margin:0 0 var(--s2)}
+.doc b{font-weight:600}
+.doc ul{margin:0 0 var(--s2);padding-inline-start:20px;display:grid;gap:var(--s1)}
+.doc li::marker{color:var(--sec)}
+@media (max-width:640px){.doc{padding:var(--s5) 0 var(--s8)}.doc h2{font-size:19px;margin-top:var(--s5)}}
 </style>
 </head>
 <body data-languages="fi,sv,en">
 <div id="site-header"></div><script src="/layout.js"></script>
-<main class="wrap doc">
+<main id="top">
 <article data-lang="fi">
-<h1>Tietosuojaseloste</h1>
-<p class="upd">Polku hoitoon -jonotuslista ja palaute · päivitetty 14.11.2026</p>
+<section class="band short"><div class="wrap"><h1>Tietosuojaseloste</h1><p class="upd note-line">Polku hoitoon -jonotuslista ja palaute · päivitetty 14.11.2026</p></div></section>
+<div class="wrap"><div class="doc">
 <h2>1. Kuka tietoja käsittelee</h2>
 <p>Rekisterinpitäjä on Polku Labs, Junction 2026 -hackathonissa toimiva opiskelijatiimi. Yhteydenotot ja tietopyynnöt: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
 <p>Polku hoitoon ei ole vielä oikea terveyspalvelu, vaan konsepti, jonka kiinnostusta mittaamme.</p>
@@ -130,10 +53,11 @@ main.doc{padding:56px 24px 72px}
 <p>Sinulla on oikeus tarkastaa tietosi, korjata ne, pyytää niiden poistamista, perua suostumuksesi ja saada tietosi siirrettävässä muodossa. Lähetä pyyntö osoitteeseen <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. Voit myös tehdä valituksen Tietosuojavaltuutetun toimistolle (<a href="https://tietosuoja.fi">tietosuoja.fi</a>).</p>
 <h2>9. Evästeet</h2>
 <p>Sivusto ei käytä evästeitä, mainosseurantaa eikä analytiikkatyökaluja. Valitsemasi kieli tallennetaan vain omaan selaimeesi.</p>
+</div></div>
 </article>
 <article data-lang="sv">
-<h1>Dataskyddsbeskrivning</h1>
-<p class="upd">Polku hoitoons väntelista och respons · uppdaterad 14.11.2026</p>
+<section class="band short"><div class="wrap"><h1>Dataskyddsbeskrivning</h1><p class="upd note-line">Polku hoitoons väntelista och respons · uppdaterad 14.11.2026</p></div></section>
+<div class="wrap"><div class="doc">
 <h2>1. Vem behandlar uppgifterna</h2>
 <p>Personuppgiftsansvarig är Polku Labs, ett studentteam vid hackathonet Junction 2026. Kontakt och begäranden: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
 <p>Polku hoitoon är ännu ingen riktig hälsotjänst utan ett koncept vars intresse vi mäter.</p>
@@ -161,10 +85,11 @@ main.doc{padding:56px 24px 72px}
 <p>Du har rätt att få tillgång till dina uppgifter, rätta dem, begära radering, återkalla ditt samtycke och få dina uppgifter i överförbart format. Skicka begäran till <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. Du kan också lämna klagomål till Dataombudsmannens byrå (<a href="https://tietosuoja.fi/sv">tietosuoja.fi</a>).</p>
 <h2>9. Kakor</h2>
 <p>Webbplatsen använder inga kakor, ingen annonsspårning och inga analysverktyg. Språket du väljer sparas bara i din egen webbläsare.</p>
+</div></div>
 </article>
 <article data-lang="en">
-<h1>Privacy notice</h1>
-<p class="upd">Polku hoitoon waitlist and feedback · updated 14 November 2026</p>
+<section class="band short"><div class="wrap"><h1>Privacy notice</h1><p class="upd note-line">Polku hoitoon waitlist and feedback · updated 14 November 2026</p></div></section>
+<div class="wrap"><div class="doc">
 <h2>1. Who processes the data</h2>
 <p>The controller is Polku Labs, a student team at the Junction 2026 hackathon. Contact and data requests: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
 <p>Polku hoitoon is not yet a real health service but a concept whose interest we are measuring.</p>
@@ -192,6 +117,7 @@ main.doc{padding:56px 24px 72px}
 <p>You have the right to access, correct and erase your data, withdraw your consent, and receive your data in a portable format. Send requests to <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. You can also complain to the Office of the Data Protection Ombudsman (<a href="https://tietosuoja.fi/en">tietosuoja.fi</a>).</p>
 <h2>9. Cookies</h2>
 <p>The site uses no cookies, ad tracking or analytics tools. The language you choose is stored only in your own browser.</p>
+</div></div>
 </article>
 
 </main>
