@@ -40,6 +40,8 @@ if modal:
         .add_local_file(HERE / "palaute.html", "/root/palaute.html")
         .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
         .add_local_file(HERE / "layout.js", "/root/layout.js")
+        .add_local_file(HERE / "site.css", "/root/site.css")
+        .add_local_dir(HERE / "assets", "/root/assets")
         .add_local_file(MAP / "kartta.html", "/root/kartta.html")
         .add_local_file(MAP / "pilot_map.json", "/root/pilot_map.json")
         .add_local_file(MAP / "vendor/leaflet.js", "/root/leaflet.js")
@@ -94,6 +96,9 @@ def build_api(src):
     fb_page = src("palaute.html").read_text(encoding="utf-8")
     data_page = src("keuhkodata.html").read_text(encoding="utf-8")
     layout_script = src("layout.js").read_text(encoding="utf-8")
+    site_css = src("site.css").read_bytes()
+    ASSET_TYPES = {".js": "application/javascript", ".json": "application/json", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml"}
+    assets = {f.name: f.read_bytes() for f in src("assets").iterdir() if f.suffix in ASSET_TYPES}
     map_page = src("kartta.html").read_text(encoding="utf-8")
     map_data = src("pilot_map.json").read_bytes()
     leaflet_js = src("leaflet.js").read_bytes()
@@ -122,6 +127,16 @@ def build_api(src):
     def layout():
         return Response(content=layout_script, media_type="application/javascript")
 
+    @api.get("/site.css")
+    def site_css_file():
+        return Response(site_css, media_type="text/css", headers={"Cache-Control": "public, max-age=300"})
+
+    @api.get("/assets/{name}")
+    def asset_file(name: str):   # 3D hero script (bundled three.js), Finland outlines, still fallback image
+        if name not in assets:
+            raise HTTPException(status_code=404)
+        return Response(assets[name], media_type=ASSET_TYPES[Path(name).suffix], headers={"Cache-Control": "public, max-age=3600"})
+
     @api.get("/kartta", response_class=HTMLResponse)
     @api.get("/kartta/", response_class=HTMLResponse)
     @api.get("/map", response_class=HTMLResponse)
@@ -149,7 +164,7 @@ def build_api(src):
         if name not in fonts:
             raise HTTPException(status_code=404)
         kind = "text/css" if name.endswith(".css") else "font/woff2"
-        return Response(fonts[name], media_type=kind, headers={"Cache-Control": "public, max-age=604800"})
+        return Response(fonts[name], media_type=kind, headers={"Cache-Control": "public, max-age=" + ("300" if name.endswith(".css") else "604800")})
 
     @api.get("/sovellus")
     @api.get("/sovellus/")
