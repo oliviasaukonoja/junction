@@ -3,8 +3,9 @@ import {SpiderScene} from './spider.mjs';
 import {PROMPTS} from './prompts.mjs';
 import {guideCue} from './motion.mjs';
 import {FrameDelivery} from './delivery.mjs';
+import {CalmScene} from './calm.mjs';
 const $=id=>document.getElementById(id),native=window.StepCloserNative,practice=new Practice();
-let scene=null,player=null,muted=false,armed=false,startWall=0,guideIndex=0,lastMotionCue='';
+let scene=null,spiderScene=null,calmScene=null,realPlace=null,savedDuration=null,player=null,muted=false,armed=false,startWall=0,guideIndex=0,lastMotionCue='';
 const delivery=new FrameDelivery('auto');
 let pendingStart=null,history=[],saved=false,clearIntent=false;
 const connectionLines=[];
@@ -57,12 +58,12 @@ function update(){
     pendingStart?'Connecting, then starting your chosen spider. STOP cancels.':
     practice.mode==='display'&&!practice.lensReady?'Start connects your registered glasses automatically.':'Tap once to start. No audio check, rehearsal, or review is required.';
   $('practiceSection').hidden=!showing;
-  $('intro').hidden=showing;$('outputSection').hidden=showing;$('planSection').hidden=showing;
+  $('intro').hidden=showing;if($('realLife'))$('realLife').hidden=showing;$('outputSection').hidden=showing;$('planSection').hidden=showing;
   $('optionalSettings').hidden=showing;
   $('renderOptions').hidden=showing;
   $('reflection').hidden=practice.state!=='reflection';
-  $('practiceTitle').textContent=practice.state==='drill'?'Optional STOP test':practice.plan.name;
-  $('practiceEyebrow').textContent=practice.state==='drill'?'NEUTRAL DOT ONLY':practice.spiderCount+' SPIDER'+(practice.spiderCount===1?'':'S')+' · '+practice.motionSpeed+'× SPEED';
+  $('practiceTitle').textContent=practice.state==='drill'?'Optional STOP test':realPlace?realPlace+' · coach is with you':practice.plan.name;
+  $('practiceEyebrow').textContent=practice.state==='drill'?'NEUTRAL DOT ONLY':realPlace?'REAL-LIFE COACH · NOTHING VIRTUAL SHOWN':practice.spiderCount+' SPIDER'+(practice.spiderCount===1?'':'S')+' · '+practice.motionSpeed+'× SPEED';
   $('stageLabel').textContent=practice.mode==='display'?($('matchMirror').checked?'Glasses-paced preview · submitted frames':'Live phone preview · glasses update separately'):'Phone 3D preview';
   $('pause').hidden=practice.state==='drill';
   $('stopStatus').textContent=pendingStart?'Connecting · STOP cancels':showing?'Spider / dot is being shown':'Nothing is being shown on this phone';
@@ -89,7 +90,25 @@ function hide(reason='stopped'){
     $('after').value=String(practice.before);$('afterValue').textContent=String(practice.before);
     say(reason==='completed'?'completed':reason==='paused'?'pause':'stopped');
   }
+  if(realPlace)endReal();
   update();window.scrollTo({top:0,behavior:'smooth'});
+}
+function endReal(){
+  realPlace=null;window.CalmsightMode=null;
+  if(spiderScene)scene=spiderScene;
+  $('scene').hidden=false;$('calmCanvas').hidden=true;
+  if(savedDuration!==null){$('duration').value=savedDuration;savedDuration=null;}
+}
+const PLACES={lift:['Lift','spaces'],space:['Small space','spaces'],injection:['Injection / blood test','needles'],
+  scan:['Before a scan','spaces'],other:['Scary moment','spaces']};
+function startReal(key){
+  if(practice.visible||pendingStart||!calmScene)return;
+  const [label,fear]=PLACES[key]||PLACES.other;
+  realPlace=label;window.CalmsightMode={situation:key+' '+label,fear,label};
+  scene=calmScene;$('scene').hidden=true;$('calmCanvas').hidden=false;
+  savedDuration=$('duration').value;$('duration').value='300';
+  begin(1);
+  if(!practice.visible&&!pendingStart)endReal();
 }
 function interrupted(message){
   pendingStart=null;practice.lensReady=false;
@@ -110,9 +129,9 @@ function startNow(level){
   const token=practice.start();startWall=performance.now();guideIndex=0;lastMotionCue='';
   pendingStart=null;delivery.reset(token);armed=practice.mode==='phone';
   $('frameStats').textContent=practice.mode==='display'?'Waiting for SDK acknowledgement…':'';
-  scene.show(practice.plan);notice('');
+  if(realPlace)calmScene.show(practice.plan,realPlace);else scene.show(practice.plan);notice('');
   if(practice.mode==='display')native.arm(token);else practice.shown(token,performance.now());
-  say('level'+practice.level);update();$('practiceSection').scrollIntoView({behavior:'smooth',block:'start'});
+  if(!realPlace)say('level'+practice.level);update();$('practiceSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function begin(level){
   if(practice.visible||pendingStart)return;
@@ -203,6 +222,12 @@ window.StepCloserCallbacks={event(event){
       }else if(event.status==='CLEAR_UNCONFIRMED'&&practice.mode==='display')notice(event.message);
       update();break;
     case 'interruption':interrupted(event.message);break;
+    case 'speech':window.CalmsightCoach?.heard(event.text);break;
+    case 'speechPartial':window.CalmsightCoach?.partial(event.text);break;
+    case 'speechState':window.CalmsightCoach?.speechState(event.state);break;
+    case 'voiceLaunch':
+      if(!practice.visible&&!pendingStart){if(native&&practice.mode!=='display')setMode('display');startReal('other');}
+      break;
   }
 }};
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();hide('stopped');}});
@@ -211,9 +236,12 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{pendingStart=null;scene?.clear();native?.stop();stopAudio();});
 try{
-  scene=new SpiderScene($('scene'));practice.renderReady=true;
+  scene=spiderScene=new SpiderScene($('scene'));practice.renderReady=true;
   $('scene').addEventListener('webglcontextlost',event=>{event.preventDefault();hide('interrupted');practice.renderReady=false;notice('3D rendering was interrupted. Reopen the app.');update();});
 }catch(error){notice('3D rendering could not start. '+error.message);}
+try{calmScene=new CalmScene($('calmCanvas'));}catch{}
+window.CalmsightLens={update(o){calmScene?.set(o);}};
+for(const b of document.querySelectorAll('[data-place]'))b.onclick=()=>startReal(b.dataset.place);
 function loop(now){
   if(pendingStart&&now-pendingStart.at>47000){pendingStart=null;notice('Connection timed out. See Connection details.');update();}
   if(practice.visible&&scene){
@@ -238,9 +266,9 @@ function loop(now){
     $('motionLabel').textContent=scene.motionLabel(elapsed,practice.motionSpeed);
     if(practice.state==='active'){
       $('timer').textContent=formatTime(practice.remaining(now));
-      const cue=guideCue(elapsed,practice.plan);
+      const cue=realPlace?null:guideCue(elapsed,practice.plan);
       if(cue&&cue.id!==lastMotionCue){lastMotionCue=cue.id;say(cue.key);}
-      else if(!practice.plan.behavior&&guideIndex<3&&elapsed>=[22,45,85][guideIndex])say(['observe','choice','stay'][guideIndex++]);
+      else if(!realPlace&&!practice.plan.behavior&&guideIndex<3&&elapsed>=[22,45,85][guideIndex])say(['observe','choice','stay'][guideIndex++]);
       if(practice.remaining(now)<=0)hide('completed');
     }else{$('timer').textContent='Starting…';if(now-startWall>8000){hide('interrupted');notice('No first frame acknowledgement. See Connection details.');}}
   }

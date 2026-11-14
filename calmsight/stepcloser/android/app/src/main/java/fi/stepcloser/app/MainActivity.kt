@@ -36,6 +36,16 @@ import com.meta.wearable.dat.core.types.Device
 import com.meta.wearable.dat.core.types.DeviceIdentifier
 import com.meta.wearable.dat.core.types.LinkState
 import com.meta.wearable.dat.core.types.RegistrationState
+import com.meta.wearable.dat.core.types.Permission as DatPermission
+import com.meta.wearable.dat.core.types.PermissionStatus as DatPermissionStatus
+import com.meta.wearable.dat.core.voiceinvocations.isVoiceInvocationsIntent
+import com.meta.wearable.dat.core.voiceinvocations.startVoiceInvocationsStream
+import com.meta.wearable.dat.core.voiceinvocations.types.actions.LaunchApp
+import com.meta.wearable.dat.speech.Speech
+import com.meta.wearable.dat.speech.addSpeech
+import com.meta.wearable.dat.speech.removeSpeech
+import com.meta.wearable.dat.speech.types.SpeechState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -72,6 +82,19 @@ class MainActivity : ComponentActivity() {
     private var lastSessionState = "none"
     private var lastDisplayState = "none"
     private var connectionRequestSerial = 0L
+    // --- Calmsight voice coach: speech on the glasses + "Hey Meta, start ..." ---
+    private var speech: Speech? = null
+    private val speechJobs = mutableListOf<Job>()
+    @Volatile private var coachSpeakingUntil = 0L
+    private var voiceStreamStarted = false
+    private var pageReady = false
+    private var pendingVoiceLaunch = false
+    private val micPermission = registerForActivityResult(Wearables.RequestPermissionContract()) { result ->
+        result.onSuccess { status ->
+            if (status == DatPermissionStatus.Granted) attachSpeech()
+            else emit("speechState", "state" to "DENIED")
+        }.onFailure { error, _ -> emit("speechState", "state" to ("ERROR " + error.description)) }
+    }
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { allowed ->
         val action = permissionAction; permissionAction = null
         if (allowed) initialize { action?.invoke() }
@@ -86,6 +109,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         audio = getSystemService(AUDIO_SERVICE) as AudioManager
+        if (savedInstanceState == null && isVoiceInvocationsIntent(intent)) pendingVoiceLaunch = true
+        if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) initialize { }
         lens = LensRenderer(lifecycleScope, { status, token, message ->
             lastDisplayState = status
             if (status in listOf("STARTING", "READY", "ERROR", "LOST", "CLEAR_UNCONFIRMED"))
@@ -133,6 +158,8 @@ class MainActivity : ComponentActivity() {
             override fun onPageFinished(view: WebView, url: String) {
                 emit("host", "platform" to "android", "version" to "0.5.0")
                 publishDevices()
+                pageReady = true
+                if (pendingVoiceLaunch) { pendingVoiceLaunch = false; emit("voiceLaunch") }
             }
             override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
                 abort("The renderer stopped."); closeSession(); finish(); return true
@@ -171,6 +198,7 @@ class MainActivity : ComponentActivity() {
         Wearables.initialize(this).fold(
             onSuccess = {
                 initialized = true
+                startVoiceInvocations()
                 lifecycleScope.launch {
                     Wearables.registrationState.collect { state ->
                         trace("Registration: " + state.name)
@@ -256,7 +284,7 @@ class MainActivity : ComponentActivity() {
                             lastSessionState = state.name
                             trace("Session state: " + state.name)
                             when (state) {
-                                DeviceSessionState.STARTED -> lens.attach(created)
+                                DeviceSessionState.STARTED -> { lens.attach(created); attachSpeech() }
                                 DeviceSessionState.PAUSED, DeviceSessionState.STOPPING, DeviceSessionState.STOPPED -> {
                                     abort("Glasses session entered " + state.name + ". Reconnect, then tap Start again.")
                                     closeSession()
@@ -333,7 +361,9 @@ class MainActivity : ComponentActivity() {
                     setOnErrorListener { _, _, _ ->
                         stopAudio(); emit("message", "message" to "Audio playback failed. Text guidance remains available."); true
                     }
-                    prepare(); start()
+                    prepare()
+                    coachSpeakingUntil = SystemClock.elapsedRealtime() + duration + 700
+                    start()
                 }
             }
         } catch (e: Exception) {
@@ -356,7 +386,10 @@ class MainActivity : ComponentActivity() {
             player = MediaPlayer().apply {
                 setAudioAttributes(attrs)
                 setDataSource(url)
-                setOnPreparedListener { it.start() }
+                setOnPreparedListener {
+                    coachSpeakingUntil = SystemClock.elapsedRealtime() + it.duration + 700
+                    it.start()
+                }
                 setOnCompletionListener { stopAudio() }
                 setOnErrorListener { _, _, _ -> stopAudio(); emit("coachAudioFailed"); true }
                 prepareAsync()
@@ -364,6 +397,75 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             stopAudio(); emit("coachAudioFailed")
         }
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (isVoiceInvocationsIntent(intent)) voiceLaunch()
+    }
+    private fun voiceLaunch() {
+        runOnUiThread { if (pageReady) emit("voiceLaunch") else pendingVoiceLaunch = true }
+    }
+    private fun startVoiceInvocations() {
+        if (voiceStreamStarted) return
+        voiceStreamStarted = true
+        lifecycleScope.launch {
+            Wearables.registrationState.first { it == RegistrationState.REGISTERED }
+            val stream = Wearables.startVoiceInvocationsStream(AutoDeviceSelector())
+            launch { stream.errors.collect { error -> trace("Voice invocation: " + error.description) } }
+            stream.invocations.collect { invocation ->
+                when (invocation) {
+                    is LaunchApp -> {
+                        invocation.responseHandle.sendSuccess(null)
+                        voiceLaunch()
+                    }
+                }
+            }
+        }
+    }
+    private fun attachSpeech() {
+        val current = session ?: return
+        if (speech != null) return
+        lifecycleScope.launch {
+            val granted = Wearables.checkPermissionStatus(DatPermission.MICROPHONE).fold(
+                onSuccess = { it == DatPermissionStatus.Granted }, onFailure = { _, _ -> false })
+            if (!granted) { emit("speechState", "state" to "NEEDS_PERMISSION"); return@launch }
+            if (session !== current || speech != null) return@launch
+            current.addSpeech().fold(
+                onSuccess = { sp ->
+                    speech = sp
+                    var hasStarted = false
+                    speechJobs += lifecycleScope.launch {
+                        sp.transcriptions.collect { result ->
+                            result ?: return@collect
+                            if (SystemClock.elapsedRealtime() < coachSpeakingUntil) return@collect
+                            if (!result.isFinal) { emit("speechPartial", "text" to result.text); return@collect }
+                            if (result.text.isNotBlank()) emit("speech", "text" to result.text)
+                        }
+                    }
+                    speechJobs += lifecycleScope.launch {
+                        sp.state.collect { state ->
+                            emit("speechState", "state" to state.name)
+                            if (state == SpeechState.STARTED) hasStarted = true
+                            // Known DAT issue: recognition goes quiet after ~1 min. Start it again.
+                            if (state == SpeechState.STOPPED && hasStarted && speech === sp) { delay(300); sp.start() }
+                        }
+                    }
+                    speechJobs += lifecycleScope.launch {
+                        while (speech === sp) { delay(50_000); if (speech === sp) { sp.stop(); delay(400); sp.start() } }
+                    }
+                    sp.start().onFailure { error, _ -> emit("speechState", "state" to ("ERROR " + error.description)) }
+                },
+                onFailure = { error, _ -> emit("speechState", "state" to ("UNAVAILABLE " + error.description)) }
+            )
+        }
+    }
+    private fun detachSpeech() {
+        val sp = speech ?: return
+        speech = null
+        speechJobs.forEach { it.cancel() }; speechJobs.clear()
+        runCatching { sp.stop() }
+        runCatching { session?.removeSpeech() }
     }
     private fun stopExposure() {
         activeToken = ""; watchdog?.cancel(); watchdog = null; stopAudio()
@@ -383,6 +485,7 @@ class MainActivity : ComponentActivity() {
         connectTimeout?.cancel(); connectTimeout = null
         stateJob?.cancel(); errorJob?.cancel(); stateJob = null; errorJob = null
         lens.release()
+        detachSpeech()
         session?.stop(); session = null
     }
     inner class Bridge {
@@ -443,6 +546,10 @@ class MainActivity : ComponentActivity() {
             runOnUiThread { stopExposure() }
         }
         @JavascriptInterface fun playPrompt(key: String) { runOnUiThread { this@MainActivity.playPrompt(key) } }
+        @JavascriptInterface fun enableVoice() { runOnUiThread {
+            if (session == null) { emit("speechState", "state" to "CONNECT_FIRST"); return@runOnUiThread }
+            micPermission.launch(DatPermission.MICROPHONE)
+        } }
         @JavascriptInterface fun playUrl(url: String) { runOnUiThread { this@MainActivity.playUrl(url) } }
         @JavascriptInterface fun stopAudio() { runOnUiThread { this@MainActivity.stopAudio() } }
     }

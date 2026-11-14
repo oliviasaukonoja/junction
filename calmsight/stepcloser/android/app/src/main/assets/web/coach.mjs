@@ -25,8 +25,14 @@ function speak(reply){
   if(native?.playUrl){native.playUrl(reply.audioUrl);return;}
   try{audio?.pause();audio=new Audio(reply.audioUrl);audio.play().catch(()=>{});}catch{}
 }
+function mode(){return window.CalmsightMode||null;}
+function shortLine(t){const s=(t||'').split(/(?<=[.!?])\s+/);let out=s[0]||'';if(out.length<40&&s[1])out+=' '+s[1];return out;}
+function lens(reply){
+  window.CalmsightLens?.update({rating:reply.display?.big!==''&&reply.display?.big!==undefined?reply.display.big:null,
+    line:shortLine(reply.line),label:reply.display?.label||'',visual:reply.display?.visual||'text'});
+}
 function show(reply){
-  $('coachLine').textContent=reply.line||'';
+  $('coachLine').textContent=reply.line||'';lens(reply);
   const next=reply.nextStep;
   $('coachNext').hidden=!next||next.advice==='stay';
   if(next)$('coachNext').textContent=next.text;
@@ -34,15 +40,18 @@ function show(reply){
 }
 function diag(){try{return window.StepCloserDiagnostics?.()}catch{return null}}
 
-async function saveProfile(){
-  const name=($('coachName')?.value||'').trim();
-  try{localStorage.setItem('calmsight-name',name);}catch{}
-  try{await call('/profile',{name:name||'there',fear:'spiders',faintHistory:false});}catch{}
+async function saveProfile(fear){
+  const name=($('coachName')?.value||'').trim(),faint=!!$('coachFaint')?.checked;
+  try{localStorage.setItem('calmsight-name',name);localStorage.setItem('calmsight-faint',faint?'1':'');}catch{}
+  try{await call('/profile',{name:name||'there',fear:fear||mode()?.fear||'spiders',faintHistory:faint});}catch{}
 }
 async function openSession(level){
   try{
-    const reply=await call('/start',{situation:'spider stepcloser',level});
+    const m=mode();
+    await saveProfile(m?.fear||'spiders');
+    const reply=await call('/start',{situation:m?m.situation:'spider stepcloser',level:m?null:level});
     sessionOpen=true;$('coachLine').textContent=reply.line||'';$('coachNext').hidden=true;
+    if(m){lens(reply);speak(reply);}   // real life: the coach opens the conversation
     status('Tap a number any time');
   }catch{sessionOpen=false;status('Coach offline · the guide still works');}
 }
@@ -53,7 +62,7 @@ async function rate(n){
   try{
     const d=diag();
     if(!sessionOpen)await openSession(d?.level);
-    const reply=await call('/turn',{text:String(n),level:d?.level});
+    const reply=await call('/turn',{text:String(n),level:mode()?null:d?.level});
     show(reply);speak(reply);
     if(['complete','stop','pause'].includes(reply.action))sessionOpen=false;
     if(!reply.why)status('Tap again when it changes');
@@ -67,8 +76,8 @@ function build(){
     if(v>=7)b.classList.add('hot');b.setAttribute('aria-label','Fear '+v+' of 10');
     b.onclick=()=>rate(v);row.append(b);
   }
-  try{$('coachName').value=localStorage.getItem('calmsight-name')||'';}catch{}
-  $('coachName')?.addEventListener('change',saveProfile);
+  try{$('coachName').value=localStorage.getItem('calmsight-name')||'';$('coachFaint').checked=!!localStorage.getItem('calmsight-faint');}catch{}
+  $('coachName')?.addEventListener('change',()=>saveProfile());$('coachFaint')?.addEventListener('change',()=>saveProfile());
 }
 // Follow StepCloser's own session lifecycle without changing its logic.
 function watch(){
@@ -87,4 +96,32 @@ function watch(){
   }
   setTimeout(watch,500);
 }
+// ---- Voice: the glasses hear you (Meta speech), the coach answers in your ear ----
+let voiceAsked=false,listening=false;
+async function heard(text){
+  const t=(text||'').trim(); if(!t||busy)return;
+  busy=true; status('You said: “'+t+'”');
+  try{
+    const d=diag();
+    if(!sessionOpen)await openSession(d?.level);
+    const reply=await call('/turn',{text:t,level:mode()?null:d?.level});
+    if(reply.rating!==undefined&&reply.rating!==null)
+      for(const b of $('ratingRow').children)b.classList.toggle('picked',Number(b.dataset.v)===reply.rating);
+    show(reply);speak(reply);
+    if(['complete','stop','pause'].includes(reply.action)){sessionOpen=false;
+      if(reply.action==='stop')document.getElementById('stop')?.click();}
+    if(!reply.why)status(listening?'🎙 Listening · just talk':'Tap or talk');
+  }catch{status('Coach offline · the guide still works');}
+  busy=false;
+}
+window.CalmsightCoach={
+  heard,
+  partial(t){if(t)status('🎙 “'+t+'…”');},
+  speechState(s){
+    listening=s==='STARTED';
+    if(s==='STARTED')status('🎙 Listening · just talk to your coach');
+    else if(s==='NEEDS_PERMISSION'&&!voiceAsked){voiceAsked=true;native?.enableVoice?.();}
+    else if(String(s).startsWith('UNAVAILABLE')||String(s).startsWith('ERROR'))status('Voice unavailable · tap a number instead');
+  }
+};
 build();saveProfile();watch();

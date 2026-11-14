@@ -5,8 +5,20 @@
 <link rel="stylesheet" href="styles.css"><script type="module" src="app.mjs"></script><script type="module" src="coach.mjs"></script></head><body>
 <header class="topbar"><div class="brandmark" aria-hidden="true">↗</div><div><strong>StepCloser <span>3D</span></strong><small>Start directly. Choose your pace.</small></div><span class="build">v0.5</span></header>
 <main><div id="notice" class="notice" role="status" hidden></div>
+<section id="realLife" class="hero real-hero">
+  <span class="eyebrow">FACING IT NOW · REAL LIFE</span>
+  <h1>Your coach,<br>in your ear.</h1>
+  <p>About to step into a lift or get an injection? Start the coach. Nothing virtual appears: just a calm breathing guide in your lens and a voice that knows what works for you.</p>
+  <div class="place-grid">
+    <button class="place" data-place="lift">🛗<span>Lift</span></button>
+    <button class="place" data-place="space">🚪<span>Small space</span></button>
+    <button class="place" data-place="injection">💉<span>Injection / blood test</span></button>
+    <button class="place" data-place="scan">🩻<span>Before a scan</span></button>
+    <button class="place" data-place="other">✋<span>Other moment</span></button>
+  </div>
+</section>
 <section id="intro" class="hero">
-  <span class="eyebrow">LARGER · MOVING 3D SPIDERS</span>
+  <span class="eyebrow">PRACTICE AT HOME · VIRTUAL SPIDERS</span>
   <h1>Try the spider.<br>At your pace.</h1>
   <p>No mandatory audio test, STOP rehearsal, or review screen. Tap a button to begin.</p>
   <span id="outputLabel" class="pill">Meta Display glasses</span>
@@ -43,7 +55,7 @@
 </section>
 <section id="practiceSection" class="practice-section" hidden>
   <div class="section-heading"><div><span id="practiceEyebrow" class="eyebrow">DIRECT PRACTICE</span><h2 id="practiceTitle">Walking toward you</h2></div><span id="timer" class="timer">—</span></div>
-  <div class="stage"><canvas id="scene" width="600" height="600" aria-label="Moving three dimensional spider"></canvas><div id="stageLabel" class="stage-label">Glasses output · phone mirror</div><div id="motionLabel" class="motion-label"></div><div id="frameStats" class="frame-stats"></div></div>
+  <div class="stage"><canvas id="scene" width="600" height="600" aria-label="Moving three dimensional spider"></canvas><canvas id="calmCanvas" width="600" height="600" aria-label="Breathing guide shown in the glasses" hidden></canvas><div id="stageLabel" class="stage-label">Glasses output · phone mirror</div><div id="motionLabel" class="motion-label"></div><div id="frameStats" class="frame-stats"></div></div>
   <div class="guide-card"><span class="guide-icon">◉</span><div><strong>Your audio guide</strong><p id="guideText" aria-live="polite">You choose the pace.</p></div></div>
   <div id="coachCard" class="coach-card">
     <div class="coach-head"><strong>How scared are you right now?</strong><span id="coachStatus" class="hint">Your coach listens</span></div>
@@ -59,6 +71,7 @@
   <p class="hint">These are optional. They never unlock or block the Start buttons.</p>
   <div class="row"><button id="testAudio" class="secondary">Play audio test</button><button id="drill" class="secondary">Try STOP with a dot</button></div>
   <label class="label">Your first name (so your coach can greet you)<input id="coachName" maxlength="30" placeholder="Optional"></label>
+  <label class="checkbox"><input id="coachFaint" type="checkbox">I have fainted or felt faint with needles or blood</label>
   <label class="label">Practice time<select id="duration"><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select></label>
   <label class="label">Optional fear rating: <output id="beforeValue">3</output> / 10<input id="before" type="range" min="0" max="10" step="1" value="3"></label>
 </details>

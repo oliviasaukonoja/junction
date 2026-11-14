@@ -150,9 +150,12 @@ def parse(text: str) -> dict:
     m = re.search(r"\b(10|[0-9])\b", t)
     if m:
         return {"kind": "rating", "value": int(m.group(1))}
-    for w, n in NUMBER_WORDS.items():
-        if re.search(rf"\b{w}\b", t):
-            return {"kind": "rating", "value": n}
+    # Spoken numbers only count in short answers ("eight", "about a six"),
+    # so "this one is scary" is treated as conversation, not a rating of 1.
+    if len(t.split()) <= 6 or re.search(r"\b(out of|i'?m at|about|maybe|like a|it'?s a)\b", t):
+        for w, n in NUMBER_WORDS.items():
+            if re.search(rf"\b{w}\b", t):
+                return {"kind": "rating", "value": n}
     return {"kind": "unknown"}
 
 
@@ -178,27 +181,78 @@ def situation_key(text) -> str:
 TECHNIQUES = ("breathing", "appliedTension", "grounding", "countWithMe")
 
 # Starting beliefs from the evidence, before we know the person (alpha, beta).
-CLINICAL_PRIOR = {
-    "needles": {"appliedTension": (3, 1), "countWithMe": (2, 1),
-                "breathing": (2, 1), "grounding": (1, 1)},
-    "spaces": {"grounding": (3, 1), "breathing": (2, 1),
-               "countWithMe": (2, 1), "appliedTension": (1, 1)},
-    "speaking": {"breathing": (3, 1), "grounding": (2, 1),
-                 "countWithMe": (1, 1), "appliedTension": (1, 1)},
-    "spiders": {"breathing": (3, 1), "grounding": (3, 1),
-                "countWithMe": (2, 1), "appliedTension": (1, 1)},
+# Each technique: how to coach it, how it looks on the lens, and spoken variants.
+TECH = {
+    "appliedTension": {"name": "Squeeze & hold", "visual": "squeeze",
+        "how": "applied tension: tense legs, stomach and arms for about 10-15 seconds until the face feels warm, release for 20 seconds, repeat. Keeps blood pressure up so you don't faint.",
+        "lines": ["Squeeze your thighs, stomach and fists hard. Hold… hold… and let go.",
+                  "Press your knees together and make tight fists. Feel the warmth in your face. Hold it. Now release.",
+                  "Tense everything below your chest like you're bracing. Ten seconds… and soften."]},
+    "lookAway": {"name": "Eyes on one spot", "visual": "spot",
+        "how": "choose one fixed spot away from the needle (a poster, a mark on the wall) and describe it in detail in your head.",
+        "lines": ["Pick one spot on the wall, away from your arm. Tell me its colour and its shape.",
+                  "Keep your eyes on one point in the room. Notice every detail of it, like you'll have to draw it later."]},
+    "askNurse": {"name": "Say it out loud", "visual": "text",
+        "how": "tell the nurse you are nervous; ask to lie down, to be told before it happens, or for numbing cream next time.",
+        "lines": ["Tell the nurse: I'm nervous about needles. Ask if you can lie down. They hear this every day.",
+                  "Say it to the nurse now: please tell me just before you start. You're allowed to ask."]},
+    "breathing": {"name": "Long breath out", "visual": "breath",
+        "how": "slow breathing with a longer exhale: in through the nose for 4, out through the mouth for 6.",
+        "lines": ["Breathe in through your nose for four, and let it out slowly for six.",
+                  "Let your breath out longer than you breathe in. In… two, three, four. Out… slowly."]},
+    "grounding": {"name": "5 · 4 · 3 · 2 · 1", "visual": "list",
+        "how": "5-4-3-2-1 grounding: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste.",
+        "lines": ["Name five things you can see right now. Out loud or in your head. Take your time.",
+                  "Find four things you can touch. The wall, your sleeve, the floor under your feet."]},
+    "findExit": {"name": "You can get out", "visual": "text",
+        "how": "locate the door, the open-door button or alarm button; remind them the space opens and there is plenty of air.",
+        "lines": ["Find the door-open button and the alarm button. Just look at them. You know where they are.",
+                  "Notice the doors. They open in a moment. There is plenty of air in here, more than you need."]},
+    "coldTouch": {"name": "Feel something cool", "visual": "text",
+        "how": "touch something cool (metal handrail, wall, phone screen) and notice temperature and texture.",
+        "lines": ["Put your hand on the cool handrail or the wall. Notice how cold it feels, and how solid.",
+                  "Touch something metal near you. Feel the temperature. Stay with that feeling."]},
+    "reframe": {"name": "It's a feeling", "visual": "text",
+        "how": "name the fear as a feeling that rises and falls; it is uncomfortable, not dangerous; it peaks and passes.",
+        "lines": ["This is a wave of fear. It feels big, but it isn't danger. It rises, and then it falls.",
+                  "Say to yourself: this is anxiety, it's uncomfortable, and it passes. It always has."]},
+    "countWithMe": {"name": "Count with me", "visual": "count",
+        "how": "count slowly backwards from 20 together, or count floors, tiles or lights.",
+        "lines": ["Count backwards from twenty with me. Twenty… nineteen… eighteen…",
+                  "Count the lights on the ceiling, or the floors as we pass. One… two…"]},
+    "humming": {"name": "Hum one note", "visual": "breath",
+        "how": "hum one long low note on the out-breath; it slows the breath and the heart.",
+        "lines": ["Hum one long, low note as you breathe out. Feel it in your chest.",
+                  "Breathe in, and hum softly all the way out. Again."]},
 }
+
+ALLOWED = {
+    "needles": ["appliedTension", "lookAway", "askNurse", "breathing", "countWithMe"],
+    "needles_faint": ["appliedTension", "lookAway", "askNurse", "countWithMe"],
+    "spaces": ["findExit", "grounding", "coldTouch", "reframe", "breathing", "countWithMe", "humming"],
+    "spiders": ["breathing", "grounding", "reframe", "countWithMe"],
+    "speaking": ["breathing", "grounding", "reframe", "humming"],
+}
+
+# Starting beliefs from the evidence, before we know the person (alpha, beta).
+CLINICAL_PRIOR = {
+    "needles": {"appliedTension": (4, 1), "lookAway": (3, 1), "askNurse": (2, 1),
+                "breathing": (2, 1), "countWithMe": (2, 1)},
+    "spaces": {"findExit": (3, 1), "grounding": (3, 1), "breathing": (3, 1),
+               "reframe": (2, 1), "coldTouch": (2, 1), "countWithMe": (2, 1), "humming": (2, 1)},
+    "spiders": {"breathing": (3, 1), "grounding": (3, 1), "reframe": (2, 1), "countWithMe": (2, 1)},
+    "speaking": {"breathing": (3, 1), "grounding": (2, 1), "reframe": (3, 1), "humming": (2, 1)},
+}
+TECHNIQUES = tuple(TECH)
 
 
 def allowed_techniques(profile: dict) -> list:
     """Safety guardrails: the bandit may only pick from these."""
-    fear = profile.get("fear", "needles")
+    fear = profile.get("fear", "spaces")
     if fear == "needles" and profile.get("faint_history"):
-        # Vasovagal fainting: breathing/relaxation can lower blood pressure further.
-        return ["appliedTension", "countWithMe"]
-    if fear == "needles":
-        return ["appliedTension", "breathing", "countWithMe"]
-    return ["breathing", "grounding", "countWithMe"]
+        # Vasovagal fainting: relaxation/breathing can lower blood pressure further.
+        return ALLOWED["needles_faint"]
+    return ALLOWED.get(fear, ALLOWED["spaces"])
 
 
 def prior(profile: dict, tech: str, pop: dict) -> tuple:
@@ -209,10 +263,11 @@ def prior(profile: dict, tech: str, pop: dict) -> tuple:
 
 
 def choose_technique(profile: dict, situation: str, stats: dict, pop: dict,
-                     rng=random) -> dict:
+                     rng=random, avoid=()) -> dict:
     """Thompson sampling over allowed techniques. Returns choice + reason."""
     best, best_draw, scores = None, -1.0, {}
-    for tech in allowed_techniques(profile):
+    options = [t for t in allowed_techniques(profile) if t not in avoid] or allowed_techniques(profile)
+    for tech in options:
         pa, pb = prior(profile, tech, pop)
         s, f = stats.get(f"{situation}|{tech}", (0, 0))
         a, b = pa + s, pb + f
@@ -223,10 +278,10 @@ def choose_technique(profile: dict, situation: str, stats: dict, pop: dict,
             best, best_draw = tech, draw
     sc = scores[best]
     if sc["tries"]:
-        reason = (f"{best} worked {sc['worked']} of {sc['tries']} times "
-                  f"for you in this situation")
+        reason = (f"{TECH[best]['name']} worked {sc['worked']} of {sc['tries']} times "
+                  f"for you here")
     else:
-        reason = f"{best}: best starting choice for {profile.get('fear')} fear"
+        reason = f"{TECH[best]['name']}: a strong first choice for this fear"
     return {"technique": best, "reason": reason, "scores": scores}
 
 
@@ -341,25 +396,62 @@ FALLBACK = {
     "complete": "{name}, that's it. You went from {first} down to {last}. You did that yourself.",
     "pause": "Stop here, {name}. Tell the nurse or someone next to you that you feel faint, right now. Sit with your head low.",
     "stop": "Okay, stopping now. You did well, {name}.",
+    "chat": "I hear you, {name}. I'm right here. On a scale from 0 to 10, how scared are you right now?",
 }
 
 
 def fallback_line(key: str, profile: dict, session: dict) -> str:
     rs = session.get("ratings") or [0]
-    return FALLBACK[key].format(name=profile.get("name", "there"),
-                                first=rs[0], last=rs[-1])
+    name = profile.get("name") or ""
+    name = "" if name.lower() == "there" else name
+    if key in TECH:
+        used = session.get("lines_used", 0)
+        text = TECH[key]["lines"][used % len(TECH[key]["lines"])] + " Then tell me your number."
+        return (f"{name}, " + text[0].lower() + text[1:]) if name else text
+    text = FALLBACK[key].format(name=name or "you", first=rs[0], last=rs[-1])
+    return text.replace("you, ", "").replace(", you.", ".").replace("Hi you.", "Hi.").replace(" you.", ".") if not name else text
 
 
-def build_prompt(base: str, profile: dict, style: int, memory: str, key: str) -> str:
+def build_prompt(base: str, profile: dict, style: int, memory: str, key: str,
+                 session: dict = None) -> str:
+    session = session or {}
+    tech = TECH.get(key)
+    task = (f"Coach this technique now: {tech['how']}" if tech else f"Say this: {base}")
+    name = profile.get("name") if (profile.get("name") or "there").lower() != "there" else None
+    recent = " | ".join(session.get("said", [])[-3:])
     return (
-        "You are Calmsight, a calm fear coach speaking into someone's ear through "
-        "smart glasses at a scary moment. Rewrite the coach line below. Keep EXACTLY "
-        "the same instruction and meaning. Never add medical advice. Spoken style, "
-        f"short sentences, no emojis, no lists, max {STYLE_WORDS[style]} words. "
-        f"Tone: {STYLE_TONE[style]}.\n"
-        f"Person: {profile.get('name')}, fear: {profile.get('fear')}. {memory}\n"
-        f"Coach line ({key}): {base}\nReturn only the line."
+        "You are Calmsight, a warm, expert fear coach speaking into someone's ear through smart "
+        "glasses, live, in the scary moment itself. Talk like a calm friend who knows exposure therapy.\n"
+        f"Situation right now: {session.get('situationText') or session.get('situation') or 'unknown'}. "
+        f"Fear: {profile.get('fear')}. Fear ratings so far: {session.get('ratings') or 'none'}.\n"
+        f"{memory}\n{task}\n"
+        "Make it concrete to THIS situation (e.g. lift: buttons, doors, floors; injection: nurse, arm, chair). "
+        "One instruction at a time. Do not mention breathing unless the technique is breathing or humming. "
+        f"Do not repeat these recent lines: {recent or 'none'}.\n"
+        f"Spoken style, short sentences, no emojis, no lists, max {STYLE_WORDS[style]} words. "
+        f"Tone: {STYLE_TONE[style]}. "
+        + (f"Use the name {name} at most once. " if name else "Do not use any name. ")
+        + "Never give medical advice beyond the technique. Return only the line."
     )
+
+
+def chat_prompt(heard: str, profile: dict, session: dict, style: int, memory: str) -> str:
+    rs = session.get("ratings") or []
+    return (
+        "You are Calmsight, a calm fear coach speaking into someone's ear through smart glasses. "
+        f"The person just said: \"{heard}\". "
+        f"Their fear: {profile.get('fear')}. Situation: {session.get('situationText') or session.get('situation')}. "
+        f"Fear ratings so far: {rs or 'none yet'}. {memory}\n"
+        "Reply in spoken style: acknowledge what they said in their own words, keep them grounded, "
+        f"max {STYLE_WORDS[style]} words, no medical advice, no lists, no emojis. "
+        + ("End by asking how scared they are from 0 to 10. " if not rs else
+           "End by gently asking for their fear number now, 0 to 10. ")
+        + "If they mention feeling faint, dizzy or unable to breathe, tell them to sit down and tell someone nearby right now. "
+        f"Use their name ({profile.get('name')}) at most once. Return only the line."
+    )
+
+
+LLM_ERRORS = []
 
 
 def llm_line(prompt: str, base: str) -> tuple:
@@ -368,17 +460,19 @@ def llm_line(prompt: str, base: str) -> tuple:
     gk = os.environ.get("GEMINI_API_KEY")
     if gk:
         try:
-            model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+            model = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
             r = httpx.post(
                 f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                 params={"key": gk},
-                json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=5)
-            r.raise_for_status()
-            t = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=8)
+            if r.status_code >= 400:
+                raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
+            t = "".join(x.get("text", "") for x in r.json()["candidates"][0]["content"]["parts"] if not x.get("thought")).strip()
             if t:
                 return t, "gemini"
         except Exception as e:  # noqa: BLE001
             print("gemini failed:", e)
+            LLM_ERRORS.append(f"gemini: {str(e)[:200]}")
     ak = os.environ.get("ANTHROPIC_API_KEY")
     if ak:
         try:
@@ -390,12 +484,14 @@ def llm_line(prompt: str, base: str) -> tuple:
                       "max_tokens": 150,
                       "messages": [{"role": "user", "content": prompt}]},
                 timeout=6)
-            r.raise_for_status()
+            if r.status_code >= 400:
+                raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
             t = r.json()["content"][0]["text"].strip()
             if t:
                 return t, "claude"
         except Exception as e:  # noqa: BLE001
             print("claude failed:", e)
+            LLM_ERRORS.append(f"claude: {str(e)[:200]}")
     return base, "builtin"
 
 
@@ -506,10 +602,13 @@ def web():
     def respond(req, uid, profile, session, decision, key, lrn):
         prompt = build_prompt(fallback_line(key, profile, session), profile,
                               lrn.get("style", 0),
-                              memory_text(uid, session.get("situation")), key)
+                              memory_text(uid, session.get("situation")), key, session)
         line, source = llm_line(prompt, fallback_line(key, profile, session))
+        session["said"] = (session.get("said", []) + [line])[-6:]
+        session["lines_used"] = session.get("lines_used", 0) + 1
         rating = decision.get("rating")
-        label = {"calm": decision.get("technique", ""), "stay": "Keep going",
+        tech = TECH.get(decision.get("technique") or "")
+        label = {"calm": tech["name"] if tech else "", "stay": "Keep going",
                  "complete": "You did it", "pause": "Tell the nurse",
                  "stop": "Stopped", "ask": "0 – 10?", "start": "0 – 10?"
                  }.get(decision["action"], "")
@@ -517,7 +616,7 @@ def web():
                 "audioUrl": speak(line, base(req)),
                 "nextCheckInSec": next_check_in(lrn.get("pace", {})),
                 "display": {"big": "" if rating is None else str(rating),
-                            "label": label,
+                            "label": label, "visual": tech["visual"] if tech else "text",
                             "showStop": decision["action"] not in ("stop", "complete")}}
 
     def finish(uid, session):
@@ -571,8 +670,28 @@ def web():
             for res in session.get("results", [])[n_before:]:
                 store.log_outcome(uid, profile.get("fear"), session["situation"], res)
 
+        if d["action"] == "ask" and (body.get("text") or "").strip():
+            heard = body["text"].strip()
+            sit = situation_key(heard)
+            if sit != "other" and not session.get("ratings"):
+                session["situation"], session["situationText"] = sit, heard
+            d = {"action": "chat", "heard": heard}
+            line, source = llm_line(chat_prompt(heard, profile, session, lrn.get("style", 0),
+                                                memory_text(uid, session.get("situation"))),
+                                    fallback_line("chat", profile, session))
+            store.set("sessions", uid, session)
+            last = (session.get("ratings") or [None])[-1]
+            return {**d, "line": line, "lineSource": source, "audioUrl": speak(line, base(req)),
+                    "nextCheckInSec": next_check_in(lrn.get("pace", {})), "nextStep": None,
+                    "display": {"big": "" if last is None else str(last), "label": "Listening",
+                                "showStop": True}}
         if d["action"] == "calm":
-            pick = choose_technique(profile, session["situation"], lrn["stats"], pop)
+            res = session.get("results") or []
+            avoid = {res[-1]["tech"]} if res and not res[-1]["worked"] else set()
+            if session.get("techniques"):
+                avoid.add(session["techniques"][-1]) if len(session["techniques"]) >= 2 and \
+                    session["techniques"][-1] == session["techniques"][-2] else None
+            pick = choose_technique(profile, session["situation"], lrn["stats"], pop, avoid=avoid)
             d.update(technique=pick["technique"], why=pick["reason"])
             session["techniques"].append(pick["technique"])
             session["pending"] = {"tech": pick["technique"], "rating": d["rating"], "t": now}
@@ -645,7 +764,8 @@ def web():
                 "gemini": os.environ.get("GEMINI_API_KEY", "none") not in ("", "none"),
                 "claude": os.environ.get("ANTHROPIC_API_KEY", "none") not in ("", "none"),
                 "elevenlabs": bool(os.environ.get("ELEVENLABS_API_KEY")),
-                "voice": os.environ.get("ELEVEN_VOICE_ID", COACH_VOICE)}
+                "voice": os.environ.get("ELEVEN_VOICE_ID", COACH_VOICE),
+                "lastLlmErrors": LLM_ERRORS[-4:]}
 
     @api.get("/glasses", response_class=HTMLResponse)
     async def glasses_page():
