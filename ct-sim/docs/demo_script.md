@@ -28,7 +28,7 @@ Rule for the whole pitch: say what we would measure, never that screening or a s
 
 **2:30-2:50, the analyst.** Ask: "What should we measure first before a pilot?" or press Readout (no AI). Read the bottom line and the caveats aloud.
 
-**2:50-3:00, the ask.** "We would like a county and AstraZeneca to run a pilot that randomises invitations: control gets the usual hospital CT, treatment also gets a mobile slot. 173 people per arm detect a 15-point uplift; a campaign cancels out in the comparison. The protocol and calculator are on the Gap finder page."
+**2:50-3:00, the ask.** Strategy line first (confirm action numbers in the roadmap PDF before saying them): "Roadmap action 2.3.4 expects the lung pilot to expand regionally by 2028. We propose the equity and access arm of that expansion, funded under 2.4.4." Then: "We would like a county and AstraZeneca to run a pilot that randomises invitations: control gets the usual hospital CT, treatment also gets a mobile slot. 173 people per arm detect a 15-point uplift; a campaign cancels out in the comparison. The protocol and calculator are on the Gap finder page."
 
 ## What to say about data quality (20% of the score)
 - The Gap finder page has a data-status table: verified, proxy, assumed, gap. Lead with it when asked where numbers come from.
