@@ -19,14 +19,14 @@
     et: "Eesti", ar: "العربية", so: "Soomaali", uk: "Українська"
   };
   const labels = {
-    fi: { join: "Liity jonotuslistalle", about: "Tietoa meistä", faq: "Usein kysytyt kysymykset", feedback: "Anna palautetta", privacy: "Tietosuojaseloste", decision: "Päättäjille" },
-    sv: { join: "Anmäl dig till väntelistan", about: "Om oss", faq: "Vanliga frågor", feedback: "Ge respons", privacy: "Dataskyddsbeskrivning", decision: "För beslutsfattare" },
-    en: { join: "Join the waitlist", about: "About us", faq: "Questions", feedback: "Give feedback", privacy: "Privacy notice", decision: "For decision-makers" },
-    ru: { join: "В список ожидания", about: "О нас", faq: "Частые вопросы", feedback: "Оставить отзыв", privacy: "Политика конфиденциальности", decision: "Для руководителей" },
-    et: { join: "Liitu ootenimekirjaga", about: "Meist", faq: "Korduma kippuvad küsimused", feedback: "Anna tagasisidet", privacy: "Privaatsusteade", decision: "Otsustajatele" },
-    ar: { join: "انضم إلى قائمة الانتظار", about: "من نحن", faq: "أسئلة شائعة", feedback: "أرسل ملاحظاتك", privacy: "إشعار الخصوصية", decision: "لصناع القرار" },
-    so: { join: "Ku biir liiska sugitaanka", about: "Nagu saabsan", faq: "Su'aalaha", feedback: "Na sii ra'yi", privacy: "Ogeysiiska asturnaanta", decision: "Go'aamiyeyaasha" },
-    uk: { join: "До списку очікування", about: "Про нас", faq: "Поширені запитання", feedback: "Залишити відгук", privacy: "Повідомлення про конфіденційність", decision: "Для керівників" }
+    fi: { join: "Liity jonotuslistalle", about: "Tietoa meistä", faq: "Usein kysytyt kysymykset", feedback: "Anna palautetta", privacy: "Tietosuojaseloste", lungdata: "Keuhkodata", pilotmap: "Pilottikartta" },
+    sv: { join: "Anmäl dig till väntelistan", about: "Om oss", faq: "Vanliga frågor", feedback: "Ge respons", privacy: "Dataskyddsbeskrivning", lungdata: "Lungdata", pilotmap: "Pilotkarta" },
+    en: { join: "Join the waitlist", about: "About us", faq: "Questions", feedback: "Give feedback", privacy: "Privacy notice", lungdata: "Lung data", pilotmap: "Pilot map" },
+    ru: { join: "В список ожидания", about: "О нас", faq: "Частые вопросы", feedback: "Оставить отзыв", privacy: "Политика конфиденциальности", lungdata: "Данные о раке лёгких", pilotmap: "Пилотная карта" },
+    et: { join: "Liitu ootenimekirjaga", about: "Meist", faq: "Korduma kippuvad küsimused", feedback: "Anna tagasisidet", privacy: "Privaatsusteade", lungdata: "Kopsuvähi andmed", pilotmap: "Pilootkaart" },
+    ar: { join: "انضم إلى قائمة الانتظار", about: "من نحن", faq: "أسئلة شائعة", feedback: "أرسل ملاحظاتك", privacy: "إشعار الخصوصية", lungdata: "بيانات سرطان الرئة", pilotmap: "خريطة المشروع التجريبي" },
+    so: { join: "Ku biir liiska sugitaanka", about: "Nagu saabsan", faq: "Su'aalaha", feedback: "Na sii ra'yi", privacy: "Ogeysiiska asturnaanta", lungdata: "Xogta kansarka sambabka", pilotmap: "Khariidadda tijaabada" },
+    uk: { join: "До списку очікування", about: "Про нас", faq: "Поширені запитання", feedback: "Залишити відгук", privacy: "Повідомлення про конфіденційність", lungdata: "Дані про рак легень", pilotmap: "Пілотна карта" }
   };
   const supported = (document.body.dataset.languages || "fi,sv,en,ru,et,ar,so,uk").split(",");
   const current = () => document.getElementById("lang")?.value || document.documentElement.lang || "fi";
@@ -42,7 +42,7 @@
     const footer = document.getElementById("site-footer");
     if (!footer) return;
     const t = copy();
-    footer.innerHTML = `<footer><div class="wrap"><nav aria-label="More information" style="display:flex;flex-wrap:wrap;gap:18px"><a href="/meista">${t.about}</a><a href="/ukk">${t.faq}</a><a href="/palaute">${t.feedback}</a><a href="/tietosuoja">${t.privacy}</a><a href="/keuhkodata">${t.decision}</a></nav><div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>`;
+    footer.innerHTML = `<footer><div class="wrap"><nav aria-label="More information" style="display:flex;flex-wrap:wrap;gap:18px"><a href="/meista">${t.about}</a><a href="/ukk">${t.faq}</a><a href="/palaute">${t.feedback}</a><a href="/tietosuoja">${t.privacy}</a><a href="/keuhkodata">${t.lungdata}</a><a href="/kartta">${t.pilotmap}</a></nav><div style="margin-top:14px;font-size:15px"><b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>`;
     const note = document.getElementById("site-footer-note");
     if (note) footer.querySelector(".wrap").prepend(note);
   }

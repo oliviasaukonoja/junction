@@ -1,4 +1,5 @@
-"""Polku hoitoon waitlist: bus page (/) + app page (/sovellus) + professional page (/ammattilaisille) + lung cancer data dashboard (/keuhkodata) + sign-up API on Modal.
+"""Polku hoitoon waitlist: bus page (/) + lung cancer data dashboard (/keuhkodata) + pilot map (/kartta) + sign-up API on Modal.
+/sovellus redirects to / and /ammattilaisille to /kartta (the HTML files stay in the repo but are not served).
 
 Deploy:      python3 ../ct-sim/docs/analysis/build_pilot_map_data.py   (creates map/private/pilot_map_advanced.json, not in git)
              modal deploy app.py
@@ -29,8 +30,6 @@ image = (
     modal.Image.debian_slim()
     .pip_install("fastapi[standard]", "anthropic")
     .add_local_file(HERE / "index.html", "/root/index.html")
-    .add_local_file(HERE / "sovellus.html", "/root/sovellus.html")
-    .add_local_file(HERE / "ammattilaisille.html", "/root/ammattilaisille.html")
     .add_local_file(HERE / "tietosuoja.html", "/root/tietosuoja.html")
     .add_local_file(HERE / "meista.html", "/root/meista.html")
     .add_local_file(HERE / "ukk.html", "/root/ukk.html")
@@ -85,8 +84,6 @@ def web():
 
     api = FastAPI(docs_url=None, redoc_url=None)
     page = Path("/root/index.html").read_text(encoding="utf-8")
-    app_page = Path("/root/sovellus.html").read_text(encoding="utf-8")
-    pro_page = Path("/root/ammattilaisille.html").read_text(encoding="utf-8")
     priv_page = Path("/root/tietosuoja.html").read_text(encoding="utf-8")
     team_img = Path("/root/team.jpg").read_bytes()
     regions = json.loads(Path("/root/regions.json").read_text(encoding="utf-8"))
@@ -154,15 +151,15 @@ def web():
         kind = "text/css" if name.endswith(".css") else "font/woff2"
         return Response(fonts[name], media_type=kind, headers={"Cache-Control": "public, max-age=604800"})
 
-    @api.get("/sovellus", response_class=HTMLResponse)
-    @api.get("/sovellus/", response_class=HTMLResponse)
+    @api.get("/sovellus")
+    @api.get("/sovellus/")
     def app_index():
-        return HTMLResponse(app_page)
+        return RedirectResponse(url="/", status_code=302)
 
-    @api.get("/ammattilaisille", response_class=HTMLResponse)
-    @api.get("/ammattilaisille/", response_class=HTMLResponse)
+    @api.get("/ammattilaisille")
+    @api.get("/ammattilaisille/")
     def pro_index():
-        return HTMLResponse(pro_page)
+        return RedirectResponse(url="/kartta", status_code=302)
 
     @api.get("/paattajille", response_class=HTMLResponse)
     @api.get("/paattajille/", response_class=HTMLResponse)
