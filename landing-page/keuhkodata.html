@@ -114,6 +114,43 @@ th{color:var(--muted);font-weight:600}
 .sources li{margin:5px 0}
 footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);background:#fff}
 .hidden{display:none}
+
+/* ---- redesign v2 ---- */
+.wrap{max-width:1160px;padding:0 28px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.hero{padding-top:36px;padding-bottom:8px}
+.hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.hero-top .badge{margin:0}.hero-top .ptabs{margin:0}
+.hero h1{font-size:clamp(26px,3.4vw,40px);max-width:22em;line-height:1.12}
+.lead{font-size:17px;margin:12px 0 24px;max-width:40em}
+.headline{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+@media(max-width:780px){.headline{grid-template-columns:1fr}}
+.hl{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.hl .v{font-family:"Space Grotesk",sans-serif;font-size:40px;font-weight:700;line-height:1;color:var(--hi)}
+.hl:first-child .v{color:var(--ink)}
+.hl .l{font-size:15px;margin-top:8px;color:var(--ink)}
+.hl .s{font-size:12px;color:var(--muted);margin-top:10px}
+.toolbar{position:sticky;top:64px;z-index:4;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:rgba(245,247,251,.96);backdrop-filter:blur(6px);padding:10px 0;margin-bottom:12px;border-bottom:1px solid var(--line)}
+@media(max-width:780px){.toolbar{position:static}}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px;margin:0}
+.seg button{border:0!important;border-radius:9px!important;padding:8px 14px!important;font-size:14.5px!important;font-weight:600;color:var(--muted)!important;background:none!important}
+.seg button[aria-pressed=true]{background:var(--ink)!important;color:#fff!important}
+.myarea{margin:0;gap:8px}.myarea label{font-weight:600;color:var(--ink);font-size:14.5px}
+.myarea select{min-height:40px;padding:0 10px}
+.toolbar .picker{position:static;margin:0;padding:0;border:0;background:none;margin-inline-start:auto}
+.toolbar .picker>summary{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 14px;font-weight:600;font-size:14.5px}
+.pickpanel{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 40px rgba(20,33,61,.16);padding:16px 20px;max-height:70vh;overflow:auto}
+@media(max-width:780px){.toolbar .picker{margin-inline-start:0;width:100%}.pickpanel{position:static;box-shadow:none;margin-top:8px}}
+.areapanel{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:780px){.areapanel{grid-template-columns:1fr}}
+.areapanel .snap{margin:0}.areapanel .ai{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.areapanel .aihint{display:block;margin:8px 0 0}
+.grid{gap:20px}
+.card{border-radius:16px;padding:22px 24px 16px;box-shadow:0 1px 2px rgba(20,33,61,.04)}
+.card h2{font-size:20px}
+.tiles{grid-template-columns:repeat(3,1fr)}
+@media(max-width:780px){.tiles{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -132,29 +169,36 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 </header>
 <main>
   <div class="wrap hero">
-    <span class="badge" data-t="badge"></span>
-    <h1 data-t="h1">Keuhkosyöpä Suomessa julkisen datan valossa</h1>
-    <p class="lead" data-t="lead">Kuolleisuus, alue-erot, viiveet, riskiryhmä ja eriarvoisuus yhdessä paikassa. Valitse alta, mitä haluat katsoa. Jokaisen luvun lähde näkyy kuvaajan alla.</p>
-    <nav class="tabs ptabs" role="tablist">
-      <button class="tab on" role="tab" aria-selected="true" data-tab="dash" data-t="tab_dash"></button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="src" data-t="tab_src"></button>
-    </nav>
+    <div class="hero-top"><span class="badge" data-t="badge"></span>
+      <nav class="tabs ptabs" role="tablist">
+        <button class="tab on" role="tab" aria-selected="true" data-tab="dash" data-t="tab_dash"></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="src" data-t="tab_src"></button>
+      </nav></div>
+    <h1 data-t="h1">Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin</h1>
+    <p class="lead" data-t="lead">Avoimesta datasta koottu tilannekuva päättäjälle: missä ero on, missä kohtaa hoitopolkua se syntyy ja mitä sille voi tehdä.</p>
+    <div class="headline" id="headline"></div>
   </div>
   <div class="wrap">
     <section id="tab-dash">
-      <div class="presets" role="group" aria-labelledby="pre_l">
-        <span id="pre_l" data-t="pre_l"></span>
-        <button data-pre="sum" data-t="pre_sum"></button><button data-pre="reg" data-t="pre_reg"></button><button data-pre="all" data-t="pre_all"></button>
+      <div class="toolbar">
+        <div class="presets seg" role="group" aria-labelledby="pre_l">
+          <span id="pre_l" class="sr" data-t="pre_l"></span>
+          <button data-pre="sum" data-t="pre_sum"></button><button data-pre="reg" data-t="pre_reg"></button><button data-pre="all" data-t="pre_all"></button>
+        </div>
+        <div class="myarea"><label for="area" data-t="area_l"></label><select id="area"></select></div>
+        <details class="picker" id="pickerbox">
+          <summary class="picker-head"><span data-t="pick_h"></span><span class="cnt" id="cnt"></span></summary>
+          <div class="pickpanel">
+            <div class="btns"><button id="all" data-t="all"></button><button id="none" data-t="none"></button></div>
+            <div class="groups" id="groups"></div>
+            <div class="legendtags" id="legendtags"></div>
+          </div>
+        </details>
       </div>
-      <div class="myarea"><label for="area" data-t="area_l"></label><select id="area"></select></div>
-      <div class="snap hidden" id="snap"></div>
-      <div class="ai hidden" id="aibox"><button id="aibtn" data-t="ai_btn"></button><span class="aihint" data-t="ai_hint"></span><div id="aiout" aria-live="polite"></div></div>
-      <details class="picker" id="pickerbox">
-        <summary class="picker-head"><h2 data-t="pick_h"></h2><span class="cnt" id="cnt"></span></summary>
-        <div class="btns"><button id="all" data-t="all"></button><button id="none" data-t="none"></button></div>
-        <div class="groups" id="groups"></div>
-        <div class="legendtags" id="legendtags"></div>
-      </details>
+      <div class="areapanel hidden" id="areapanel">
+        <div class="snap" id="snap"></div>
+        <div class="ai hidden" id="aibox"><button id="aibtn" data-t="ai_btn"></button><span class="aihint" data-t="ai_hint"></span><div id="aiout" aria-live="polite"></div></div>
+      </div>
       <div class="grid" id="grid"></div>
       <div class="empty hidden" id="empty" data-t="empty"></div>
     </section>
@@ -173,9 +217,9 @@ const nm = c => D.names[c][lang];
 const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
 
 const T = {
- fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä Suomessa julkisen datan valossa',lead:'Kuolleisuus, alue-erot, viiveet, riskiryhmä ja eriarvoisuus yhdessä paikassa. Valitse alta, mitä haluat katsoa. Jokaisen luvun lähde näkyy kuvaajan alla.',tab_dash:'Tilannekuva',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',ai_btn:'Selitä alueen tilanne tekoälyllä',ai_hint:'Tekoäly (Claude) käyttää vain tämän sivun lähdetietoja ja voi erehtyä. Suositukset ovat tiimin, ei tekoälyn.',ai_err:'Analyysi ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.',ai_wait:'Tekoäly kirjoittaa…',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
- sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer i Finland i ljuset av öppna data',lead:'Dödlighet, regionala skillnader, fördröjningar, riskgrupp och ojämlikhet på ett ställe. Välj nedan vad du vill se. Källan till varje siffra visas under diagrammet.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
- en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer in Finland through public data',lead:'Mortality, regional gaps, delays, the risk group and inequality in one place. Choose below what you want to see. The source of every figure is shown under its chart.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
+ fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin',lead:'Avoimesta datasta koottu tilannekuva päättäjälle: missä ero on, missä kohtaa hoitopolkua se syntyy ja mitä sille voi tehdä.',tab_dash:'Tilannekuva',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',ai_btn:'Selitä alueen tilanne tekoälyllä',ai_hint:'Tekoäly (Claude) käyttää vain tämän sivun lähdetietoja ja voi erehtyä. Suositukset ovat tiimin, ei tekoälyn.',ai_err:'Analyysi ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.',ai_wait:'Tekoäly kirjoittaa…',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
+ sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer upptäcks för sent i Finland, och mest hos dem som vården når sämst',lead:'En lägesbild ur öppna data för beslutsfattare: var skillnaden finns, var i vårdkedjan den uppstår och vad man kan göra.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
+ en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer is found too late in Finland, most of all among people care reaches worst',lead:'A picture built from open data for decision-makers: where the gap is, where on the care pathway it forms and what can be done.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
 };
 const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
 const t = k => T[lang][k];
@@ -392,7 +436,7 @@ const SOURCES = {
 };
 
 const KEY='keuhkodata-views-v4';
-const PRE={sum:['kpi','pathway','smr','risk','reco'],reg:['smr','risk','smokereg','scrcounty'],all:null};
+const PRE={sum:['pathway','smr','risk','reco'],reg:['smr','risk','smokereg','scrcounty'],all:null};
 let selected;
 try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!Array.isArray(selected)) selected=PRE.sum.slice();
@@ -530,6 +574,7 @@ function snapHTML(){
   const ab=document.getElementById('aibox'),has=!!(c&&REGNAME(c));
   ab.classList.toggle('hidden',!has);
   if(aiFor!==c+lang){aiFor=c+lang;const o=document.getElementById('aiout');o.className='';o.textContent='';}
+  document.getElementById('areapanel').classList.toggle('hidden',!c);
   if(!c){box.classList.add('hidden');return;}
   const S=D.smr.find(r=>r[0]===c),R=D.risk.find(r=>r[0]===c),K=D.smoke_reg.find(r=>r[0]===c),C=D.scr_county.find(r=>r[0]===c),M=D.region.find(r=>r[0]===c);
   const f1=x=>fmt(Math.round(x*10)/10), sg=S?(S[2]>1?{fi:'merkitsevästi yli maan tason',sv:'signifikant över riksnivån',en:'significantly above national'}[lang]:S[3]<1?{fi:'merkitsevästi alle maan tason',sv:'signifikant under riksnivån',en:'significantly below national'}[lang]:{fi:'ei merkitsevästi maan tasosta',sv:'inte signifikant skild från riksnivån',en:'not significantly different from national'}[lang]):'';
@@ -545,8 +590,15 @@ function snapHTML(){
   box.innerHTML=`<b>${nm(c)}</b><ul>${li.map(x=>`<li>${lang==='en'?x.replace(/ %/g,'%'):x}</li>`).join('')}</ul>`;
   box.classList.remove('hidden');
 }
+function headline(){
+  const top=D.smr[0],pct=Math.round((top[1]-1)*100);
+  const X={fi:[['155 pv','oireista hoidon alkuun Suomessa. Tanskassa 67.','Yle MOT 2026'],[`+${pct} %`,`enemmän keuhkosyöpäkuolemia ${nm(top[0])} alueella kuin ikärakenne ennustaa`,'Tilastokeskus, Polku Labs -laskelma'],['2,7×','yleisempi perusasteen kuin korkea-asteen koulutuksen saaneilla miehillä','Syöpärekisteri, Syöpä 2022']],
+           sv:[['155 d','från symtom till behandling i Finland. I Danmark 67.','Yle MOT 2026'],[`+${pct} %`,`fler lungcancerdödsfall i ${nm(top[0])} välfärdsområde än åldersstrukturen förutsäger`,'Statistikcentralen, Polku Labs beräkning'],['2,7×','vanligare bland män med grundutbildning än med högre utbildning','Cancerregistret, Cancer 2022']],
+           en:[['155 days','from symptoms to treatment in Finland. Denmark: 67.','Yle MOT 2026'],[`+${pct}%`,`more lung cancer deaths in ${nm(top[0])} than its age structure predicts`,'Statistics Finland, Polku Labs calculation'],['2.7×','more common in men with basic than with higher education','Finnish Cancer Registry, Cancer 2022']]}[lang];
+  document.getElementById('headline').innerHTML=X.map(x=>`<div class="hl"><div class="v">${x[0]}</div><div class="l">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
+}
 function render(){
-  markPre(); snapHTML(); syncHash();
+  markPre(); snapHTML(); syncHash(); headline();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
   const grid=document.getElementById('grid');
   const vs=VIEWS.filter(v=>selected.includes(v.id));
