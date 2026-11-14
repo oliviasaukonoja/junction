@@ -198,12 +198,11 @@ main.doc{padding:56px 24px 72px}
 </main>
 <div id="site-footer"></div>
 <script>
-var TABS = {fi:["Seulontabussi","Sovellus"], sv:["Screeningbussen","Appen"], en:["Screening bus","App"]};
+var LANGS = {fi:1, sv:1, en:1};
 function apply(l){
-  if (!TABS[l]) l = "en";
+  if (!LANGS[l]) l = "en";
   document.documentElement.lang = l;
   document.querySelectorAll("article").forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-lang") === l); });
-  document.getElementById("tb").textContent = TABS[l][0]; document.getElementById("ta").textContent = TABS[l][1];
   document.title = document.querySelector("article.on h1").textContent + " – Polku hoitoon";
   try { localStorage.setItem("vayla-lang", l); } catch (e) {}
   sel.value = l;
