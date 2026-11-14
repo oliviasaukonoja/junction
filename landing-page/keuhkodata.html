@@ -12,9 +12,9 @@
 <script src="/vendor/chart.umd.js"></script>
 <link href="/site.css" rel="stylesheet">
 <style>
-/* Keuhkodata. System: /site.css. Chart colours: validated with the dataviz checker (men/women vs #FCFBF8). */
-:root{--grid:#ECE8E0;--men:#00889B;--women:#B5701A;--total:#0F1A24;--edu-low:#0B5563;--edu-mid:#4C97A2;--edu-high:#A3CBD0;
-  --bar:#B9B3A8;--hi:var(--worse);--lo:var(--better);--mid:#B9B3A8;--neutral:#B9B3A8;--neutral2:#8C877D;--neutral3:#5B6670}
+/* Keuhkodata. System: /site.css. Chart colours: validated with the dataviz checker (men/women vs #FFFFFF). */
+:root{--grid:#E3E6E6;--men:#2BA39A;--women:#E39A2D;--total:#0F1A24;--edu-low:#1D7C75;--edu-mid:#2BA39A;--edu-high:#A6DAD4;
+  --bar:#B5BCBF;--hi:var(--worse);--lo:var(--better);--mid:#B5BCBF;--neutral:#B5BCBF;--neutral2:#8A9195;--neutral3:#5B6670}
 main{padding-bottom:var(--s10)}
 .navbar{display:none}
 
@@ -29,7 +29,7 @@ main{padding-bottom:var(--s10)}
 .hl:last-child{border-bottom:1px solid var(--on-ink-line)}
 @media (max-width:640px){.hl{grid-template-columns:1fr}.hl .v{grid-row:auto;margin-bottom:4px}}
 .hl .v{grid-row:span 2;font-size:28px;font-weight:600;line-height:1.1;color:var(--on-ink);letter-spacing:-.01em;white-space:nowrap}
-.hl.worse .v{color:#FF6B5E}
+.hl.worse .v{color:var(--worse)}
 .hl .l{font-size:15px;line-height:1.45;color:var(--on-ink)}
 .hl .s{font-family:var(--mono);font-size:11.5px;color:var(--on-ink-2);margin-top:4px}
 .globe{position:relative;display:flex;flex-direction:column;margin-inline-end:calc(-1 * max(var(--s4), (100vw - var(--wrap)) / 2 + var(--s4)))}
@@ -39,7 +39,7 @@ main{padding-bottom:var(--s10)}
 .globe .stage.is-still{flex:none;aspect-ratio:6/7;height:auto;min-height:0;max-height:none;width:min(100%,600px);margin-inline:auto}
 .globe .lbl{position:absolute;transform:translate(-50%,calc(-100% - 10px));pointer-events:none;white-space:nowrap;text-align:center;opacity:0;transition:opacity .4s var(--ease)}
 .globe .lbl.on{opacity:1}
-.globe .lbl{background:rgba(15,26,36,.9);border:1px solid var(--on-ink-line);border-radius:2px;padding:4px 8px}
+.globe .lbl{background:rgba(255,255,255,.94);border:1px solid var(--on-ink-line);border-radius:2px;padding:4px 8px}
 .globe .lbl b{display:block;font-size:13px;font-weight:600;color:var(--on-ink);line-height:1.3}
 .globe .lbl span{display:block;font-family:var(--mono);font-size:11.5px;color:var(--on-ink-2)}
 .globe .lbl[data-h=HVA01]{transform:translate(-100%,8px)}
@@ -162,9 +162,9 @@ th{color:var(--sec);font-weight:500;font-size:13px}
 .goal div{border-top:1px solid var(--line);padding:var(--s1) 0}
 .goal b{display:block;font-weight:600}
 .goal span{font-size:14px;color:var(--sec)}
-.mapbtn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:var(--r);background:var(--on-ink);color:var(--ink);font-weight:600;font-size:16px;text-decoration:none;transition:background-color .2s var(--ease)}
-.mapbtn:hover{background:#fff;color:var(--ink)}
-.band a.mapbtn,.band a.mapbtn:hover{color:var(--ink);text-decoration:none}
+.mapbtn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:var(--r);background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decoration:none;transition:background-color .2s var(--ease)}
+.mapbtn:hover{background:var(--accent-d);color:#fff}
+.band a.mapbtn,.band a.mapbtn:hover{color:#fff;text-decoration:none}
 
 /* sources */
 .sources{max-width:72ch;padding-top:var(--s6)}
@@ -630,7 +630,7 @@ function heroCaption(){
   const W={fi:{h:'Korkeus: keuhkosyöpäkuolemat suhteessa siihen, mitä alueen ikärakenne ennustaa (SMR 2021–2025, 1,0 = maan taso).',w:'Merkitsevästi yli maan tason',b:'Merkitsevästi alle',n:'Ei merkitsevää eroa'},
            sv:{h:'Höjd: lungcancerdödsfall i förhållande till vad områdets åldersstruktur förutsäger (SMR 2021–2025, 1,0 = riksnivå).',w:'Signifikant över riksnivån',b:'Signifikant under',n:'Ingen signifikant skillnad'},
            en:{h:'Height: lung cancer deaths relative to what each area\'s age structure predicts (SMR 2021–2025, 1.0 = national level).',w:'Significantly above the national level',b:'Significantly below',n:'No significant difference'}}[lang];
-  document.getElementById('mapcap').innerHTML=`<span class="key"><span><i style="background:var(--worse)"></i>${W.w}</span><span><i style="background:var(--better)"></i>${W.b}</span><span><i style="background:#1D2A36;outline:1px solid #34434F"></i>${W.n}</span></span>${W.h} ${tagHTML('S')}<span class="src">${src(['smr'])}</span>`;
+  document.getElementById('mapcap').innerHTML=`<span class="key"><span><i style="background:var(--worse)"></i>${W.w}</span><span><i style="background:var(--better)"></i>${W.b}</span><span><i style="background:#DFE3E3;outline:1px solid #CDD2D3"></i>${W.n}</span></span>${W.h} ${tagHTML('S')}<span class="src">${src(['smr'])}</span>`;
   const box=document.getElementById('globeLabels');
   D.smr.filter(r=>r[2]>1).forEach(r=>{
     let el=HERO.labels[r[0]];

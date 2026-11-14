@@ -7,7 +7,7 @@ import {
   AmbientLight, DirectionalLight, Group, BufferGeometry, Float32BufferAttribute, LineLoop, LineBasicMaterial, Vector3, Color,
 } from "three";
 
-const C = { ink: 0x0f1a24, base: 0x1d2a36, baseLine: 0x34434f, worse: 0xd92d20, worseLine: 0xf3a59c, better: 0x2f6fb5, betterLine: 0x8db3dc };
+const C = { ink: 0xffffff, base: 0xdfe3e3, baseLine: 0xffffff, worse: 0xd92d20, worseLine: 0xf6c9c4, better: 0x2f6fb5, betterLine: 0xd3e2f3 };
 const RISE_MS = 1500, DRIFT_MS = 5200, K = 320, BASE = 5;
 const ease = (t) => {           // cubic-bezier(.2,.8,.2,1), solved numerically
   const cx = 0.6, bx = -0.3, ax = 0.7, cy = 2.4, by = -3, ay = 1.6;   // from P1(.2,.8) P2(.2,1)

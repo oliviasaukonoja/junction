@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="/site.css">
 <link rel="stylesheet" href="/vendor/leaflet.css">
 <style>
-/* Pilot map: the one page that is ink throughout. Tokens from /site.css; page-only overrides below. */
-:root{color-scheme:dark;--field-ink:rgba(242,239,232,.38);--hosp:#C9CFD4;--custom:#E58FB4}
-html{scrollbar-color:var(--ink-3) var(--ink)}
-body{background:var(--ink);color:var(--on-ink);font-size:15px;line-height:1.5}
+/* Pilot map: white page, light grey panels, the three route colours carry the map. Tokens from /site.css; page-only overrides below. */
+:root{color-scheme:light;--field-ink:#CDD2D3;--hosp:#9AA3A8;--custom:#0F1A24}
+html{scrollbar-color:var(--line-2) var(--surf)}
+body{background:var(--surf);color:var(--on-ink);font-size:15px;line-height:1.5}
 body a{color:var(--accent-l)}
 body a:hover{color:var(--on-ink)}
 body :focus-visible{outline:2px solid var(--accent-l);outline-offset:2px}
@@ -22,7 +22,7 @@ body :focus-visible{outline:2px solid var(--accent-l);outline-offset:2px}
 /* app page: header spans the full width so the logo lines up with the page title */
 #site-header .bar{max-width:none;padding-inline:var(--s3)}
 @media (max-width:860px){#site-header .bar{padding-inline:var(--s2)}}
-::selection{background:var(--accent-l);color:var(--ink)}
+::selection{background:var(--accent-t);color:var(--ink)}
 input,textarea{caret-color:var(--accent-l)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ico{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
@@ -37,17 +37,17 @@ input,textarea{caret-color:var(--accent-l)}
 
 /* layout */
 .app{display:grid;grid-template-columns:minmax(400px,500px) minmax(0,1fr) minmax(280px,340px);gap:var(--s2);padding:0 var(--s3) var(--s3);height:calc(100vh - 64px - 150px);min-height:600px}
-.panel{background:var(--ink-2);border:1px solid var(--on-ink-line);border-radius:var(--r-lg);overflow:auto;padding:var(--s2) var(--s3) var(--s3);scrollbar-color:var(--ink-3) var(--ink-2)}
+.panel{background:var(--surf-2);border:1px solid var(--on-ink-line);border-radius:var(--r-lg);overflow:auto;padding:var(--s2) var(--s3) var(--s3);scrollbar-color:var(--line-2) var(--surf-2)}
 .mapbox{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--on-ink-line);min-height:420px}
-#map{position:absolute;inset:0;background:#141E28;font-family:var(--sans)}
+#map{position:absolute;inset:0;background:#F5F6F6;font-family:var(--sans)}
 /* calm the OSM tiles: neutral dark ground so the three route colours carry the map */
-.leaflet-tile-pane{filter:grayscale(1) invert(.93) brightness(.92) contrast(.86)}
+.leaflet-tile-pane{filter:grayscale(1) brightness(1.05) contrast(.85)}
 .leaflet-container a{color:var(--accent-l)}
-.leaflet-control-attribution{background:rgba(15,26,36,.82)!important;color:var(--on-ink-2)!important;font-size:11px}
+.leaflet-control-attribution{background:rgba(255,255,255,.85)!important;color:var(--on-ink-2)!important;font-size:11px}
 .leaflet-control-attribution a{color:var(--on-ink)!important}
 .leaflet-bar{border:1px solid var(--on-ink-line)!important;border-radius:var(--r)!important;box-shadow:none!important}
-.leaflet-bar a{background:var(--ink-2)!important;color:var(--on-ink)!important;border-bottom-color:var(--on-ink-line)!important;width:36px!important;height:36px!important;line-height:36px!important}
-.leaflet-bar a:hover{background:var(--ink-3)!important}
+.leaflet-bar a{background:var(--surf-2)!important;color:var(--on-ink)!important;border-bottom-color:var(--on-ink-line)!important;width:36px!important;height:36px!important;line-height:36px!important}
+.leaflet-bar a:hover{background:var(--surf-3)!important}
 
 /* headings and text */
 .panel h2{font-family:var(--sans);font-size:17px;font-weight:600;letter-spacing:0;color:var(--on-ink);margin:var(--s4) 0 var(--s1)}
@@ -64,7 +64,7 @@ input,textarea{caret-color:var(--accent-l)}
 /* route picker */
 .picker{display:flex;flex-wrap:wrap;gap:6px;margin:0}
 .pk{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:var(--r);border:1px solid var(--on-ink-line);background:transparent;color:var(--on-ink);font:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:background-color .2s var(--ease),border-color .2s var(--ease)}
-.pk:hover{border-color:var(--field-ink);background:var(--ink-3)}
+.pk:hover{border-color:var(--field-ink);background:var(--surf-3)}
 .pk .dot{width:10px;height:10px;border-radius:50%;background:var(--c,var(--on-ink-2));flex:none}
 .pk[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
 
@@ -77,7 +77,7 @@ input,textarea{caret-color:var(--accent-l)}
 .hk .s{font-size:12.5px;color:var(--on-ink-2);margin-top:4px;line-height:1.4}
 .cvrow{display:grid;grid-template-columns:110px 1fr 48px;gap:var(--s1);align-items:center;font-size:13px;margin:6px 0;color:var(--on-ink-2)}
 .cvrow b{color:var(--on-ink);text-align:end;font-weight:600;font-variant-numeric:tabular-nums}
-.cvtrack{height:8px;background:var(--ink);border-radius:2px;overflow:hidden}.cvtrack span{display:block;height:100%}
+.cvtrack{height:8px;background:var(--surf);border-radius:2px;overflow:hidden}.cvtrack span{display:block;height:100%}
 .kpis{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--s3);margin-top:var(--s1)}
 .kpi{padding:12px 0;border-bottom:1px solid var(--on-ink-line)}
 .kpi .n{font-size:22px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
@@ -89,7 +89,7 @@ table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:
 th,td{padding:8px 6px;border-bottom:1px solid var(--on-ink-line);text-align:end;vertical-align:top}
 th:first-child,td:first-child{text-align:start;padding-inline-start:0}
 th{color:var(--on-ink-2);font-weight:500;font-size:12.5px}
-table.cmp tr.click{cursor:pointer}table.cmp tr.click:hover td{background:var(--ink-3)}
+table.cmp tr.click{cursor:pointer}table.cmp tr.click:hover td{background:var(--surf-3)}
 .sw{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block;vertical-align:0}
 .sw.sq{border-radius:1px}.sw.hol{background:transparent!important;border:1.5px dashed var(--on-ink)}
 .ln{display:inline-block;width:20px;border-top:3px solid;flex:none}
@@ -108,7 +108,7 @@ table.cmp tr.click{cursor:pointer}table.cmp tr.click:hover td{background:var(--i
 .stop:first-of-type{border-top:1px solid var(--on-ink-line)}
 .stop>summary{list-style:none;cursor:pointer;min-height:48px;padding:8px 6px;display:grid;grid-template-columns:24px minmax(0,max-content) minmax(0,1fr) auto;gap:6px 10px;align-items:center;border-radius:var(--r);transition:background-color .2s var(--ease)}
 .stop>summary::-webkit-details-marker{display:none}
-.stop>summary:hover{background:var(--ink-3)}
+.stop>summary:hover{background:var(--surf-3)}
 .stop .nb{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:var(--ink);background:var(--c);flex:none;font-variant-numeric:tabular-nums}
 .stop .nb.ct{background:transparent;color:var(--c);border:1.5px dashed var(--c)}
 .stop .nm{font-weight:600}
@@ -116,7 +116,7 @@ table.cmp tr.click{cursor:pointer}table.cmp tr.click:hover td{background:var(--i
 .stop .body{padding:0 6px 14px 40px;font-size:14px}
 .stop ul{margin:4px 0;padding-inline-start:18px}.stop li{margin:4px 0}
 .stop .body .btn{margin-top:var(--s1)}
-.stop.active>summary{background:var(--ink-3)}
+.stop.active>summary{background:var(--surf-3)}
 .stop.active .nm{color:#fff}
 .stop .role{justify-self:start}
 .role{font-size:12px;font-weight:500;line-height:1;border-radius:2px;padding:4px 6px;border:1px solid var(--on-ink-line);color:var(--on-ink-2)}
@@ -134,7 +134,7 @@ details.fold+details.fold{margin-top:0}
 /* buttons on ink: primary = accent, secondary = line */
 .pagebar .btn,.app .btn{min-height:44px;padding:0 16px;font-size:15px;font-weight:600}
 .pagebar .btn:not(.p),.app .btn:not(.p){background:transparent;color:var(--on-ink);border-color:var(--on-ink-line)}
-.pagebar .btn:not(.p):hover,.app .btn:not(.p):hover{background:var(--ink-3);border-color:var(--field-ink)}
+.pagebar .btn:not(.p):hover,.app .btn:not(.p):hover{background:var(--surf-3);border-color:var(--field-ink)}
 .app .btn.p{background:var(--accent);color:#fff}
 .app .btn.p:hover{background:var(--accent-d)}
 
@@ -142,7 +142,7 @@ details.fold+details.fold{margin-top:0}
 .form label{display:flex;justify-content:space-between;gap:var(--s2);align-items:center;margin:var(--s1) 0;font-size:14px;font-weight:400;min-height:44px}
 .form label>span{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
 .form label b{font-weight:600;font-variant-numeric:tabular-nums;color:var(--on-ink)}
-.app input[type=password],.app input[type=number],.app select,.app textarea{background-color:var(--ink);color:var(--on-ink);border:1px solid var(--field-ink);min-height:44px;font-size:15px}
+.app input[type=password],.app input[type=number],.app select,.app textarea{background-color:var(--surf);color:var(--on-ink);border:1px solid var(--field-ink);min-height:44px;font-size:15px}
 .app select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23A9B3BA' stroke-width='1.5'/%3E%3C/svg%3E")}
 .app input:hover,.app select:hover,.app textarea:hover{border-color:var(--on-ink-2)}
 .app input:focus-visible,.app select:focus-visible,.app textarea:focus-visible{border-color:var(--accent-l);box-shadow:0 0 0 3px rgba(140,195,202,.25);outline:none}
@@ -158,9 +158,9 @@ details.fold+details.fold{margin-top:0}
 
 /* map overlay controls */
 .mapctl{position:absolute;z-index:500;top:12px;inset-inline-end:12px;display:flex;gap:var(--s1)}
-.mapctl .btn{background:var(--ink-2)!important}
-.mapctl .btn:hover{background:var(--ink-3)!important}
-.legend{position:absolute;z-index:500;bottom:12px;inset-inline-start:12px;background:var(--ink-2);border:1px solid var(--on-ink-line);border-radius:var(--r-lg);padding:0 12px;font-size:13px;max-width:270px;color:var(--on-ink)}
+.mapctl .btn:not(.p){background:#fff!important}
+.mapctl .btn:not(.p):hover{background:var(--surf-2)!important}
+.legend{position:absolute;z-index:500;bottom:12px;inset-inline-start:12px;background:var(--surf-2);border:1px solid var(--on-ink-line);border-radius:var(--r-lg);padding:0 12px;font-size:13px;max-width:270px;color:var(--on-ink)}
 .legend summary{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:600}
 .legend summary::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--on-ink-2);border-bottom:1.5px solid var(--on-ink-2);transform:rotate(-135deg) translate(-2px,-2px)}
 .legend[open] summary::after{transform:rotate(45deg) translate(-2px,-2px)}
@@ -170,12 +170,12 @@ details.fold+details.fold{margin-top:0}
 
 /* map markers (Leaflet divIcons) */
 .num{width:20px;height:20px;border-radius:50%;color:var(--ink);font-weight:600;font-size:10.5px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);font-family:var(--sans);font-variant-numeric:tabular-nums}
-.num.big{width:24px;height:24px;font-size:12px}.num.ct{background:var(--ink)!important}
-.bus{width:28px;height:28px;border-radius:var(--r);background:var(--ink);color:var(--on-ink);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--c,var(--on-ink))}
+.num.big{width:24px;height:24px;font-size:12px}.num.ct{background:var(--surf)!important}
+.bus{width:28px;height:28px;border-radius:var(--r);background:var(--surf);color:var(--on-ink);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--c,var(--on-ink))}
 .bus svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.ctsq{width:12px;height:12px;border-radius:1px;background:var(--on-ink);border:1.5px solid var(--ink)}
-.ctsq.likely{background:var(--ink);border:1.5px dashed var(--on-ink)}
-.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--ink-2);color:var(--on-ink);border:1px solid var(--on-ink-line);border-radius:var(--r-lg)}
+.ctsq{width:12px;height:12px;border-radius:1px;background:var(--ink);border:1.5px solid #fff;box-shadow:0 0 0 1px var(--ink)}
+.ctsq.likely{background:var(--surf);border:1.5px dashed var(--on-ink)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--surf-2);color:var(--on-ink);border:1px solid var(--on-ink-line);border-radius:var(--r-lg)}
 .leaflet-popup-tip{border-radius:0}
 .leaflet-popup-content{margin:12px 14px;font-size:14px;line-height:1.45;font-family:var(--sans)}
 .leaflet-popup-content h4{margin:0 0 6px;font-size:16px;font-weight:600;padding-inline-end:16px}
@@ -183,7 +183,7 @@ details.fold+details.fold{margin-top:0}
 .leaflet-popup-content .role{display:inline-block;margin-bottom:4px}
 .leaflet-container a.leaflet-popup-close-button{color:var(--on-ink-2);width:28px;height:28px;font-size:20px;line-height:26px}
 .leaflet-container a.leaflet-popup-close-button:hover{color:var(--on-ink)}
-.leaflet-tooltip{background:var(--ink-2);color:var(--on-ink);border:1px solid var(--on-ink-line);border-radius:var(--r);box-shadow:none;font-family:var(--sans);font-size:13px}
+.leaflet-tooltip{background:var(--surf-2);color:var(--on-ink);border:1px solid var(--on-ink-line);border-radius:var(--r);box-shadow:none;font-family:var(--sans);font-size:13px}
 .leaflet-tooltip-top:before{border-top-color:var(--on-ink-line)}
 .ext{display:inline-flex;vertical-align:-2px}
 
@@ -192,12 +192,12 @@ details.fold+details.fold{margin-top:0}
 .chat h2{margin-top:var(--s1)}
 .chat .log{flex:1;overflow:auto;position:relative;border-top:1px solid var(--on-ink-line);padding-top:var(--s1);display:flex;flex-direction:column;gap:12px;margin:var(--s2) 0;min-height:120px}
 .msg{white-space:pre-wrap;font-size:14.5px;line-height:1.5}
-.msg.u{align-self:flex-end;max-width:88%;background:var(--ink-3);padding:8px 12px;border-radius:var(--r-lg)}
+.msg.u{align-self:flex-end;max-width:88%;background:var(--surf-3);padding:8px 12px;border-radius:var(--r-lg)}
 .msg.a{align-self:stretch;padding:0 0 12px;border-bottom:1px solid var(--on-ink-line)}
 .msg.sys{align-self:stretch;padding:10px 12px;border:1px solid var(--on-ink-line);border-radius:var(--r);color:var(--on-ink-2);font-size:14px}
 .qchips{display:flex;flex-direction:column;gap:6px}
 .qchips button{display:flex;align-items:center;min-height:44px;padding:8px 12px;background:transparent;color:var(--on-ink);border:1px solid var(--on-ink-line);border-radius:var(--r);cursor:pointer;font:inherit;font-size:14px;text-align:start;line-height:1.35;transition:background-color .2s var(--ease),border-color .2s var(--ease)}
-.qchips button:hover{background:var(--ink-3);border-color:var(--field-ink)}
+.qchips button:hover{background:var(--surf-3);border-color:var(--field-ink)}
 .chat textarea{width:100%;min-height:72px;padding:10px 12px;resize:vertical}
 .chat .send{display:flex;gap:12px;align-items:center;margin-top:var(--s1)}
 
@@ -230,8 +230,7 @@ details.fold+details.fold{margin-top:0}
   <div class="mapbox">
     <div id="map" role="application" aria-label="Map"></div>
     <div class="mapctl"><button class="btn" id="allBtn" type="button" data-t="all_fi"></button><button class="btn p" id="replayBtn" type="button" data-t="replay"></button></div>
-    <details class="legend" id="legend" open><summary data-t="legend"></summary><div id="legendBody"></div></details>
-    <script>try{if(matchMedia('(max-width:760px)').matches)document.getElementById('legend').removeAttribute('open')}catch(e){}</script>
+    <details class="legend" id="legend"><summary data-t="legend"></summary><div id="legendBody"></div></details>
   </div>
   <aside class="panel chat chatp" id="chatPanel" aria-label="Chat">
     <h2 data-t="chat_h"></h2>
@@ -394,8 +393,8 @@ en:{title:'Polku hoitoon · Pilot map',tagline:'Where could lung-cancer CT scree
  lg_hosp:'Hospital invitation area (≤ {m} min)',lg_bus:'Bus area (> {m} min), in the region\'s colour',lg_ct:'CT confirmed',lg_ctl:'CT inferred',lg_route:'Route (open, no return leg)',lg_stop:'Stop; dashed edge = CT town',lg_custom:'Custom route',lg_hs:'Hospital pilot invitation area',
  err:'Could not load the data.',back:'← All routes'}};
 const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
-const COL={HVA21:'#E39A2D',HVA10:'#2BA39A',HVA06:'#6C8EBF',custom:'#E58FB4'};
-const HOSP_COL='#C9CFD4',FIN=[[59.6,19.4],[70.15,31.7]];
+const COL={HVA21:'#E39A2D',HVA10:'#2BA39A',HVA06:'#6C8EBF',custom:'#0F1A24'};
+const HOSP_COL='#9AA3A8',FIN=[[59.6,19.4],[70.15,31.7]];
 let lang='fi',D=null,ADV=null,token=null,sel=null,CUSTOM=null,HS=null,thresh=45,map,G={},anims=[],chat=[],chatOK=null,scen=null,reduce=false;
 const O={bub:true,ct:true,hull:true};
 const $=id=>document.getElementById(id);
@@ -431,9 +430,9 @@ function hullOf(pts){pts=pts.map(p=>[p[1],p[0]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1
 function drawStatic(){
   ['hull','bub','ct'].forEach(k=>G[k].clearLayers());
   D.meta.priority.forEach(c=>{
-    if(O.hull){const h=hullOf(munis(c).map(m=>[m.lat,m.lon]));if(h)L.polygon(h,{color:'#F2EFE8',weight:1,opacity:sel===c?.32:.16,fillColor:COL[c],fillOpacity:sel===c?.07:.03,interactive:false})   /* area outline: quiet hairline, the route colour is for the road route only */.addTo(G.hull)}
+    if(O.hull){const h=hullOf(munis(c).map(m=>[m.lat,m.lon]));if(h)L.polygon(h,{color:'#0F1A24',weight:1,opacity:sel===c?.32:.16,fillColor:COL[c],fillOpacity:sel===c?.07:.03,interactive:false})   /* area outline: quiet hairline, the route colour is for the road route only */.addTo(G.hull)}
     if(O.bub)munis(c).forEach(m=>{const h=isHosp(m),unc=h&&m.ct_status!=='confirmed';
-      L.circleMarker([m.lat,m.lon],{radius:3+Math.sqrt(m.eligible)*.42,color:unc?'#F2EFE8':'#0F1A24',weight:unc?1.2:.8,dashArray:unc?'2 3':null,fillColor:h?HOSP_COL:COL[c],fillOpacity:(sel&&sel!==c&&sel!=='custom')?.18:.5})
+      L.circleMarker([m.lat,m.lon],{radius:3+Math.sqrt(m.eligible)*.42,color:unc?'#5B6670':'#0F1A24',weight:unc?1.2:.8,dashArray:unc?'2 3':null,fillColor:h?HOSP_COL:COL[c],fillOpacity:(sel&&sel!==c&&sel!=='custom')?.18:.5})
        .addTo(G.bub).bindPopup(()=>muniPop(m)).bindTooltip(esc(m.name),{direction:'top'})});
   });
   if(O.ct)D.ct_towns.forEach(x=>{const mine=D.meta.priority.includes(x.county);
@@ -450,7 +449,7 @@ function ctPop(x){const c=D.counties[x.county];const full=c?c.hospital.towns.fin
   return `<h4>${esc(x.town)}</h4><div>CT ${t('st_'+x.status)}</div>${sites?`<ul>${sites}</ul>`:''}`}
 function legend(){
   const r=(c,txt,k='')=>`<div class="row"><span class="sw ${k}" style="background:${c}"></span>${txt}</div>`;
-  $('legendBody').innerHTML=r(HOSP_COL,t('lg_hosp',{m:thresh}))+r('#A9B3BA',t('lg_bus',{m:thresh}))+r('#F2EFE8',t('lg_ct'),'sq')+r('#0F1A24',t('lg_ctl'),'sq hol')
+  $('legendBody').innerHTML=r(HOSP_COL,t('lg_hosp',{m:thresh}))+r('#5B6670',t('lg_bus',{m:thresh}))+r('#0F1A24',t('lg_ct'),'sq')+r('#0F1A24',t('lg_ctl'),'sq hol')
    +D.meta.priority.map(c=>`<div class="row"><span class="ln" style="border-color:${COL[c]}"></span>${esc(cn(c))}</div>`).join('')
    +`<div class="row m">${t('lg_route')}</div><div class="row m">${t('lg_stop')}</div>`
    +(CUSTOM?`<div class="row"><span class="ln" style="border-color:${COL.custom};border-top-style:dashed"></span>${t('lg_custom')}</div>`:'')
@@ -668,8 +667,8 @@ function bindTools(){
 }
 function drawHS(){G.hs.clearLayers();if(!HS)return;const tw=D.ct_towns.find(x=>x.town===HS.town),pts=[];
   HS.municipalities.forEach(m=>{const mm=D.municipalities.find(q=>q.name===m.name);if(!mm)return;pts.push([mm.lat,mm.lon]);
-    L.circleMarker([mm.lat,mm.lon],{radius:6+Math.sqrt(m.eligible)*.45,color:'#F2EFE8',weight:1.5,dashArray:'3 3',fill:false}).addTo(G.hs).bindTooltip(esc(m.name)+': '+n0(m.eligible));
-    if(tw)L.polyline([[tw.lat,tw.lon],[mm.lat,mm.lon]],{color:'#F2EFE8',weight:1,opacity:.5,interactive:false}).addTo(G.hs)});
+    L.circleMarker([mm.lat,mm.lon],{radius:6+Math.sqrt(m.eligible)*.45,color:'#0F1A24',weight:1.5,dashArray:'3 3',fill:false}).addTo(G.hs).bindTooltip(esc(m.name)+': '+n0(m.eligible));
+    if(tw)L.polyline([[tw.lat,tw.lon],[mm.lat,mm.lon]],{color:'#0F1A24',weight:1,opacity:.5,interactive:false}).addTo(G.hs)});
   if(tw)pts.push([tw.lat,tw.lon]);if(pts.length)map.flyToBounds(L.latLngBounds(pts),{padding:[40,40],maxZoom:9,duration:.7});legend()}
 async function loadAdv(){try{const r=await fetch('/api/map/advanced',{headers:{'X-Map-Token':token}});if(!r.ok){token=null;ADV=null;try{sessionStorage.removeItem('polku-map-token')}catch(e){}return}ADV=await r.json()}catch(e){token=null;ADV=null}}
 

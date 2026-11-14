@@ -1,7 +1,7 @@
 (() => {
   // Styles live in /site.css (linked by every page). This script renders the shared header and footer.
   document.documentElement.classList.add("js");
-  const mark = '<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 18c4 0 4-6 8-6s4-6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="6" r="2.4" fill="#8CC3CA"/></svg>';
+  const mark = '<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 18c4 0 4-6 8-6s4-6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="6" r="2.4" fill="#E39A2D"/></svg>';
 
   const languages = {
     fi: "Suomi", sv: "Svenska", en: "English", ru: "Русский",
