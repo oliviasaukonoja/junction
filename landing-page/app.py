@@ -119,7 +119,7 @@ def web():
 - England's Targeted Lung Health Check mobile CT units found over 5,000 lung cancers, 76% at stage 1-2. [NHS England / GOV.UK 2023]
 - Expert interviews: symptoms go unnoticed because information is scattered across systems and doctors change; fear and low health literacy delay help-seeking; language is one barrier. [AstraZeneca expert interviews, Junction 2026]
 POSSIBLE ACTIONS (Polku hoitoon concept, not yet piloted, no measured effect):
-A) Flag + direct imaging referral in primary care when a smoker visits a third time with respiratory symptoms. Metric: days from first visit to imaging.
+A) (Role not decided by the team; do not recommend it.) Flag + direct imaging referral in primary care when a smoker visits a third time with respiratory symptoms. Metric: days from first visit to imaging.
 B) App: continuous symptom tracking in the patient's own language and a visible care path. Metric: time from symptoms to first visit, also by language group.
 C) Risk-group low-dose CT screening bus (age 50-74, heavy smokers), started as a pilot with randomised invitations so it measures whether the bus reaches people a hospital CT would not. Metric: share diagnosed at stage 1-2.
 - Estimated risk group about 120,000 people nationally (7% of 50-74-year-olds): smoking rates times an assumed factor, because Finnish pack-year data does not exist. [Polku Labs estimate from THL Sotkanet; assumption]
