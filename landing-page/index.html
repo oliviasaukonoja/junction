@@ -5,193 +5,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Polku hoitoon – keuhkotarkastus lähellä</title>
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/site.css" rel="stylesheet">
 <style>
-:root{--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange:#D9730D;--orange-bg:#FFF3E6;--orange-ink:#8A3B00}
-*{box-sizing:border-box}
+/* Bus sign-up page. Shared system: /site.css. Only page-specific layout here. */
 html{scroll-behavior:smooth}
-body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:17px}
-a{color:var(--blue)}a:hover{color:var(--blue-d)}
-h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
-.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
-.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
-.btn:hover{background:var(--blue-d);color:#fff}
-.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
-.hero{background:var(--bg);padding:56px 0 48px}
-.hero-g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
-.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:16px}
-.hero h1{font-size:clamp(34px,5vw,54px)}
-.lead{font-size:19px;color:var(--muted);margin:18px 0 26px;max-width:36em}
-.bus{width:100%;height:auto}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:-28px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(20,33,61,.05)}
-.faq{border-bottom:1px solid var(--line);padding:14px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq p{margin:8px 0 0;color:var(--muted)}
-.stat-cap{grid-column:1/-1;justify-self:start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--muted)}
-.stat b{display:block;font-family:"Space Grotesk",sans-serif;font-size:34px;color:var(--blue-d)}
-.stat span{font-size:15px;color:var(--muted)}
-section{padding:56px 0}
-.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
-.list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
-.list li{display:flex;gap:12px;align-items:flex-start}
-.dot{flex:none;width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:9px}
-.uk{background:var(--ink);color:#fff}
-.uk h2{color:#fff}
-.uk p{color:#DCE3F0}
-.uk .src{font-size:14px;color:#AAB6CC}
-.uk a{color:#9EC1FF}
-.warn{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:18px;padding:22px 24px;color:var(--orange-ink)}
-.warn h3{color:var(--orange-ink);font-size:22px;margin-bottom:6px}
-form{display:flex;flex-direction:column;gap:16px}
-label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
-input[type=text],input[type=tel]{width:100%;font:inherit;min-height:48px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)}
-input:focus,select:focus,.btn:focus,.opt:focus-within{outline:3px solid #9EC1FF;outline-offset:2px}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;font-weight:500;cursor:pointer}
-.opt input{width:18px;height:18px;accent-color:var(--blue)}
-.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:15px}
-.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}
-.msg{padding:14px 16px;border-radius:12px;font-size:16px}
-.msg.ok{background:var(--sky);color:var(--blue-d)}
-.msg.err{background:#FDECEC;color:#9B1C1C}
-.msg.demo{background:var(--orange-bg);color:var(--orange-ink)}
-.team{background:var(--bg)}
-table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
-footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
-footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;color:var(--ink)}
-.hidden{display:none}
-[dir=rtl] .list li,[dir=rtl] .consent{flex-direction:row}
-@media (max-width:780px){.hero-g,.g2{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr);margin-top:20px}.hero{padding:36px 0}.bus{max-width:360px}}
-.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
-@media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
-@media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
-.menu{position:relative}.menu summary{list-style:none;cursor:pointer;min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;border:1px solid #C9D2E0;border-radius:10px;font-size:20px;background:#fff;color:var(--ink)}.menu summary::-webkit-details-marker{display:none}
-.menu-p{position:absolute;inset-inline-end:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(20,33,61,.14);padding:8px;min-width:230px;display:flex;flex-direction:column;z-index:20}
-.menu-p a{padding:11px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:16px}.menu-p a:hover{background:var(--bg)}
-/* spacing v2 */
-body{line-height:1.6}
-.wrap{padding:0 24px}
-header .bar{padding:12px 24px;gap:16px;min-height:72px}
-.bar-r{gap:12px}
-section{padding:80px 0}
-.hero{padding:72px 0 64px}
-.lead{margin:20px 0 30px}
-.g2{gap:48px}
-.card{padding:28px}
-form{gap:20px}
-.stats{gap:20px}
-.list{gap:14px;margin-top:20px}
-.faq{padding:18px 0}
-footer{padding:40px 0 56px}
-@media (max-width:780px){.wrap{padding:0 20px}header .bar{padding:12px 20px;gap:12px}.bar-r{display:contents}.logo{order:1;flex:1;font-size:22px}header select{order:2;padding:0 8px;font-size:14px}.menu{order:3}.tabs{order:4;width:100%}header .btn.sm{display:none}section{padding:56px 0}.hero{padding:40px 0 44px}.g2{gap:32px}}
-/* stats-space */
-.stats{margin-top:48px;margin-bottom:80px}
-.stat-cap{margin-bottom:4px}
-@media (max-width:780px){.stats{margin-top:32px;margin-bottom:56px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+#join{scroll-margin-top:var(--s10)}
+
+/* hero */
+.hero-g{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--s6);align-items:end}
+.hero-acts{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);margin-top:var(--s4)}
+.hero-acts p{margin:0;font-weight:500}
+.hero-acts p a{display:inline-flex;align-items:center;min-height:44px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:var(--s1);margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--on-ink-line)}
+.hero-meta .tag{font-size:12px;padding:6px 8px}
+#mtNote{margin:var(--s2) 0 0;font-size:14px;color:var(--on-ink-2)}
+.bus{display:block;width:100%;height:auto;max-width:520px;margin-inline-start:auto;margin-bottom:calc(-1 * var(--s8))}
+[dir=rtl] .bus{transform:scaleX(-1)}
+
+/* UK evidence */
+.uk-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s3) var(--s6);align-items:start}
+.uk-txt p{font-size:19px;line-height:1.6;max-width:44em}
+.uk-txt p:last-child{margin-bottom:0}
+.stats{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));margin-top:var(--s8);border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.stat-cap,.stat{padding-block:var(--s3);padding-inline:0 var(--s3)}
+.stat-cap{font-size:15px;font-weight:600;color:var(--ink);line-height:1.4}
+.stat{padding-inline-start:var(--s3);border-inline-start:1px solid var(--line)}
+.stat b{display:block;font-family:var(--serif);font-weight:400;font-size:44px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums;color:var(--ink)}
+.stat span{display:block;margin-top:var(--s1);font-size:15px;color:var(--sec);line-height:1.4}
+.uk .src{margin:var(--s2) 0 0;max-width:none}
+.uk.block{padding-bottom:var(--s6)}
+#join{border-top:1px solid var(--line)}
+
+/* join */
+.join-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s6);align-items:start}
+.join-side{position:sticky;top:calc(64px + var(--s4))}
+.count{margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+#countN{font-family:var(--serif);font-size:48px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums;color:var(--accent)}
+.count .count-t{margin-top:var(--s1);color:var(--sec);font-size:15px}
+.count p{margin:var(--s2) 0 0;font-size:16px}
+.form-sheet{padding:var(--s5)}
+form{display:flex;flex-direction:column;gap:var(--s3)}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend,.fld label{display:block;font-weight:600;font-size:15px;margin-bottom:var(--s1);padding:0}
+.fld input{width:100%}
+.opts{display:flex;flex-wrap:wrap;gap:var(--s1)}
+.opt{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding-inline:14px 18px;background:#fff;border:1px solid var(--line-2);border-radius:var(--r);font-weight:500;font-size:16px;cursor:pointer;transition:border-color .2s var(--ease),background-color .2s var(--ease)}
+.opt:hover{border-color:var(--ink)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-t);color:var(--accent-d)}
+.opt input{margin:0;flex:none}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.help{margin:var(--s1) 0 0;font-size:14px;color:var(--sec)}
+.consents{display:flex;flex-direction:column;gap:var(--s2);padding-top:var(--s3);border-top:1px solid var(--line)}
+.consent{display:flex;gap:12px;align-items:flex-start;font-weight:400;font-size:15px;line-height:1.5;cursor:pointer}
+.consent input{margin:1px 0 0;flex:none}
+.hp{position:absolute;inset-inline-start:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+form>.btn{align-self:flex-start}
+.msg{padding:var(--s2);border:1px solid var(--line);border-radius:var(--r);font-size:16px;line-height:1.5}
+.msg.ok{background:var(--accent-t);border-color:var(--accent-l);color:var(--accent-d);font-weight:500}
+.msg.err{display:flex;gap:12px;align-items:flex-start;background:#fff;border-color:var(--ink);color:var(--ink);font-weight:500}
+.msg.err::before{content:"";flex:none;width:20px;height:20px;margin-top:1px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='9' fill='%230F1A24'/%3E%3Cpath d='M10 5v6' stroke='%23F7F5F0' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='14.5' r='1.2' fill='%23F7F5F0'/%3E%3C/svg%3E") no-repeat}
+.msg.demo{background:var(--paper-2);border-color:var(--line-2);color:var(--ink)}
+.share{display:flex;flex-direction:column;gap:var(--s1);padding-top:var(--s3);border-top:1px solid var(--line)}
+.share span{font-size:15px;color:var(--sec)}
+.share .opts{margin-top:var(--s1)}
+
+@media (max-width:900px){
+  .hero-g,.uk-g,.join-g{grid-template-columns:minmax(0,1fr)}
+  .bus{max-width:360px;margin-inline-start:0;margin-bottom:calc(-1 * var(--s5))}
+  .join-side{position:static}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stat-cap{grid-column:1/-1;border-bottom:1px solid var(--line);padding:var(--s2) 0}
+  .stat{padding-block:var(--s2)}
+  .stat:nth-child(2){border-inline-start:0;padding-inline-start:0}
+}
+@media (max-width:640px){
+  .stats{grid-template-columns:minmax(0,1fr)}
+  .stat{display:flex;align-items:baseline;gap:var(--s2);padding:var(--s2) 0;border-inline-start:0;border-top:1px solid var(--line)}
+  .stat:nth-child(2){border-top:0}
+  .stat b{font-size:36px;min-width:4.2ch}
+  .stat span{margin:0}
+  .form-sheet{padding:var(--s3) var(--s2)}
+  .hero-acts .btn{width:100%}
+}
 </style>
 </head>
 <body>
 <div id="site-header"></div><script src="/layout.js"></script>
 
 <main id="top">
-  <div class="hero">
+  <section class="band">
     <div class="wrap hero-g">
       <div>
-        <span class="badge" style="margin-inline-end:6px" data-t="badge"></span>
-        <span class="badge" style="background:#E7F6EC;color:#14532D;margin-inline-start:0" data-t="free"></span>
         <h1 data-t="h1"></h1>
         <p class="lead" data-t="lead"></p>
-        <a class="btn" href="#join" data-t="cta"></a>
-        <p style="margin:14px 0 0;font-weight:600"><a href="/keuhkodata" data-t="datalink"></a></p>
-        <p id="mtNote" class="hidden" style="font-size:14px;color:var(--muted);margin-top:14px"></p>
+        <div class="hero-acts">
+          <a class="btn" href="#join" data-t="cta"></a>
+          <p><a href="/keuhkodata" data-t="datalink"></a></p>
+        </div>
+        <div class="hero-meta">
+          <span class="tag" data-t="badge"></span>
+          <span class="tag" data-t="free"></span>
+        </div>
+        <p id="mtNote" class="hidden"></p>
       </div>
-      <svg class="bus" viewBox="0 0 420 260" role="img" aria-label="Polku hoitoon bus">
-        <rect x="18" y="58" width="370" height="150" rx="26" fill="#1F5FD6"/>
-        <rect x="18" y="160" width="370" height="48" rx="0" fill="#123E91"/>
-        <rect x="18" y="182" width="370" height="26" rx="13" fill="#123E91"/>
-        <rect x="44" y="82" width="70" height="56" rx="10" fill="#EAF1FF"/>
-        <rect x="128" y="82" width="70" height="56" rx="10" fill="#EAF1FF"/>
-        <rect x="212" y="82" width="70" height="56" rx="10" fill="#EAF1FF"/>
-        <rect x="300" y="82" width="64" height="110" rx="10" fill="#9EC1FF"/>
-        <path d="M150 168c0-10 8-18 18-18s18 8 18 18v12h-36z" fill="#FFFFFF"/>
-        <path d="M196 168c0-10 8-18 18-18s18 8 18 18v12h-36z" fill="#FFFFFF"/>
-        <rect x="186" y="150" width="10" height="30" rx="3" fill="#FFFFFF"/>
-        <circle cx="92" cy="214" r="28" fill="#14213D"/><circle cx="92" cy="214" r="11" fill="#C9D2E0"/>
-        <circle cx="318" cy="214" r="28" fill="#14213D"/><circle cx="318" cy="214" r="11" fill="#C9D2E0"/>
-        <rect x="376" y="150" width="14" height="22" rx="4" fill="#F5B97A"/>
-        <rect x="0" y="242" width="420" height="4" rx="2" fill="#C9D2E0"/>
+      <svg class="bus" viewBox="0 0 440 250" role="img" aria-label="Polku hoitoon bus">
+        <path d="M0 226H440" stroke="#22303C" stroke-width="2"/>
+        <path d="M24 74a12 12 0 0 1 12-12H344a10 10 0 0 1 8 4l34 46a14 14 0 0 1 3 8V196a10 10 0 0 1-10 10H36a12 12 0 0 1-12-12Z" fill="#0B5563"/>
+        <path d="M24 176H389V194a12 12 0 0 1-10 12H36a12 12 0 0 1-12-12Z" fill="#083F49"/>
+        <path d="M24 170H389" stroke="#8CC3CA" stroke-width="2"/>
+        <rect x="44" y="82" width="54" height="40" rx="3" fill="#18242F"/>
+        <rect x="108" y="82" width="54" height="40" rx="3" fill="#18242F"/>
+        <rect x="174" y="78" width="124" height="84" rx="4" fill="#F7F5F0"/>
+        <circle cx="222" cy="120" r="30" fill="none" stroke="#0F1A24" stroke-width="10"/>
+        <circle cx="222" cy="120" r="30" fill="none" stroke="#8CC3CA" stroke-width="2" stroke-dasharray="3 5"/>
+        <rect x="200" y="124" width="90" height="6" rx="1" fill="#22303C"/>
+        <path d="M262 130v20M282 130v20" stroke="#5B6670" stroke-width="3"/>
+        <rect x="312" y="82" width="28" height="94" rx="2" fill="#083F49" stroke="#8CC3CA" stroke-opacity=".5"/>
+        <rect x="317" y="88" width="18" height="32" rx="2" fill="#18242F"/>
+        <path d="M352 76l30 40H352Z" fill="#18242F"/>
+        <rect x="380" y="160" width="9" height="10" rx="1" fill="#F2EFE8"/>
+        <path d="M44 150c10 0 10-14 20-14s10-14 20-14" fill="none" stroke="#F2EFE8" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="84" cy="122" r="5" fill="#8CC3CA"/>
+        <circle cx="92" cy="206" r="22" fill="#18242F" stroke="#A9B3BA" stroke-width="2"/>
+        <circle cx="92" cy="206" r="7" fill="#A9B3BA"/>
+        <circle cx="330" cy="206" r="22" fill="#18242F" stroke="#A9B3BA" stroke-width="2"/>
+        <circle cx="330" cy="206" r="7" fill="#A9B3BA"/>
       </svg>
     </div>
-  </div>
+  </section>
 
-  <div class="wrap">
-    <div class="stats">
-      <div class="stat-cap" data-t="stats_h"></div>
-      <div class="stat"><b>76&nbsp;%</b><span data-t="s1"></span></div>
-      <div class="stat"><b>5&nbsp;000+</b><span data-t="s2"></span></div>
-      <div class="stat"><b>2019</b><span data-t="s3"></span></div>
-    </div>
-  </div>
-
-  <section class="uk">
+  <section class="uk block reveal">
     <div class="wrap">
-      <h2 data-t="uk_h"></h2>
-      <p style="font-size:19px;max-width:44em" data-t="uk_p"></p>
-      <p style="font-size:19px;max-width:44em" data-t="uk_p2"></p>
+      <div class="uk-g">
+        <h2 data-t="uk_h"></h2>
+        <div class="uk-txt">
+          <p data-t="uk_p"></p>
+          <p data-t="uk_p2"></p>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat-cap" data-t="stats_h"></div>
+        <div class="stat"><b>76&nbsp;%</b><span data-t="s1"></span></div>
+        <div class="stat"><b>5&nbsp;000+</b><span data-t="s2"></span></div>
+        <div class="stat"><b>2019</b><span data-t="s3"></span></div>
+      </div>
       <p class="src">NHS England / GOV.UK 2023 · <a href="https://www.gov.uk/government/news/new-lung-cancer-screening-roll-out-to-detect-cancer-sooner">GOV.UK</a> · <a href="https://www.england.nhs.uk/2022/04/hundreds-of-people-diagnosed-with-cancer-early-through-life-saving-nhs-lung-checks/">NHS England</a> · Finland vs Norway: <a href="https://ihe.se/app/uploads/2026/04/IHE-Cancer-Dashboard-Finland_.pdf">IHE Cancer Dashboard Finland 2026</a></p>
     </div>
   </section>
 
-  <section id="join">
-    <div class="wrap g2">
-      <div>
+  <section id="join" class="block reveal">
+    <div class="wrap join-g">
+      <div class="join-side">
         <h2 data-t="form_h"></h2>
-        <div id="countBox" class="hidden"><div class="card" style="margin-top:16px">
-          <div id="countN" style="font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;color:var(--blue-d)">0</div>
-          <div data-t="count_t" style="color:var(--muted)"></div>
-          <p data-t="vote_p" style="margin:12px 0 8px"></p>
+        <div id="countBox" class="hidden"><div class="count">
+          <div id="countN">0</div>
+          <div class="count-t" data-t="count_t"></div>
+          <p data-t="vote_p"></p>
         </div></div>
       </div>
-      <div class="card">
+      <div class="sheet form-sheet">
         <form id="f" novalidate>
-          <fieldset hidden style="border:0;padding:0;margin:0">
-            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="int_lbl"></legend>
+          <fieldset hidden>
+            <legend data-t="int_lbl"></legend>
             <div class="opts">
               <label class="opt"><input type="checkbox" name="prod" value="bus" checked><span data-t="nav_bus"></span></label>
             </div>
           </fieldset>
-          <fieldset style="border:0;padding:0;margin:0">
-            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="who_lbl"></legend>
+          <fieldset>
+            <legend data-t="who_lbl"></legend>
             <div class="opts">
               <label class="opt"><input type="radio" name="who" value="self" checked><span data-t="me"></span></label>
               <label class="opt"><input type="radio" name="who" value="relative"><span data-t="rel"></span></label>
             </div>
-            <p id="relHelp" class="hidden" style="margin:8px 0 0;font-size:14px;color:var(--muted)" data-t="rel_help"></p>
+            <p id="relHelp" class="help hidden" data-t="rel_help"></p>
           </fieldset>
-          <div><label for="fname" data-t="f_name"></label><input id="fname" type="text" autocomplete="given-name"></div>
-          <div><label for="contact" data-t="f_contact"></label><input id="contact" type="text" autocomplete="tel"></div>
-          <div><label for="post" data-t="f_post"></label><input id="post" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
-          <fieldset style="border:0;padding:0;margin:0">
-            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="f_age1"></legend>
+          <div class="fld"><label for="fname" data-t="f_name"></label><input id="fname" type="text" autocomplete="given-name"></div>
+          <div class="fld"><label for="contact" data-t="f_contact"></label><input id="contact" type="text" autocomplete="tel"></div>
+          <div class="fld"><label for="post" data-t="f_post"></label><input id="post" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
+          <fieldset>
+            <legend data-t="f_age1"></legend>
             <div class="opts"><label class="opt"><input type="radio" name="age" value="yes"><span data-t="yes"></span></label><label class="opt"><input type="radio" name="age" value="no"><span data-t="no"></span></label></div>
           </fieldset>
-          <fieldset style="border:0;padding:0;margin:0">
-            <legend style="font-weight:600;font-size:15px;margin-bottom:6px" data-t="f_smoke"></legend>
+          <fieldset>
+            <legend data-t="f_smoke"></legend>
             <div class="opts"><label class="opt"><input type="radio" name="smoke" value="now"><span data-t="smoke_now"></span></label><label class="opt"><input type="radio" name="smoke" value="former"><span data-t="smoke_former"></span></label><label class="opt"><input type="radio" name="smoke" value="never"><span data-t="smoke_never"></span></label></div>
           </fieldset>
-          <div style="position:absolute;left:-9999px" aria-hidden="true"><label for="website">Website</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
-          <label class="consent"><input id="consent" type="checkbox"><span data-t="f_consent"></span></label>
-          <label class="consent"><input id="privok" type="checkbox" required aria-required="true"><span data-t="privok"></span></label>
+          <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
+          <div class="consents">
+            <label class="consent"><input id="consent" type="checkbox"><span data-t="f_consent"></span></label>
+            <label class="consent"><input id="privok" type="checkbox" required aria-required="true"><span data-t="privok"></span></label>
+          </div>
           <button class="btn" type="submit" data-t="submit"></button>
           <div id="out" class="msg hidden" role="status" aria-live="polite"></div>
-          <div id="shareWrap" class="hidden"><div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:var(--sky)">
-            <strong data-t="share_h"></strong><span style="font-size:15px" data-t="share_p"></span>
-            <div class="opts"><a id="waBtn" class="btn sm" href="#" target="_blank" rel="noopener" data-t="wa"></a><button id="copyBtn" type="button" class="btn sm" style="background:#fff;color:var(--blue-d);border:1px solid #C9D2E0" data-t="copy"></button></div>
+          <div id="shareWrap" class="hidden"><div class="share">
+            <strong data-t="share_h"></strong><span data-t="share_p"></span>
+            <div class="opts"><a id="waBtn" class="btn sm" href="#" target="_blank" rel="noopener" data-t="wa"></a><button id="copyBtn" type="button" class="btn sm line" data-t="copy"></button></div>
           </div></div>
         </form>
       </div>
