@@ -230,7 +230,8 @@ details.fold+details.fold{margin-top:0}
   <div class="mapbox">
     <div id="map" role="application" aria-label="Map"></div>
     <div class="mapctl"><button class="btn" id="allBtn" type="button" data-t="all_fi"></button><button class="btn p" id="replayBtn" type="button" data-t="replay"></button></div>
-    <details class="legend" id="legend"><summary data-t="legend"></summary><div id="legendBody"></div></details>
+    <details class="legend" id="legend" open><summary data-t="legend"></summary><div id="legendBody"></div></details>
+    <script>try{if(matchMedia('(max-width:760px)').matches)document.getElementById('legend').removeAttribute('open')}catch(e){}</script>
   </div>
   <aside class="panel chat chatp" id="chatPanel" aria-label="Chat">
     <h2 data-t="chat_h"></h2>
@@ -614,8 +615,8 @@ function toolsHTML(){
     <label><span>${t('thr')} <b id="thr_v">${thresh}</b> ${chip('ass')}</span><input type="range" id="thr" min="15" max="120" step="5" value="${thresh}"></label></div></details>
    <details class="fold" open><summary>${t('mk_h')}</summary><form class="form" id="mkForm">
     <div class="sub">${t('mk_regions')}</div><div class="checks">${P.map(c=>`<label><input type="checkbox" name="mk_c" value="${c}" ${SP.counties.includes(c)?'checked':''}>${esc(cn(c))}</label>`).join('')}</div>
-    <label><span>${t('mk_start')}</span><select id="mk_start"><option value="">${t('mk_auto')}</option>${names.map(n=>`<option ${SP.start===n?'selected':''}>${esc(n)}</option>`).join('')}</select></label>
-    <div class="sub">${t('mk_excl')}</div><div class="checks">${names.map(n=>`<label><input type="checkbox" name="mk_x" value="${esc(n)}" ${SP.exclude.includes(n)?'checked':''}>${esc(n)}</label>`).join('')}</div>
+    <label><span>${t('mk_start')}</span><select id="mk_start">${mkStartOpts(SP.counties,SP.start)}</select></label>
+    <div class="sub">${t('mk_excl')}</div><div class="checks" id="mk_xbox">${mkExclBoxes(SP.counties,SP.exclude)}</div>
     ${rng('mk_work_days','mk_wd',10,SP.work_days)}${rng('mk_interval','mk_int',0.5,SP.interval)}${rng('mk_lam','mk_lam',0.25,SP.lam)}${rng('mk_gamma','mk_gamma',0.25,SP.gamma)}${rng('mk_mu','mk_mu',0.05,SP.mu)}${rng('mk_spare','mk_spare',0.01,SP.spare)}${rng('mk_k_elig','mk_k',0.05,SP.k_elig)}
     <label><span>${t('mk_ct')}</span><select id="mk_ct"><option value="confirmed+likely">${t('mk_ctl')}</option><option value="confirmed" ${SP.ct_mode==='confirmed'?'selected':''}>${t('mk_ctc')}</option></select></label>
     <button class="btn p" type="submit" id="mkGo">${t('mk_go')}</button> ${CUSTOM?`<button class="btn" type="button" id="mkClear">${t('mk_clear')}</button>`:''}<div class="sub" id="mkMsg" role="status">${t('mk_note')}</div></form></details>
@@ -632,6 +633,9 @@ function toolsHTML(){
   h+=`<div style="margin-top:16px"><button class="btn" type="button" id="lockBtn">${t('lock')}</button></div>`;
   return h;
 }
+function mkNames(cs){return D.municipalities.filter(m=>cs.includes(m.county)).map(m=>m.name).sort((a,b)=>a.localeCompare(b,'fi'))}
+function mkStartOpts(cs,cur){return `<option value="">${t('mk_auto')}</option>`+mkNames(cs).map(n=>`<option ${cur===n?'selected':''}>${esc(n)}</option>`).join('')}
+function mkExclBoxes(cs,ex){return mkNames(cs).map(n=>`<label><input type="checkbox" name="mk_x" value="${esc(n)}" ${ex.includes(n)?'checked':''}>${esc(n)}</label>`).join('')}
 function hsHTML(){const x=HS;let s=`<div class="notice">${t('hs_res',{t:esc(x.town),st:t('st_'+x.ct_status),n:x.municipalities.length,e:n0(x.eligible),inv:n0(x.invitations_per_year),sc:n0(x.expected_scans_year),w:n1(x.expected_scans_week)})} ${chip('mod')}`;
   if(x.user_slots_per_week)s+=`<br>${t('hs_slots_res',{s:n0(x.user_slots_per_week),wk:n0(x.weeks_to_cover_one_round),p:pc(x.share_of_demand_covered)})} ${chip('ass')}`;
   s+=`<br><span class="sub">${t('hs_cap')}${esc(x.capacity.needed_data.join('; '))}.</span></div><table><tbody>${x.municipalities.map(m=>`<tr><td>${esc(m.name)}</td><td>${m.minutes} min</td><td>${n0(m.eligible)}</td><td>${n1(m.scans_year)}</td></tr>`).join('')}</tbody></table>`;return s}
@@ -646,6 +650,8 @@ function bindTools(){
   const thr=$('thr');if(thr)thr.addEventListener('input',()=>{thresh=+thr.value;$('thr_v').textContent=thresh;drawStatic()}),thr.addEventListener('change',()=>renderLeft());
   $('left').querySelectorAll('#mkForm input[type=range]').forEach(r=>r.addEventListener('input',()=>{$(r.id+'_v').textContent=r.value}));
   const hm=$('hs_min');if(hm)hm.addEventListener('input',()=>{$('hs_min_v').textContent=hm.value});
+  $('left').querySelectorAll('input[name=mk_c]').forEach(c=>c.addEventListener('change',()=>{const cs=[...document.querySelectorAll('input[name=mk_c]:checked')].map(x=>x.value),st=$('mk_start').value,ex=[...document.querySelectorAll('input[name=mk_x]:checked')].map(x=>x.value);
+    $('mk_start').innerHTML=mkStartOpts(cs,st);$('mk_xbox').innerHTML=mkExclBoxes(cs,ex)}));
   const mk=$('mkForm');if(mk)mk.addEventListener('submit',async e=>{e.preventDefault();const msg=$('mkMsg');$('mkGo').disabled=true;msg.textContent=t('mk_busy');
     const spec={counties:[...document.querySelectorAll('input[name=mk_c]:checked')].map(x=>x.value),exclude:[...document.querySelectorAll('input[name=mk_x]:checked')].map(x=>x.value),
       start:$('mk_start').value||null,work_days:+$('mk_work_days').value,interval:+$('mk_interval').value,lam:+$('mk_lam').value,gamma:+$('mk_gamma').value,mu:+$('mk_mu').value,spare:+$('mk_spare').value,k_elig:+$('mk_k_elig').value,ct_mode:$('mk_ct').value};
