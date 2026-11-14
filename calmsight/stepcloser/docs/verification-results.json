@@ -1,0 +1,13 @@
+{
+  "version": "0.5.0",
+  "apk_bytes": 24903096,
+  "apk_sha256": "a9c2b49aa6d5b566841ae13f5c18ab8cffd71511c4832f6803322bc560c3f70d",
+  "same_signer_as_v040": true,
+  "packaged_asset_byte_comparison": "33/33",
+  "core_node_tests_passed": 35,
+  "app_flow_checks_passed": 8,
+  "native_jvm_tests_passed": 9,
+  "physical_glasses_fps_benchmark": "not run",
+  "visual_browser_gpu_review": "not run",
+  "android_lint": "not rerun; offline lint engine unavailable in earlier attempt"
+}

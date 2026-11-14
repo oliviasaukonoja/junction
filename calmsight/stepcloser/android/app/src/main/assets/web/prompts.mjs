@@ -1,0 +1,22 @@
+export const PROMPTS={
+  test:"Welcome to StepCloser. You choose the pace. You can pause, repeat a step, or stop at any time. Check that you hear me clearly and comfortably.",
+  neutral:"This is only a neutral dot. Find the red STOP button and press it. Check that the dot disappears.",
+  drilldone:"Your stop rehearsal is complete. Choose a small step that feels manageable. Nothing appears until you choose to start.",
+  level1:"You chose a simplified spider. It will stay still. Notice its shape for a moment. You decide how long to continue.",
+  level2:"You chose a larger, detailed spider. It will stay still. Notice one feature, then another. There is no need to rush.",
+  level3:"You chose a larger spider with gentle leg movement. Keep a comfortable breath. You can pause or stop at any time.",
+  level4:"Watch the movement approach, then retreat. Breathe gently. Stop whenever you choose.",
+  level5:"Watch the circling movement. Breathe gently. Relax your shoulders. You can stop.",
+  level6:"Watch the circling movement and jumps. Breathe gently. You can stop anytime.",
+  circle_breathe:"Easy breath. Relax your shoulders. You choose the pace.",
+  circle_notice:"Notice the movement. Keep a comfortable breath. Take one moment at a time.",
+  circle_choice:"You can keep watching, repeat an easier step, or stop. There is no rush.",
+  jump_cue:"A jump is coming. Breathe gently. You stay in control.",
+  jump_recover:"Let your shoulders soften. Take an easy breath. You can pause or stop.",
+  observe:"Notice one detail you can see. What did you expect would happen? What is happening in this moment? Keep a natural, comfortable breath.",
+  choice:"You can repeat the same step as often as you choose. There is no score to beat, and no need to move to a harder step today.",
+  stay:"If this feels manageable, give yourself time to observe. If you want to pause or finish, use the controls. You are choosing the pace.",
+  pause:"The activity is paused and the image is being cleared. Notice your surroundings. Restart only when you choose to.",
+  stopped:"You have stopped the activity. Check that the image has disappeared. Take a moment before deciding what comes next.",
+  completed:"This practice interval has ended. Notice what you learned. You can repeat the same step. A timer does not decide when you are ready for a harder one."
+};

@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self' https://*.modal.run; connect-src https://*.modal.run; object-src 'none'; base-uri 'none'">
+<meta name="theme-color" content="#123d38"><title>StepCloser 3D</title>
+<link rel="stylesheet" href="styles.css"><script type="module" src="app.mjs"></script><script type="module" src="coach.mjs"></script></head><body>
+<header class="topbar"><div class="brandmark" aria-hidden="true">↗</div><div><strong>StepCloser <span>3D</span></strong><small>Start directly. Choose your pace.</small></div><span class="build">v0.5</span></header>
+<main><div id="notice" class="notice" role="status" hidden></div>
+<section id="intro" class="hero">
+  <span class="eyebrow">LARGER · MOVING 3D SPIDERS</span>
+  <h1>Try the spider.<br>At your pace.</h1>
+  <p>No mandatory audio test, STOP rehearsal, or review screen. Tap a button to begin.</p>
+  <span id="outputLabel" class="pill">Meta Display glasses</span>
+  <div class="quick-actions"><button id="quickWalk" class="primary full">Start walking toward me →</button><button id="quickJump" class="secondary full">Start large spider · circling & jumps</button></div>
+  <p id="readyHint" class="hint">Loading the 3D renderer…</p>
+</section>
+<section id="outputSection" class="card">
+  <h2>Your view</h2>
+  <div class="mode-switch"><button id="phoneMode">Phone preview<small>3D on this screen</small></button><button id="displayMode">Meta Display glasses<small>3D lens overlay</small></button></div>
+  <div id="displaySetup" class="device-panel" hidden>
+    <strong id="deviceState">Display not connected</strong><p>The Start buttons connect registered glasses automatically. Register only if this is your first connection.</p>
+    <div class="row"><button id="register" class="secondary">Register with Meta AI</button><button id="connect" class="secondary">Connect only</button></div>
+    <p id="registration" class="hint">Registration appears after connecting.</p><p id="devices" class="hint"></p><p id="lensMessage" class="hint"></p>
+    <details class="connection-details"><summary>Connection details</summary><pre id="connectionLog">No connection attempt yet.</pre></details>
+  </div>
+</section>
+<section id="renderOptions" class="card">
+  <h2>How many spiders?</h2>
+  <div class="plan-controls">
+    <label class="label">Spiders<select id="spiderCount"><option value="1">1 spider</option><option value="3">3 spiders</option><option value="5">5 spiders</option><option value="10">10 spiders</option><option value="20">20 spiders</option></select></label>
+    <label class="label">Walking / circling speed<select id="motionSpeed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+  </div>
+  <p class="hint">Crowds use smaller spiders to fit the view. Jump timing stays aligned with the spoken cues.</p>
+  <details><summary>Glasses playback quality</summary>
+    <label class="label">Transfer profile<select id="deliveryProfile"><option value="auto" selected>Auto · adapt for motion</option><option value="fast">Fast motion · lower detail</option><option value="balanced">Balanced</option><option value="sharp">Sharper images · fewer updates</option></select></label>
+    <label class="checkbox"><input id="matchMirror" type="checkbox" checked>Phone preview follows the glasses frame submissions</label>
+    <p class="hint">If motion is choppy, try Fast motion. Live phone preview can update faster than the glasses. The acknowledgement counter measures SDK responses, not optical lens FPS.</p>
+  </details>
+</section>
+<section id="planSection" class="card">
+  <div class="section-heading"><div><span class="eyebrow">OR CHOOSE ANOTHER STEP</span><h2>Your spider, your movement</h2></div><span class="pill">6 steps</span></div>
+  <div id="levels" class="levels"></div><div class="next-step"><h3 id="selectedName">Walking toward you</h3><p id="selectedDetail"></p></div>
+  <button id="startSelected" class="primary full">Start selected spider →</button>
+</section>
+<section id="practiceSection" class="practice-section" hidden>
+  <div class="section-heading"><div><span id="practiceEyebrow" class="eyebrow">DIRECT PRACTICE</span><h2 id="practiceTitle">Walking toward you</h2></div><span id="timer" class="timer">—</span></div>
+  <div class="stage"><canvas id="scene" width="600" height="600" aria-label="Moving three dimensional spider"></canvas><div id="stageLabel" class="stage-label">Glasses output · phone mirror</div><div id="motionLabel" class="motion-label"></div><div id="frameStats" class="frame-stats"></div></div>
+  <div class="guide-card"><span class="guide-icon">◉</span><div><strong>Your audio guide</strong><p id="guideText" aria-live="polite">You choose the pace.</p></div></div>
+  <div id="coachCard" class="coach-card">
+    <div class="coach-head"><strong>How scared are you right now?</strong><span id="coachStatus" class="hint">Your coach listens</span></div>
+    <div id="ratingRow" class="rating-row"></div>
+    <p id="coachLine" class="coach-line" aria-live="polite"></p>
+    <p id="coachNext" class="coach-next" hidden></p>
+  </div>
+  <div class="row"><button id="pause" class="secondary">Ⅱ Pause & hide</button><button id="mute" class="secondary" aria-pressed="false">Mute guide</button></div>
+  <p class="hint">STOP clears the phone image and requests lens clearing. If the connection fails and an image remains, remove the glasses.</p>
+</section>
+<details id="optionalSettings" class="card">
+  <summary>Optional settings & tests</summary>
+  <p class="hint">These are optional. They never unlock or block the Start buttons.</p>
+  <div class="row"><button id="testAudio" class="secondary">Play audio test</button><button id="drill" class="secondary">Try STOP with a dot</button></div>
+  <label class="label">Your first name (so your coach can greet you)<input id="coachName" maxlength="30" placeholder="Optional"></label>
+  <label class="label">Practice time<select id="duration"><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select></label>
+  <label class="label">Optional fear rating: <output id="beforeValue">3</output> / 10<input id="before" type="range" min="0" max="10" step="1" value="3"></label>
+</details>
+<section id="reflection" class="card" hidden>
+  <span class="eyebrow">OPTIONAL REFLECTION</span><h2>You can start again above.</h2><p id="sessionSummary"></p>
+  <label class="label">Fear now: <output id="afterValue">3</output> / 10<input id="after" type="range" min="0" max="10" step="1" value="3"></label>
+  <label class="label">What did you notice?<textarea id="reflectionNote" maxlength="500" placeholder="Optional note"></textarea></label>
+  <button id="saveReflection" class="secondary full">Save reflection</button><p id="savedMessage" class="hint"></p><button id="repeat" class="quiet full">Back to the spider buttons</button>
+</section>
+<details class="card history"><summary>Your practice journal <span id="historyCount">0 sessions</span></summary><p class="hint">Saved on this phone.</p><div id="history"></div><button id="clearHistory" class="quiet" hidden>Clear journal</button></details>
+<details class="card help"><summary>About the glasses & prototype</summary>
+  <p>Requires Meta Ray-Ban Display for lens visuals. Ordinary Ray-Ban Meta and Oakley Meta can play the guide audio; the 3D preview stays on the phone.</p>
+  <p>Circling and jumps move inside the lens overlay, with simulated depth. The app does not track your room or place a spider behind your actual body.</p>
+  <p>Use while sitting or standing still in a clear space. This is an experimental practice tool; clinical effectiveness has not been established.</p>
+  <p>App v0.5.0 · Android 12+ · ARM64. Audio and STOP tests are optional. Every presentation starts only from your Start button.</p>
+</details></main>
+<footer class="stopbar"><span id="stopStatus">Nothing is being shown</span><button id="stop" class="stop">■ STOP <small>Hide spider / cancel start</small></button></footer>
+</body></html>

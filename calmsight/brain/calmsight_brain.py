@@ -8,6 +8,7 @@ Modal Secrets (exact names):
   gemini      -> GEMINI_API_KEY          (main voice of the coach, optional GEMINI_MODEL)
   anthropic-secret -> ANTHROPIC_API_KEY  (backup if Gemini fails)
   custom-secret    -> ELEVENLABS_API_KEY, ELEVEN_VOICE_ID
+  calmsight-db     -> DATABASE_URL  (Aiven Postgres service URI)
 
 How it learns (per person, per situation):
   * Technique choice = Thompson-sampling bandit. Each (user, situation, technique)
@@ -30,15 +31,105 @@ import uuid
 import modal
 
 app = modal.App("calmsight-brain")
-image = modal.Image.debian_slim().pip_install("fastapi[standard]", "httpx")
+image = modal.Image.debian_slim().pip_install("fastapi[standard]", "httpx", "psycopg[binary]")
 
-# Storage (swap to Aiven Postgres later; same keys/shapes)
-profiles = modal.Dict.from_name("calmsight-profiles", create_if_missing=True)
-sessions = modal.Dict.from_name("calmsight-sessions", create_if_missing=True)
-history = modal.Dict.from_name("calmsight-history", create_if_missing=True)
-learning = modal.Dict.from_name("calmsight-learning", create_if_missing=True)
-population = modal.Dict.from_name("calmsight-population", create_if_missing=True)
+# Audio clips are short-lived binary blobs -> Modal Dict.
 audio_store = modal.Dict.from_name("calmsight-audio", create_if_missing=True)
+
+
+class Store:
+    """Aiven Postgres (DATABASE_URL) with Modal Dict fallback.
+
+    Tables:
+      kv(ns, key, value jsonb)  -> profiles, sessions, history, learning, population
+      outcomes                  -> every technique attempt (queryable analytics)
+    """
+
+    def __init__(self):
+        self.conn = None
+        self.fallback = {}
+
+    def _db(self):
+        url = os.environ.get("DATABASE_URL", "")
+        if not url.startswith("postgres"):
+            return None
+        if self.conn is None or self.conn.closed:
+            import psycopg
+            self.conn = psycopg.connect(url, autocommit=True, connect_timeout=5)
+            self.conn.execute(
+                "CREATE TABLE IF NOT EXISTS kv (ns text, key text, value jsonb, "
+                "updated_at timestamptz DEFAULT now(), PRIMARY KEY (ns, key))")
+            self.conn.execute(
+                "CREATE TABLE IF NOT EXISTS outcomes (id bigserial PRIMARY KEY, "
+                "user_id text, fear text, situation text, technique text, "
+                "rating_from int, rating_to int, worked boolean, seconds real, "
+                "created_at timestamptz DEFAULT now())")
+        return self.conn
+
+    def _dict(self, ns):
+        if ns not in self.fallback:
+            self.fallback[ns] = modal.Dict.from_name(f"calmsight-{ns}", create_if_missing=True)
+        return self.fallback[ns]
+
+    def get(self, ns, key, default=None):
+        try:
+            db = self._db()
+            if db:
+                row = db.execute("SELECT value FROM kv WHERE ns=%s AND key=%s",
+                                 (ns, key)).fetchone()
+                return row[0] if row else default
+        except Exception as e:  # noqa: BLE001
+            print("db get failed, using Modal Dict:", e)
+            self.conn = None
+        return self._dict(ns).get(key, default)
+
+    def set(self, ns, key, value):
+        try:
+            db = self._db()
+            if db:
+                from psycopg.types.json import Jsonb
+                db.execute(
+                    "INSERT INTO kv (ns, key, value) VALUES (%s, %s, %s) "
+                    "ON CONFLICT (ns, key) DO UPDATE SET value=EXCLUDED.value, updated_at=now()",
+                    (ns, key, Jsonb(value)))
+                return
+        except Exception as e:  # noqa: BLE001
+            print("db set failed, using Modal Dict:", e)
+            self.conn = None
+        self._dict(ns)[key] = value
+
+    def pop(self, ns, key):
+        try:
+            db = self._db()
+            if db:
+                db.execute("DELETE FROM kv WHERE ns=%s AND key=%s", (ns, key))
+                return
+        except Exception as e:  # noqa: BLE001
+            print("db pop failed:", e)
+            self.conn = None
+        self._dict(ns).pop(key, None)
+
+    def log_outcome(self, uid, fear, situation, r):
+        try:
+            db = self._db()
+            if db:
+                db.execute(
+                    "INSERT INTO outcomes (user_id, fear, situation, technique, rating_from, "
+                    "rating_to, worked, seconds) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (uid, fear, situation, r["tech"], r["from"], r["to"], r["worked"],
+                     r.get("seconds")))
+        except Exception as e:  # noqa: BLE001
+            print("outcome log failed:", e)
+            self.conn = None
+
+    def backend(self):
+        try:
+            return "aiven-postgres" if self._db() else "modal-dict"
+        except Exception:  # noqa: BLE001
+            return "modal-dict"
+
+
+store = Store()
 
 # =============================================================== parsing
 NUMBER_WORDS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
@@ -64,6 +155,7 @@ def parse(text: str) -> dict:
 
 
 SITUATIONS = {
+    "spider": ("spider", "stepcloser"),
     "lift": ("lift", "elevator"),
     "injection": ("needle", "vaccin", "shot", "injection", "blood", "jab"),
     "scanner": ("mri", "scan", "ct"),
@@ -91,6 +183,8 @@ CLINICAL_PRIOR = {
                "countWithMe": (2, 1), "appliedTension": (1, 1)},
     "speaking": {"breathing": (3, 1), "grounding": (2, 1),
                  "countWithMe": (1, 1), "appliedTension": (1, 1)},
+    "spiders": {"breathing": (3, 1), "grounding": (3, 1),
+                "countWithMe": (2, 1), "appliedTension": (1, 1)},
 }
 
 
@@ -132,6 +226,25 @@ def choose_technique(profile: dict, situation: str, stats: dict, pop: dict,
     else:
         reason = f"{best}: best starting choice for {profile.get('fear')} fear"
     return {"technique": best, "reason": reason, "scores": scores}
+
+
+MAX_LEVEL = 6
+
+
+def recommend_level(action: str, rating, level):
+    """Exposure ladder advice. The person always chooses; we only suggest."""
+    if level is None:
+        return None
+    level = int(level)
+    if action == "complete" and level < MAX_LEVEL:
+        return {"level": level + 1, "advice": "ready", "text": f"Ready to try step {level + 1} when you choose."}
+    if action == "complete":
+        return {"level": level, "advice": "ready", "text": "You finished the hardest step. Repeat it whenever you like."}
+    if action == "calm" and rating is not None and rating >= 9 and level > 1:
+        return {"level": level - 1, "advice": "easier", "text": f"It's fine to go back to step {level - 1}. Stopping is also fine."}
+    if action == "pause":
+        return {"level": max(1, level - 1), "advice": "pause", "text": "Pause now. Come back only when you choose."}
+    return {"level": level, "advice": "stay", "text": "Stay with this step for now."}
 
 
 def outcome(prev_rating: int, new_rating: int) -> bool:
@@ -207,7 +320,8 @@ def learn_from_turn(session: dict, stats: dict, pace: dict, pop: dict, profile: 
     pop[pk] = (ps + 1, pf) if ok else (ps, pf + 1)
     pace = update_pace(pace, last["rating"], new_r, new_t - last["t"])
     session.setdefault("results", []).append(
-        {"tech": last["tech"], "from": last["rating"], "to": new_r, "worked": ok})
+        {"tech": last["tech"], "from": last["rating"], "to": new_r, "worked": ok,
+         "seconds": round(new_t - last["t"], 1)})
     session["pending"] = None
     return stats, pace, pop
 
@@ -303,11 +417,46 @@ def speak(text: str, base_url: str):
         return None
 
 
+# =============================================================== StepCloser voice
+@app.function(image=image, secrets=[modal.Secret.from_name("custom-secret")], timeout=600)
+def tts_many(texts: dict) -> dict:
+    """Generate ElevenLabs MP3s for many prompts (keys stay in Modal)."""
+    import httpx
+    key, voice = os.environ["ELEVENLABS_API_KEY"], os.environ["ELEVEN_VOICE_ID"]
+    out = {}
+    for name, text in texts.items():
+        r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
+                       params={"output_format": "mp3_44100_128"},
+                       headers={"xi-api-key": key},
+                       json={"text": text, "model_id": "eleven_multilingual_v2"}, timeout=60)
+        r.raise_for_status()
+        out[name] = r.content
+        print("voiced", name, len(r.content))
+    return out
+
+
+@app.local_entrypoint()
+def voice_stepcloser(prompts: str = "../stepcloser/android/app/src/main/assets/web/prompts.mjs",
+                     outdir: str = "../stepcloser/android/app/src/main/assets/web/audio"):
+    """python3 -m modal run calmsight_brain.py::voice_stepcloser  -> replaces robotic clips."""
+    import json
+    import pathlib
+    src = pathlib.Path(prompts).read_text()
+    body = src[src.index("{"): src.rindex("}") + 1]
+    body = re.sub(r"(\b[a-z0-9_]+)\s*:", r'"\1":', body)
+    texts = json.loads(body)
+    clips = tts_many.remote(texts)
+    for name, data in clips.items():
+        pathlib.Path(outdir, f"{name}.mp3").write_bytes(data)
+    print(f"Wrote {len(clips)} ElevenLabs clips to {outdir}")
+
+
 # =============================================================== api
 @app.function(image=image,
               secrets=[modal.Secret.from_name("gemini"),
                        modal.Secret.from_name("anthropic-secret"),
-                       modal.Secret.from_name("custom-secret")])  # custom-secret = ElevenLabs
+                       modal.Secret.from_name("custom-secret"),   # ElevenLabs
+                       modal.Secret.from_name("calmsight-db")])   # Aiven Postgres DATABASE_URL
 @modal.concurrent(max_inputs=20)
 @modal.asgi_app()
 def web():
@@ -323,15 +472,15 @@ def web():
         return str(req.base_url).rstrip("/").replace("http://", "https://")
 
     def get_profile(uid):
-        return profiles.get(uid) or {"userId": uid, "name": "there",
+        return store.get("profiles", uid) or {"userId": uid, "name": "there",
                                      "fear": "needles", "faint_history": False}
 
     def get_learning(uid):
-        return learning.get(uid) or {"stats": {}, "pace": {}, "style": 0}
+        return store.get("learning", uid) or {"stats": {}, "pace": {}, "style": 0}
 
     def memory_text(uid, situation):
-        past = [h for h in history.get(uid, []) if h.get("situation") == situation] \
-            or history.get(uid, [])
+        past = [h for h in store.get("history", uid, []) if h.get("situation") == situation] \
+            or store.get("history", uid, [])
         if not past:
             return "First session."
         h = past[-1]
@@ -357,20 +506,20 @@ def web():
 
     def finish(uid, session):
         if session.get("ratings"):
-            past = history.get(uid, [])
+            past = store.get("history", uid, [])
             past.append({"first": session["ratings"][0], "last": session["ratings"][-1],
                          "techniques": sorted({r["tech"] for r in session.get("results", [])}
                                               | set(session.get("techniques", []))),
                          "situation": session.get("situation"), "at": time.time()})
-            history[uid] = past[-50:]
-        sessions.pop(uid, None)
+            store.set("history", uid, past[-50:])
+        store.pop("sessions", uid)
 
     @api.post("/profile")
     async def set_profile(body: dict):
         p = {"userId": body["userId"], "name": body.get("name", "there"),
              "fear": body.get("fear", "needles"),
              "faint_history": bool(body.get("faintHistory", False))}
-        profiles[p["userId"]] = p
+        store.set("profiles", p["userId"], p)
         return p
 
     @api.post("/start")
@@ -379,8 +528,9 @@ def web():
         profile = get_profile(uid)
         session = {"ratings": [], "times": [], "techniques": [], "step_start": None,
                    "situation": situation_key(body.get("situation")),
-                   "situationText": body.get("situation"), "pending": None}
-        sessions[uid] = session
+                   "situationText": body.get("situation"), "pending": None,
+                   "level": body.get("level")}
+        store.set("sessions", uid, session)
         out = respond(req, uid, profile, session, {"action": "start",
                       "situation": session["situation"]}, "start", get_learning(uid))
         return out
@@ -390,15 +540,20 @@ def web():
         uid = body["userId"]
         now = time.time()
         profile, lrn = get_profile(uid), get_learning(uid)
-        session = sessions.get(uid) or {"ratings": [], "times": [], "techniques": [],
+        session = store.get("sessions", uid) or {"ratings": [], "times": [], "techniques": [],
                                         "step_start": None, "situation": "other",
                                         "pending": None}
-        pop = dict(population.get("all", {}))
+        pop = dict(store.get("population", "all", {}))
+        if body.get("level") is not None:
+            session["level"] = body.get("level")
         d = decide(session, profile, parse(body.get("text", "")), now)
 
         if d.get("rating") is not None:
+            n_before = len(session.get("results", []))
             lrn["stats"], lrn["pace"], pop = learn_from_turn(
                 session, lrn["stats"], lrn["pace"], pop, profile)
+            for res in session.get("results", [])[n_before:]:
+                store.log_outcome(uid, profile.get("fear"), session["situation"], res)
 
         if d["action"] == "calm":
             pick = choose_technique(profile, session["situation"], lrn["stats"], pop)
@@ -411,20 +566,21 @@ def web():
         else:
             key = d["action"]
 
-        learning[uid] = lrn
-        population["all"] = pop
+        store.set("learning", uid, lrn)
+        store.set("population", "all", pop)
         out = respond(req, uid, profile, session, d, key, lrn)
+        out["nextStep"] = recommend_level(d["action"], d.get("rating"), session.get("level"))
         if d["action"] in ("complete", "stop", "pause"):
             finish(uid, session)
         else:
-            sessions[uid] = session
+            store.set("sessions", uid, session)
         return out
 
     @api.post("/stop")
     async def stop(body: dict):
         uid = body["userId"]
         profile = get_profile(uid)
-        session = sessions.get(uid) or {"ratings": []}
+        session = store.get("sessions", uid) or {"ratings": []}
         finish(uid, session)
         return {"action": "stop", "line": fallback_line("stop", profile, session),
                 "audioUrl": None, "nextCheckInSec": None,
@@ -436,14 +592,14 @@ def web():
         uid = body["userId"]
         lrn = get_learning(uid)
         lrn["style"] = update_style(lrn.get("style", 0), body.get("feedback", "helpful"))
-        learning[uid] = lrn
+        store.set("learning", uid, lrn)
         return {"style": lrn["style"], "maxWords": STYLE_WORDS[lrn["style"]]}
 
     @api.get("/insights/{uid}")
     async def insights(uid: str):
         """What Calmsight has learned about this person (for the phone app + demo)."""
         profile, lrn = get_profile(uid), get_learning(uid)
-        pop = population.get("all", {})
+        pop = store.get("population", "all", {})
         per_situation = {}
         for sit in list(SITUATIONS) + ["other"]:
             rows = []
@@ -459,13 +615,25 @@ def web():
                 "paceSecPerPoint": round(lrn["pace"].get("sec_per_point", 0), 1) or None,
                 "nextCheckInSec": next_check_in(lrn["pace"]),
                 "talkingStyle": {-1: "brief", 0: "normal", 1: "more support"}[lrn.get("style", 0)],
-                "sessions": history.get(uid, [])[-10:]}
+                "sessions": store.get("history", uid, [])[-10:]}
 
     @api.get("/audio/{aid}.mp3")
     async def audio(aid: str):
         data = audio_store.get(aid)
         return Response(status_code=404) if data is None else Response(
             content=data, media_type="audio/mpeg")
+
+    @api.get("/health")
+    async def health():
+        return {"ok": True, "storage": store.backend(),
+                "gemini": os.environ.get("GEMINI_API_KEY", "none") not in ("", "none"),
+                "claude": os.environ.get("ANTHROPIC_API_KEY", "none") not in ("", "none"),
+                "elevenlabs": bool(os.environ.get("ELEVENLABS_API_KEY")
+                                   and os.environ.get("ELEVEN_VOICE_ID"))}
+
+    @api.get("/glasses", response_class=HTMLResponse)
+    async def glasses_page():
+        return GLASSES_PAGE
 
     @api.get("/", response_class=HTMLResponse)
     async def test_page():
@@ -505,4 +673,42 @@ function send(){go('/turn',{text:say.value});say.value=''}
 async function fb(f){const j=await post('/feedback',{feedback:f});note('style now: '+JSON.stringify(j));ins()}
 async function ins(){learned.textContent=JSON.stringify(await fetch('/insights/'+uid).then(r=>r.json()),null,1)}
 say.addEventListener('keydown',e=>{if(e.key==='Enter')send()});ins()
+</script>"""
+
+
+# Meta Ray-Ban Display web app: 600x600, black = transparent, arrows + Enter input.
+GLASSES_PAGE = """<!doctype html><meta name=viewport content="width=600,height=600">
+<title>Calmsight</title>
+<style>html,body{margin:0;background:#000;color:#fff;font-family:system-ui;width:600px;height:600px;overflow:hidden}
+#w{width:600px;height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#ring{width:300px;height:300px;border-radius:50%;border:6px solid #4fd1c5;display:flex;flex-direction:column;
+align-items:center;justify-content:center;transition:transform 4s ease-in-out}
+#big{font-size:140px;font-weight:700;line-height:1}#lbl{font-size:30px;color:#8cf;margin-top:6px}
+#hint{font-size:24px;color:#aaa;margin-top:26px;max-width:520px}#line{font-size:26px;margin-top:14px;max-width:540px;color:#ddd}
+.breathe{animation:b 10s ease-in-out infinite}@keyframes b{0%{transform:scale(.8)}40%{transform:scale(1.1)}100%{transform:scale(.8)}}
+</style>
+<div id=w><div id=ring><div id=big>5</div><div id=lbl>How scared?</div></div>
+<div id=line></div><div id=hint>Swipe ▲▼ to rate · Press to send</div></div>
+<script>
+const uid=new URLSearchParams(location.search).get('u')||'demo';
+const sit=new URLSearchParams(location.search).get('s')||'lift';
+let rating=5,busy=false,ended=false;
+const $=id=>document.getElementById(id);
+const post=(p,b)=>fetch(p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({userId:uid,...b})}).then(r=>r.json());
+function say(j){$('line').textContent=j.line||'';
+ const tts=()=>{try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(j.line))}catch(e){}};
+ if(j.audioUrl){const a=new Audio(j.audioUrl);a.play().catch(tts)}else tts()}
+function show(j){if(j.display){ if(j.display.big!=='')$('big').textContent=j.display.big; $('lbl').textContent=j.display.label||''}
+ $('ring').classList.toggle('breathe',j.action==='calm');
+ if(['complete','stop','pause'].includes(j.action)){ended=true;$('hint').textContent=j.action==='pause'?'Tell someone near you now':'Press to start again'}
+ else $('hint').textContent='Swipe ▲▼ to rate · Press to send'}
+async function call(p,b){if(busy)return;busy=true;try{const j=await post(p,b);show(j);say(j)}catch(e){$('line').textContent='Offline - breathe in 4, out 6.'}busy=false}
+function start(){ended=false;rating=5;$('big').textContent=rating;call('/start',{situation:sit})}
+addEventListener('keydown',e=>{
+ if(e.key==='ArrowUp'||e.key==='ArrowRight'){rating=Math.min(10,rating+1);$('big').textContent=rating;$('lbl').textContent='How scared?'}
+ else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){rating=Math.max(0,rating-1);$('big').textContent=rating;$('lbl').textContent='How scared?'}
+ else if(e.key==='Enter'||e.key===' '){ended?start():call('/turn',{text:String(rating)})}
+});
+history.pushState({c:1},'');addEventListener('popstate',()=>{post('/stop',{});speechSynthesis.cancel();$('lbl').textContent='Stopped';ended=true;history.pushState({c:1},'')});
+start();
 </script>"""
