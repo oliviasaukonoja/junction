@@ -291,7 +291,7 @@ fi:{title:'Polku hoitoon · Pilottikartta',tagline:'Missä keuhkosyövän TT-seu
  chat_h:'Kysy reiteistä (AI)',chat_sub:'Avustaja vastaa vain tämän kartan datan pohjalta ja kertoo, mikä on havaittua ja mikä mallinnettua.',send:'Lähetä',
  chat_off:'AI-avustaja ei ole vielä käytössä. Se otetaan käyttöön, kun palveluun lisätään Claude API -avain. Voit silti tutkia reittejä vasemmalta.',
  chat_wait:'Vastataan…',chat_err:'Vastaus epäonnistui. Yritä hetken päästä.',chat_rate:'Liian monta kysymystä, yritä myöhemmin.',chat_note:'Tarkista luvut kartalta.',
- q1:'Miksi Lapin reitti alkaa Enontekiöltä?',q2:'Missä bussi lyhentää matkaa eniten?',q3:'Mitä dataa puuttuu sairaalapilottia varten?',
+ q1:'Miksi Lapin reitti alkaa Enontekiöltä?',q2:'Missä bussi lyhentää matkaa eniten?',q3:'Mitä dataa puuttuu sairaalapilottia varten?',q4:'Rakenna Lapin reitti, joka alkaa Rovaniemeltä',
  lg_hosp:'Sairaalan kutsualue (≤ {m} min)',lg_bus:'Bussialue (> {m} min), alueen värillä',lg_ct:'TT vahvistettu',lg_ctl:'TT päätelty',lg_route:'Reitti (avoin, ei paluuta)',lg_stop:'Pysäkki; katkoviivareuna = TT-kaupunki',lg_custom:'Oma reitti',lg_hs:'Sairaalapilotin kutsualue',
  err:'Datan lataus epäonnistui.',back:'← Kaikki reitit'},
 sv:{title:'Polku hoitoon · Pilotkarta',tagline:'Var kunde piloter för CT-screening av lungcancer börja?',adv:'Extra verktyg',why_rec:'Varför den här rekommendationen? Se datan →',
@@ -340,7 +340,7 @@ sv:{title:'Polku hoitoon · Pilotkarta',tagline:'Var kunde piloter för CT-scree
  chat_h:'Fråga om rutterna (AI)',chat_sub:'Assistenten svarar bara utifrån kartans data och säger vad som är observerat och vad som är modellerat.',send:'Skicka',
  chat_off:'AI-assistenten är inte i bruk ännu. Den aktiveras när en Claude API-nyckel läggs till i tjänsten. Du kan ändå utforska rutterna till vänster.',
  chat_wait:'Svarar…',chat_err:'Svaret misslyckades. Försök igen om en stund.',chat_rate:'För många frågor, försök senare.',chat_note:'Kontrollera siffrorna på kartan.',
- q1:'Varför börjar Lapplands rutt i Enontekis?',q2:'Var förkortar bussen restiden mest?',q3:'Vilka data saknas för en sjukhuspilot?',
+ q1:'Varför börjar Lapplands rutt i Enontekis?',q2:'Var förkortar bussen restiden mest?',q3:'Vilka data saknas för en sjukhuspilot?',q4:'Bygg en Lapplandsrutt som börjar i Rovaniemi',
  lg_hosp:'Sjukhusets inbjudningsområde (≤ {m} min)',lg_bus:'Bussområde (> {m} min), i regionens färg',lg_ct:'CT bekräftad',lg_ctl:'CT härledd',lg_route:'Rutt (öppen, ingen återresa)',lg_stop:'Hållplats; streckad kant = CT-ort',lg_custom:'Egen rutt',lg_hs:'Sjukhuspilotens inbjudningsområde',
  err:'Det gick inte att ladda data.',back:'← Alla rutter'},
 en:{title:'Polku hoitoon · Pilot map',tagline:'Where could lung-cancer CT screening pilots start?',adv:'Advanced tools',why_rec:'Why this recommendation? See the data →',
@@ -389,7 +389,7 @@ en:{title:'Polku hoitoon · Pilot map',tagline:'Where could lung-cancer CT scree
  chat_h:'Ask about the routes (AI)',chat_sub:'The assistant answers only from this map\'s data and says what is observed and what is modelled.',send:'Send',
  chat_off:'The AI assistant is not switched on yet. It starts working once a Claude API key is added to the service. You can still explore the routes on the left.',
  chat_wait:'Answering…',chat_err:'The answer failed. Try again shortly.',chat_rate:'Too many questions, try again later.',chat_note:'Check the figures on the map.',
- q1:'Why does the Lapland route start in Enontekiö?',q2:'Where does the bus shorten travel the most?',q3:'What data is missing for a hospital pilot?',
+ q1:'Why does the Lapland route start in Enontekiö?',q2:'Where does the bus shorten travel the most?',q3:'What data is missing for a hospital pilot?',q4:'Build a Lapland route that starts in Rovaniemi',
  lg_hosp:'Hospital invitation area (≤ {m} min)',lg_bus:'Bus area (> {m} min), in the region\'s colour',lg_ct:'CT confirmed',lg_ctl:'CT inferred',lg_route:'Route (open, no return leg)',lg_stop:'Stop; dashed edge = CT town',lg_custom:'Custom route',lg_hs:'Hospital pilot invitation area',
  err:'Could not load the data.',back:'← All routes'}};
 const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
@@ -409,7 +409,7 @@ const ICON={lock:'<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><rect 
  unlock:'<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1"/><path d="M5.5 7V5a2.5 2.5 0 0 1 4.9-.7"/></svg>',
  bus:'<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="12" rx="2"/><path d="M3 9.5h14M7.5 3v6.5"/><circle cx="6.5" cy="15.5" r="1.5"/><circle cx="13.5" cy="15.5" r="1.5"/></svg>',
  ext:'<svg class="ico" viewBox="0 0 16 16" aria-hidden="true" style="width:13px;height:13px"><path d="M5 11l6-6M6.5 5H11v4.5"/></svg>'};
-const setLock=open=>{$('lockIcon').innerHTML=open?ICON.unlock:ICON.lock};
+const setLock=open=>{$('lockIcon').innerHTML=open?ICON.unlock:ICON.lock;if($('qchips'))chatRender()};   // re-render chips: the route example shows only when unlocked
 const busIcon=col=>L.divIcon({className:'',html:`<div class="bus" style="--c:${col}">${ICON.bus}</div>`,iconSize:[28,28],iconAnchor:[14,14]});
 const cn=c=>D.counties[c].names[lang];
 try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
@@ -674,7 +674,7 @@ function chatRender(){
   chat.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='user'?'u':'a');if(m.role==='user')d.textContent=m.content;else d.innerHTML=esc(m.content).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^#+\s*/gm,'');log.appendChild(d)});
   const lastA=log.lastElementChild;   // show the start of the newest message, not its end
   log.scrollTop=lastA&&lastA.classList.contains('a')?Math.max(0,lastA.offsetTop-8):log.scrollHeight;
-  $('qchips').innerHTML=['q1','q2','q3'].map(q=>`<button type="button" data-q="${q}">${t(q)}</button>`).join('');
+  $('qchips').innerHTML=[...(token&&ADV?['q4']:[]),'q1','q2','q3'].map(q=>`<button type="button" data-q="${q}">${t(q)}</button>`).join('');
   $('qchips').querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{$('chatIn').value=t(b.dataset.q);$('chatIn').focus()}));
   $('chatSend').disabled=chatOK===false;$('chatNote').textContent=chatOK?t('chat_note'):'';
 }
@@ -685,11 +685,14 @@ function selection(){
 async function sendChat(e){
   e.preventDefault();const q=$('chatIn').value.trim();if(!q||chatOK===false)return;
   chat.push({role:'user',content:q});$('chatIn').value='';chat.push({role:'assistant',content:t('chat_wait')});chatRender();
-  try{const r=await fetch('/api/map/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chat.slice(0,-1),selection:selection()})});
+  try{const r=await fetch('/api/map/chat',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},token?{'X-Map-Token':token}:{}),body:JSON.stringify({messages:chat.slice(0,-1),selection:selection()})});
     chat.pop();
     if(r.status===503){chatOK=false;chat.pop();chatRender();return}
     if(r.status===429){chat.push({role:'assistant',content:t('chat_rate')});chatRender();return}
-    const j=await r.json();chat.push({role:'assistant',content:r.ok?j.answer:t('chat_err')})}catch(err){chat.pop();chat.push({role:'assistant',content:t('chat_err')})}
+    const j=await r.json();chat.push({role:'assistant',content:r.ok?j.answer:t('chat_err')});
+    if(r.ok&&j.hospital){HS=j.hospital;drawHS()}   // the chat ran the hospital-pilot calculation: draw its invitation area
+    if(r.ok&&j.route){CUSTOM=j.route;G.custom.clearLayers();select('custom')}   // the chat built a route: draw it like the route creator does
+  }catch(err){chat.pop();chat.push({role:'assistant',content:t('chat_err')})}
   chatRender();
 }
 
