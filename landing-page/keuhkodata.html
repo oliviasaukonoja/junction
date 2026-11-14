@@ -397,7 +397,10 @@ let selected;
 try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!Array.isArray(selected)) selected=PRE.sum.slice();
 const charts={};
+let myArea='';try{myArea=localStorage.getItem('keuhkodata-area')||''}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(selected))}catch(e){}}
+(function(){try{const h=new URLSearchParams(location.hash.slice(1));const v=h.get('v');if(v){const ids=v.split(',').filter(x=>VIEWS.some(w=>w.id===x));if(ids.length)selected=ids;}const a=h.get('a');if(a&&D.names[a]){myArea=a;}}catch(e){}})();
+function syncHash(){try{const p=new URLSearchParams();p.set('v',VIEWS.map(v=>v.id).filter(id=>selected.includes(id)).join(','));if(myArea)p.set('a',myArea);history.replaceState(null,'','#'+p.toString());}catch(e){}}
 
 function buildPicker(){
   const groups={};
@@ -424,7 +427,6 @@ function smrSpec(){
       {type:'bar',label:t('ci'),data:D.smr.map(r=>[r[2],r[3]]),backgroundColor:D.smr.map(col),barThickness:3,borderRadius:2,order:2},
       {type:'line',label:'SMR',data:D.smr.map(r=>r[1]),showLine:false,pointRadius:6,pointHoverRadius:8,pointBackgroundColor:D.smr.map(col),pointBorderColor:'#fff',pointBorderWidth:2,order:1}]}};
 }
-let myArea='';try{myArea=localStorage.getItem('keuhkodata-area')||''}catch(e){}
 const dimc=c=>(typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c))?c+'3D':c;
 function highlight(spec){
   if(!myArea||!spec.codes) return;
@@ -543,7 +545,7 @@ function snapHTML(){
   box.classList.remove('hidden');
 }
 function render(){
-  markPre(); snapHTML();
+  markPre(); snapHTML(); syncHash();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
   const grid=document.getElementById('grid');
   const vs=VIEWS.filter(v=>selected.includes(v.id));
