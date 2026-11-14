@@ -31,6 +31,7 @@ import uuid
 import modal
 
 app = modal.App("calmsight-brain")
+COACH_VOICE = "PStJ2DzQnh8zxG5PDf1s"  # chosen ElevenLabs coach voice
 image = modal.Image.debian_slim().pip_install("fastapi[standard]", "httpx", "psycopg[binary]")
 
 # Audio clips are short-lived binary blobs -> Modal Dict.
@@ -398,7 +399,7 @@ def llm_line(prompt: str, base: str) -> tuple:
 
 
 def speak(text: str, base_url: str):
-    key, voice = os.environ.get("ELEVENLABS_API_KEY"), os.environ.get("ELEVEN_VOICE_ID")
+    key, voice = os.environ.get("ELEVENLABS_API_KEY"), os.environ.get("ELEVEN_VOICE_ID", COACH_VOICE)
     if not (key and voice):
         return None
     import httpx
@@ -422,7 +423,7 @@ def speak(text: str, base_url: str):
 def tts_many(texts: dict) -> dict:
     """Generate ElevenLabs MP3s for many prompts (keys stay in Modal)."""
     import httpx
-    key, voice = os.environ["ELEVENLABS_API_KEY"], os.environ["ELEVEN_VOICE_ID"]
+    key, voice = os.environ["ELEVENLABS_API_KEY"], os.environ.get("ELEVEN_VOICE_ID", COACH_VOICE)
     out = {}
     for name, text in texts.items():
         r = httpx.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
@@ -628,8 +629,8 @@ def web():
         return {"ok": True, "storage": store.backend(),
                 "gemini": os.environ.get("GEMINI_API_KEY", "none") not in ("", "none"),
                 "claude": os.environ.get("ANTHROPIC_API_KEY", "none") not in ("", "none"),
-                "elevenlabs": bool(os.environ.get("ELEVENLABS_API_KEY")
-                                   and os.environ.get("ELEVEN_VOICE_ID"))}
+                "elevenlabs": bool(os.environ.get("ELEVENLABS_API_KEY")),
+                "voice": os.environ.get("ELEVEN_VOICE_ID", COACH_VOICE)}
 
     @api.get("/glasses", response_class=HTMLResponse)
     async def glasses_page():
