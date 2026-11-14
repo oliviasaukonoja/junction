@@ -43,6 +43,8 @@ image = (
     .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
     .add_local_file(HERE / "team.jpg", "/root/team.jpg")
     .add_local_file(HERE / "regions.json", "/root/regions.json")
+    .add_local_file(HERE / "vendor/chart.umd.js", "/root/chart.umd.js")
+    .add_local_dir(HERE / "fonts", "/root/fonts")
     # map API (same layout as the repo, so map/route_engine.py finds ct-sim/ and landing-page/regions.json)
     .add_local_file(MAP / "map_server.py", "/root/map/map_server.py")
     .add_local_file(MAP / "route_engine.py", "/root/map/route_engine.py")
@@ -99,6 +101,8 @@ def web():
     map_data = Path("/root/pilot_map.json").read_bytes()
     leaflet_js = Path("/root/leaflet.js").read_bytes()
     leaflet_css = Path("/root/leaflet.css").read_bytes()
+    chart_js = Path("/root/chart.umd.js").read_bytes()
+    fonts = {f.name: f.read_bytes() for f in Path("/root/fonts").iterdir() if f.suffix in (".woff2", ".css")}
     lock = threading.Lock()
 
     import sys
@@ -138,6 +142,17 @@ def web():
     @api.get("/vendor/leaflet.css")
     def leaflet_css_file():
         return Response(leaflet_css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
+
+    @api.get("/vendor/chart.umd.js")
+    def chart_js_file():
+        return Response(chart_js, media_type="application/javascript", headers={"Cache-Control": "public, max-age=86400"})
+
+    @api.get("/fonts/{name}")
+    def font_file(name: str):
+        if name not in fonts:
+            raise HTTPException(status_code=404)
+        kind = "text/css" if name.endswith(".css") else "font/woff2"
+        return Response(fonts[name], media_type=kind, headers={"Cache-Control": "public, max-age=604800"})
 
     @api.get("/sovellus", response_class=HTMLResponse)
     @api.get("/sovellus/", response_class=HTMLResponse)

@@ -29,6 +29,7 @@ image = (
     .add_local_dir(REPO / "ct-sim/data/ct_sites", "/root/ct-sim/data/ct_sites")
     .add_local_dir(REPO / "ct-sim/data/model", "/root/ct-sim/data/model")
     .add_local_file(REPO / "landing-page/regions.json", "/root/landing-page/regions.json")
+    .add_local_dir(REPO / "landing-page/fonts", "/root/landing-page/fonts")
 )
 
 app = modal.App("polku-map-preview")

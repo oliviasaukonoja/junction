@@ -142,6 +142,14 @@ def create_app(root: Path, advanced_json: bytes):
     @api.get("/vendor/leaflet.css")
     def leaflet_css(): return Response(css, media_type="text/css", headers={"Cache-Control": "public, max-age=86400"})
 
+    fdir = root.parent / "landing-page/fonts"                                    # self-hosted fonts (the website serves the same files)
+    fonts = {f.name: f.read_bytes() for f in fdir.iterdir() if f.suffix in (".woff2", ".css")} if fdir.exists() else {}
+
+    @api.get("/fonts/{name}")
+    def font_file(name: str):
+        if name not in fonts: raise HTTPException(404)
+        return Response(fonts[name], media_type="text/css" if name.endswith(".css") else "font/woff2", headers={"Cache-Control": "public, max-age=604800"})
+
     register_api(api, pub, advanced_json)
 
     @api.get("/{path:path}")
