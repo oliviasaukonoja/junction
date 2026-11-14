@@ -194,6 +194,9 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:14px;border-top:1px soli
 .stc .open{font-weight:600;color:var(--blue);font-size:14.5px}
 .stc.dark{background:var(--ink);color:#fff;border-color:var(--ink)}.stc.dark p{color:#C9D3E6}.stc.dark .open{color:#9EC1FF}.stc.dark .num{background:#fff;color:var(--ink)}
 #pg-ov .hero{padding-top:30px}
+
+.mapbtn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none}
+.mapbtn:hover{background:var(--blue-d);color:#fff}
 </style>
 </head>
 <body data-languages="fi,sv,en">
@@ -631,7 +634,8 @@ function headline(){
            en:[['155 days','from symptoms to treatment in Finland. Denmark: 67.','Yle MOT 2026'],[`+${pct}%`,`more lung cancer deaths in ${nm(top[0])} than its age structure predicts`,'Statistics Finland, Polku Labs calculation'],['2.7×','more common in men with basic than with higher education','Finnish Cancer Registry, Cancer 2022']]}[lang];
   document.getElementById('headline').innerHTML=X.map(x=>`<div class="hl"><div class="v">${x[0]}</div><div class="l">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
 }
-function go(t,s){cur={t,s:s||null};render();window.scrollTo({top:0});}
+function go(t,s){try{history.pushState(null,'',location.href)}catch(e){}cur={t,s:s||null};render();window.scrollTo({top:0});}   // own history entry, so Back returns to the previous step
+window.addEventListener('popstate',()=>{try{const h=new URLSearchParams(location.hash.slice(1));const tt=h.get('t');cur=NAV.some(n=>n.id===tt)?{t:tt,s:h.get('s')}:{t:'ov',s:null};}catch(e){cur={t:'ov',s:null}}render();});
 function buildNav(pg){
   const nav=document.getElementById('mainnav');
   nav.innerHTML='';nav.closest('.navbar').classList.add('hidden');   // pilot map link lives in the shared top navigation
@@ -657,7 +661,7 @@ function render(){
   document.getElementById('tab-src').classList.toggle('hidden',pg.id!=='src');
   if(pg.id==='ov'){stepcards();return;}
   if(!pg.subs) return;
-  document.getElementById('pghead').innerHTML=`<div class="eyebrow">${pg.n} / 4</div><h1>${L(pg.t)}</h1><p class="lead">${L(pg.d)}</p>`;
+  document.getElementById('pghead').innerHTML=`<div class="eyebrow">${pg.n} / 4</div><h1>${L(pg.t)}</h1><p class="lead">${L(pg.d)}</p>${pg.id==='do'?`<p style="margin:16px 0 0"><a class="mapbtn" href="/kartta?county=HVA21">${L({fi:'Avaa Lapin pilottikartta →',sv:'Öppna pilotkartan för Lappland →',en:'Open the pilot map for Lapland →'})}</a></p>`:''}`;
   const grid=document.getElementById('grid');
   const RANK={kpi:-3,smr:-2,pathway:-1,reco:999};
   const vs=selected.map(id=>VIEWS.find(v=>v.id===id)).filter(Boolean);
