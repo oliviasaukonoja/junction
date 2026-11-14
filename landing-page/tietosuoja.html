@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polku hoitoon – tietosuojaseloste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--muted:#4A5872;--blue:#1F5FD6;--blue-d:#123E91;--sky:#EAF1FF;--bg:#F5F7FB;--line:#E3E8F0;--orange:#D9730D;--orange-bg:#FFF3E6;--orange-ink:#8A3B00}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55;font-size:17px}
+a{color:var(--blue)}a:hover{color:var(--blue-d)}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;line-height:1.15;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:8px 0}
+.logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:24px;color:var(--ink);text-decoration:none}
+.bar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select{font:inherit;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #C9D2E0;border-radius:10px;background:#fff;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--blue);color:#fff;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--blue-d);color:#fff}
+.btn.sm{min-height:44px;padding:0 16px;font-size:15px}
+.hero{background:var(--bg);padding:56px 0 48px}
+.hero-g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--orange-bg);color:var(--orange-ink);font-weight:700;font-size:14px;margin-bottom:16px}
+.hero h1{font-size:clamp(34px,5vw,54px)}
+.lead{font-size:19px;color:var(--muted);margin:18px 0 26px;max-width:36em}
+.bus{width:100%;height:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:-28px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(20,33,61,.05)}
+.faq{border-bottom:1px solid var(--line);padding:14px 0}.faq summary{font-weight:600;cursor:pointer;font-size:17px}.faq p{margin:8px 0 0;color:var(--muted)}
+.stat-cap{grid-column:1/-1;justify-self:start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--muted)}
+.stat b{display:block;font-family:"Space Grotesk",sans-serif;font-size:34px;color:var(--blue-d)}
+.stat span{font-size:15px;color:var(--muted)}
+section{padding:56px 0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.list li{display:flex;gap:12px;align-items:flex-start}
+.dot{flex:none;width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:9px}
+.uk{background:var(--ink);color:#fff}
+.uk h2{color:#fff}
+.uk p{color:#DCE3F0}
+.uk .src{font-size:14px;color:#AAB6CC}
+.uk a{color:#9EC1FF}
+.warn{background:var(--orange-bg);border:1px solid #F5B97A;border-radius:18px;padding:22px 24px;color:var(--orange-ink)}
+.warn h3{color:var(--orange-ink);font-size:22px;margin-bottom:6px}
+form{display:flex;flex-direction:column;gap:16px}
+label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
+input[type=text],input[type=tel]{width:100%;font:inherit;min-height:48px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;color:var(--ink)}
+input:focus,select:focus,.btn:focus,.opt:focus-within{outline:3px solid #9EC1FF;outline-offset:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #C9D2E0;border-radius:10px;font-weight:500;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--blue)}
+.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:15px}
+.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}
+.msg{padding:14px 16px;border-radius:12px;font-size:16px}
+.msg.ok{background:var(--sky);color:var(--blue-d)}
+.msg.err{background:#FDECEC;color:#9B1C1C}
+.msg.demo{background:var(--orange-bg);color:var(--orange-ink)}
+.team{background:var(--bg)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
+footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+footer p{margin:0;max-width:46em;padding:16px 18px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;color:var(--ink)}
+.hidden{display:none}
+[dir=rtl] .list li,[dir=rtl] .consent{flex-direction:row}
+@media (max-width:780px){.hero-g,.g2{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:minmax(0,1fr);margin-top:20px}.hero{padding:36px 0}.bus{max-width:360px}}
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}.tab{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:15px;color:var(--muted);text-decoration:none}.tab:hover{color:var(--ink)}.tab.on{background:#fff;color:var(--blue-d);box-shadow:0 1px 3px rgba(20,33,61,.12)}
+@media (max-width:780px){.tabs{order:3;width:100%}.tab{flex:1;justify-content:center}}
+@media (max-width:780px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:0 8px;font-size:14px;min-height:38px}}
+.doc{max-width:760px;padding:40px 0 64px}
+.doc h1{font-size:40px;margin-bottom:6px}.doc h2{font-size:22px;margin:28px 0 8px}
+.doc p,.doc li{color:var(--ink)}.doc .upd{color:var(--muted);font-size:15px;margin:0 0 8px}
+.doc ul{padding-inline-start:20px}
+article{display:none}article.on{display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="/">Polku hoitoon</a>
+    <div class="bar-r">
+      <nav class="tabs" aria-label="Polku hoitoon"><a class="tab" href="/" id="tb"></a><a class="tab" href="/sovellus" id="ta"></a></nav>
+      <label for="lang" class="hidden" id="langLbl">Language</label>
+      <select id="lang" aria-labelledby="langLbl"><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="en">English</option></select>
+    </div>
+  </div>
+</header>
+<main class="wrap doc">
+<article data-lang="fi">
+<h1>Tietosuojaseloste</h1>
+<p class="upd">Polku hoitoon -jonotuslista ja palaute · päivitetty 14.11.2026</p>
+<h2>1. Kuka tietoja käsittelee</h2>
+<p>Rekisterinpitäjä on Polku Labs, Junction 2026 -hackathonissa toimiva opiskelijatiimi. Yhteydenotot ja tietopyynnöt: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
+<p>Polku hoitoon ei ole vielä oikea terveyspalvelu, vaan konsepti, jonka kiinnostusta mittaamme.</p>
+<h2>2. Mitä tietoja keräämme</h2>
+<p><b>Jonotuslista:</b> etunimi (vapaaehtoinen), puhelinnumero tai sähköposti, postinumero, ilmoititko itsesi vai läheisesi, kiinnostuksen kohde (seulontabussi, sovellus tai molemmat), haluatko testata sovellusta, sivun kieli, ilmoittautumisen ajankohta ja linkki, jonka kautta tulit sivulle. Seulontabussin kohdalla kysymme lisäksi, oletko 55–74-vuotias ja tupakoitko tai oletko tupakoinut (vapaaehtoinen).</p>
+<p>Jos ilmoitat läheisesi, pyydä häneltä lupa ennen kuin annat hänen yhteystietonsa. Hän voi milloin tahansa pyytää tietojensa poistoa.</p>
+<p><b>Palaute:</b> arvio 1–5, vapaa teksti, sivun kieli ja linkki, jonka kautta tulit. Palautteeseen ei liitetä nimeä eikä yhteystietoja. Älä kirjoita palautteeseen henkilö- tai terveystietoja.</p>
+<p>Emme tallenna IP-osoitettasi omaan tietokantaamme.</p>
+<h2>3. Mihin tietoja käytetään</h2>
+<p>Käytämme tietoja kiinnostuksen mittaamiseen, yhteydenottoon, jos pilotti alkaa alueellasi, ja koottuihin tilastoihin (esimerkiksi ilmoittautuneiden määrä). Hackathonissa esitämme vain koottuja lukuja, emme yksittäisiä henkilöitä. Emme myy tai luovuta henkilötietoja kenellekään, emme myöskään haasteen järjestäjälle.</p>
+<h2>4. Käsittelyn peruste</h2>
+<p>Käsittely perustuu suostumukseesi (EU:n tietosuoja-asetus, 6 artiklan 1 kohdan a alakohta). Vastaus tupakointia koskevaan kysymykseen voi olla terveystietoa, jota käsittelemme nimenomaisen suostumuksesi perusteella (9 artiklan 2 kohdan a alakohta). Voit perua suostumuksesi milloin tahansa.</p>
+<h2>5. Palveluntarjoajat</h2>
+<ul>
+<li><b>Modal Labs, Inc.</b> (Yhdysvallat): verkkopalvelin ja tietojen tallennus.</li>
+<li><b>Cloudflare, Inc.</b>: verkkoliikenteen välitys ja suojaus. Käsittelee teknisiä tietoja, kuten IP-osoitteen.</li>
+<li><b>Zoner Oy</b> (Suomi): sähköposti info@polkuhoitoon.fi.</li>
+<li><b>Google</b>: sivun fontit ladataan Googlen palvelimilta, jolloin selaimesi IP-osoite välittyy Googlelle.</li>
+</ul>
+<h2>6. Tietojen siirto EU:n ulkopuolelle</h2>
+<p>Tiedot tallennetaan Modalin palvelimille Yhdysvaltoihin eli EU:n ulkopuolelle. Siirto perustuu nimenomaiseen suostumukseesi, jonka annat lomakkeen valintaruudulla. Yhdysvalloissa tietosuojan taso voi olla heikompi kuin EU:ssa.</p>
+<h2>7. Kuinka kauan tietoja säilytetään</h2>
+<p>Poistamme jonotuslistan ja palautteen tiedot viimeistään 31.3.2027. Jos pilotti alkaa, kysymme sinulta uuden suostumuksen ennen kuin käytämme tietojasi siihen. Poistamme tietosi aiemmin, jos pyydät.</p>
+<h2>8. Oikeutesi</h2>
+<p>Sinulla on oikeus tarkastaa tietosi, korjata ne, pyytää niiden poistamista, perua suostumuksesi ja saada tietosi siirrettävässä muodossa. Lähetä pyyntö osoitteeseen <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. Voit myös tehdä valituksen Tietosuojavaltuutetun toimistolle (<a href="https://tietosuoja.fi">tietosuoja.fi</a>).</p>
+<h2>9. Evästeet</h2>
+<p>Sivusto ei käytä evästeitä, mainosseurantaa eikä analytiikkatyökaluja. Valitsemasi kieli tallennetaan vain omaan selaimeesi.</p>
+</article>
+<article data-lang="sv">
+<h1>Dataskyddsbeskrivning</h1>
+<p class="upd">Polku hoitoons väntelista och respons · uppdaterad 14.11.2026</p>
+<h2>1. Vem behandlar uppgifterna</h2>
+<p>Personuppgiftsansvarig är Polku Labs, ett studentteam vid hackathonet Junction 2026. Kontakt och begäranden: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
+<p>Polku hoitoon är ännu ingen riktig hälsotjänst utan ett koncept vars intresse vi mäter.</p>
+<h2>2. Vilka uppgifter vi samlar in</h2>
+<p><b>Väntelista:</b> förnamn (frivilligt), telefonnummer eller e-post, postnummer, om du anmälde dig själv eller en närstående, vad du är intresserad av (screeningbussen, appen eller båda), om du vill testa appen, sidans språk, tidpunkt för anmälan och länken du kom via. För screeningbussen frågar vi också om du är 55–74 år och röker eller har rökt (frivilligt).</p>
+<p>Om du anmäler en närstående, be om lov innan du lämnar hens kontaktuppgifter. Hen kan när som helst be att uppgifterna raderas.</p>
+<p><b>Respons:</b> betyg 1–5, fritext, sidans språk och länken du kom via. Inget namn eller kontaktuppgifter kopplas till responsen. Skriv inte person- eller hälsouppgifter i responsen.</p>
+<p>Vi sparar inte din IP-adress i vår egen databas.</p>
+<h2>3. Ändamål</h2>
+<p>Vi använder uppgifterna för att mäta intresse, kontakta dig om en pilot startar i ditt område och för sammanställd statistik (till exempel antal anmälda). På hackathonet visar vi bara sammanställda siffror, inga enskilda personer. Vi säljer eller lämnar inte ut personuppgifter till någon, inte heller till utmaningens arrangör.</p>
+<h2>4. Rättslig grund</h2>
+<p>Behandlingen grundar sig på ditt samtycke (EU:s dataskyddsförordning, artikel 6.1 a). Svaret på frågan om rökning kan vara en hälsouppgift, som vi behandlar med ditt uttryckliga samtycke (artikel 9.2 a). Du kan återkalla samtycket när som helst.</p>
+<h2>5. Tjänsteleverantörer</h2>
+<ul>
+<li><b>Modal Labs, Inc.</b> (USA): webbserver och lagring av uppgifter.</li>
+<li><b>Cloudflare, Inc.</b>: förmedling och skydd av nättrafik. Behandlar tekniska uppgifter som IP-adress.</li>
+<li><b>Zoner Oy</b> (Finland): e-post info@polkuhoitoon.fi.</li>
+<li><b>Google</b>: sidans typsnitt laddas från Googles servrar, vilket gör att din webbläsares IP-adress förmedlas till Google.</li>
+</ul>
+<h2>6. Överföring utanför EU</h2>
+<p>Uppgifterna lagras på Modals servrar i USA, alltså utanför EU. Överföringen grundar sig på ditt uttryckliga samtycke, som du ger med kryssrutan i formuläret. Dataskyddsnivån i USA kan vara lägre än i EU.</p>
+<h2>7. Lagringstid</h2>
+<p>Vi raderar väntelistan och responsen senast 31.3.2027. Om en pilot startar ber vi om ett nytt samtycke innan vi använder dina uppgifter för den. Vi raderar dina uppgifter tidigare om du ber om det.</p>
+<h2>8. Dina rättigheter</h2>
+<p>Du har rätt att få tillgång till dina uppgifter, rätta dem, begära radering, återkalla ditt samtycke och få dina uppgifter i överförbart format. Skicka begäran till <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. Du kan också lämna klagomål till Dataombudsmannens byrå (<a href="https://tietosuoja.fi/sv">tietosuoja.fi</a>).</p>
+<h2>9. Kakor</h2>
+<p>Webbplatsen använder inga kakor, ingen annonsspårning och inga analysverktyg. Språket du väljer sparas bara i din egen webbläsare.</p>
+</article>
+<article data-lang="en">
+<h1>Privacy notice</h1>
+<p class="upd">Polku hoitoon waitlist and feedback · updated 14 November 2026</p>
+<h2>1. Who processes the data</h2>
+<p>The controller is Polku Labs, a student team at the Junction 2026 hackathon. Contact and data requests: <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>.</p>
+<p>Polku hoitoon is not yet a real health service but a concept whose interest we are measuring.</p>
+<h2>2. What we collect</h2>
+<p><b>Waitlist:</b> first name (optional), phone number or email, postcode, whether you signed up yourself or a relative, what you are interested in (screening bus, app or both), whether you want to test the app, page language, time of sign-up and the link you came from. For the screening bus we also ask whether you are 55–74 and smoke or used to smoke (optional).</p>
+<p>If you sign up a relative, ask for their permission before giving their contact details. They can ask for their data to be deleted at any time.</p>
+<p><b>Feedback:</b> a 1–5 rating, free text, page language and the link you came from. No name or contact details are attached to feedback. Please do not write personal or health information in your feedback.</p>
+<p>We do not store your IP address in our own database.</p>
+<h2>3. Why we use it</h2>
+<p>We use the data to measure interest, to contact you if a pilot starts in your area, and for aggregate statistics (such as the number of sign-ups). At the hackathon we only show aggregate numbers, never individuals. We do not sell or share personal data with anyone, including the challenge organiser.</p>
+<h2>4. Legal basis</h2>
+<p>Processing is based on your consent (EU General Data Protection Regulation, Article 6(1)(a)). Your answer about smoking may be health data, which we process on the basis of your explicit consent (Article 9(2)(a)). You can withdraw your consent at any time.</p>
+<h2>5. Service providers</h2>
+<ul>
+<li><b>Modal Labs, Inc.</b> (United States): web server and data storage.</li>
+<li><b>Cloudflare, Inc.</b>: routing and protecting web traffic. Processes technical data such as IP addresses.</li>
+<li><b>Zoner Oy</b> (Finland): email info@polkuhoitoon.fi.</li>
+<li><b>Google</b>: the page's fonts load from Google's servers, so your browser's IP address is passed to Google.</li>
+</ul>
+<h2>6. Transfers outside the EU</h2>
+<p>Data is stored on Modal's servers in the United States, outside the EU. The transfer is based on your explicit consent, which you give with the checkbox on the form. The level of data protection in the United States may be lower than in the EU.</p>
+<h2>7. How long we keep it</h2>
+<p>We delete the waitlist and feedback data by 31 March 2027 at the latest. If a pilot starts, we will ask for your consent again before using your data for it. We delete your data sooner if you ask.</p>
+<h2>8. Your rights</h2>
+<p>You have the right to access, correct and erase your data, withdraw your consent, and receive your data in a portable format. Send requests to <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a>. You can also complain to the Office of the Data Protection Ombudsman (<a href="https://tietosuoja.fi/en">tietosuoja.fi</a>).</p>
+<h2>9. Cookies</h2>
+<p>The site uses no cookies, ad tracking or analytics tools. The language you choose is stored only in your own browser.</p>
+</article>
+
+</main>
+<footer><div class="wrap"><div style="font-size:15px"><a href="/meista">Polku Labs</a> · <b style="color:var(--ink)">Polku Labs</b> · Junction 2026 · <a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>
+<script>
+var TABS = {fi:["Seulontabussi","Sovellus"], sv:["Screeningbussen","Appen"], en:["Screening bus","App"]};
+function apply(l){
+  if (!TABS[l]) l = "en";
+  document.documentElement.lang = l;
+  document.querySelectorAll("article").forEach(function(a){ a.classList.toggle("on", a.getAttribute("data-lang") === l); });
+  document.getElementById("tb").textContent = TABS[l][0]; document.getElementById("ta").textContent = TABS[l][1];
+  document.title = document.querySelector("article.on h1").textContent + " – Polku hoitoon";
+  try { localStorage.setItem("vayla-lang", l); } catch (e) {}
+  sel.value = l;
+}
+var sel = document.getElementById("lang"), start = "";
+try { start = localStorage.getItem("vayla-lang") || ""; } catch (e) {}
+if (!start) start = (navigator.language || "fi").slice(0, 2);
+apply(start);
+sel.addEventListener("change", function(){ apply(sel.value); });
+</script>
+</body>
+</html>
