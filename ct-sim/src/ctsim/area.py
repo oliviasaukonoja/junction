@@ -2,7 +2,7 @@
 
 Risk group (evidence-based definition, see RISK_GROUP): people aged 50-74 who currently smoke or quit within 15 years and have at
 least 20 pack-years. This is the lung-cancer LDCT eligibility used by US 2021 guidance, inside the EU Council 2022 range (50-75, heavy
-current/former smokers) and broader than the NLST/Oulu pilot (>=30 pack-years). Only lung cancer has randomised evidence that CT screening
+current/former smokers) and broader than NLST (>=30 pack-years); the Oulu and 2026 national pilots use cigarettes-per-day x years rules worth roughly 15-19 pack-years at the minimum, close to this definition. Only lung cancer has randomised evidence that CT screening
 reduces deaths (NELSON, NLST).
 
 What is verified and what is assumed

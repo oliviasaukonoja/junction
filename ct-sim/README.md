@@ -1,7 +1,7 @@
 # ctsim: mobile CT lung screening simulator (Junction 2026, AstraZeneca challenge)
 
 Simulation and planning toolkit for a mobile low-dose CT (LDCT) lung screening unit in Finland.
-Read [mobile_ct_screening_report.md](mobile_ct_screening_report.md) first: it states what is sourced, what is assumed, and what the numbers do and do not show.
+Read [mobile_ct_screening_report.md](mobile_ct_screening_report.md) first (and [docs/gap_analysis_and_cost.md](docs/gap_analysis_and_cost.md) for the 2026-11-14 gap analysis against the challenge, the Pohde deck and the strategy, with cost and lives-saved estimates): it states what is sourced, what is assumed, and what the numbers do and do not show.
 
 ## Layout
 ```
