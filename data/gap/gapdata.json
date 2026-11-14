@@ -1,0 +1,1153 @@
+{
+ "year": 2024,
+ "target_pct": 80,
+ "national": {
+  "breast": 81.6,
+  "colorectal": 73.5
+ },
+ "counties": [
+  {
+   "county": "Central Finland",
+   "breast": 85.1,
+   "cervical": 70.6,
+   "colorectal": 76.5
+  },
+  {
+   "county": "Central Ostrobothnia",
+   "breast": 85.4,
+   "cervical": 69.2,
+   "colorectal": 73.3
+  },
+  {
+   "county": "Central Uusimaa",
+   "breast": 80.5,
+   "cervical": 77.0,
+   "colorectal": 74.0
+  },
+  {
+   "county": "City of Helsinki",
+   "breast": 74.3,
+   "cervical": 72.2,
+   "colorectal": 69.6
+  },
+  {
+   "county": "East Uusimaa",
+   "breast": 79.8,
+   "cervical": 76.5,
+   "colorectal": 72.0
+  },
+  {
+   "county": "Kainuu",
+   "breast": 84.1,
+   "cervical": 78.5,
+   "colorectal": 76.5
+  },
+  {
+   "county": "Kanta-Häme",
+   "breast": 83.4,
+   "cervical": 70.4,
+   "colorectal": 74.3
+  },
+  {
+   "county": "Kymenlaakso",
+   "breast": 82.0,
+   "cervical": 77.3,
+   "colorectal": 70.0
+  },
+  {
+   "county": "Lapland",
+   "breast": 83.8,
+   "cervical": 79.9,
+   "colorectal": 73.7
+  },
+  {
+   "county": "North Karelia",
+   "breast": 84.2,
+   "cervical": 68.0,
+   "colorectal": 73.2
+  },
+  {
+   "county": "North Ostrobothnia",
+   "breast": 85.6,
+   "cervical": 73.6,
+   "colorectal": 75.6
+  },
+  {
+   "county": "North Savo",
+   "breast": 85.1,
+   "cervical": 70.0,
+   "colorectal": 75.4
+  },
+  {
+   "county": "Ostrobothnia",
+   "breast": 84.9,
+   "cervical": 72.4,
+   "colorectal": 75.9
+  },
+  {
+   "county": "Pirkanmaa",
+   "breast": 83.5,
+   "cervical": 71.5,
+   "colorectal": 74.3
+  },
+  {
+   "county": "Päijät-Häme",
+   "breast": 81.8,
+   "cervical": 68.9,
+   "colorectal": 75.2
+  },
+  {
+   "county": "Satakunta",
+   "breast": 84.9,
+   "cervical": 72.1,
+   "colorectal": 72.6
+  },
+  {
+   "county": "South Karelia",
+   "breast": 83.2,
+   "cervical": 77.0,
+   "colorectal": 74.0
+  },
+  {
+   "county": "South Ostrobothnia",
+   "breast": 85.0,
+   "cervical": 82.3,
+   "colorectal": 74.6
+  },
+  {
+   "county": "South Savo",
+   "breast": 82.2,
+   "cervical": 82.3,
+   "colorectal": 76.9
+  },
+  {
+   "county": "Southwest Finland",
+   "breast": 82.7,
+   "cervical": 77.8,
+   "colorectal": 73.5
+  },
+  {
+   "county": "Vantaa and Kerava",
+   "breast": 76.7,
+   "cervical": 72.1,
+   "colorectal": 71.3
+  },
+  {
+   "county": "West Uusimaa",
+   "breast": 76.1,
+   "cervical": 74.6,
+   "colorectal": 71.5
+  },
+  {
+   "county": "Åland",
+   "breast": null,
+   "cervical": 80.2,
+   "colorectal": null
+  }
+ ],
+ "groups": {
+  "language": {
+   "breast": {
+    "file": "breast_11.csv",
+    "Domestic": 83.2,
+    "Other/missing": 60.8
+   },
+   "colorectal": {
+    "file": "colorectal_10.csv",
+    "Domestic": 74.5,
+    "Other/missing": 53.4
+   },
+   "cervical": {
+    "file": "cervix_31.csv",
+    "Domestic": 76.2,
+    "Other/missing": 56.3
+   }
+  },
+  "education": {
+   "breast": {
+    "file": "breast_21.csv",
+    "Primary education/unknown": 63.5,
+    "Intermediate/secondary": 81.2,
+    "Tertiary/higher education": 85.9
+   },
+   "colorectal": {
+    "file": "colorectal_13.csv",
+    "Primary education/unknown": 61.5,
+    "Intermediate/secondary": 73.0,
+    "Tertiary/higher education": 79.3
+   }
+  }
+ },
+ "area": [
+  {
+   "hva_code": "HVA10",
+   "county": "Kymenlaakso",
+   "eligible": 5123,
+   "pop50": 55654,
+   "lung_deaths_per_100k_50_74": 175.4,
+   "mort_index": 1.268,
+   "smoking_20_64": 14.6,
+   "smoking_65plus": 7.3,
+   "ct_towns": [
+    "Kotka",
+    "Kouvola"
+   ],
+   "served_share_no_campaign": 0.392,
+   "extra_wait_no_campaign": 4.0,
+   "extra_wait_campaign_2": 14.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA01",
+   "county": "East Uusimaa",
+   "eligible": 2864,
+   "pop50": 33414,
+   "lung_deaths_per_100k_50_74": 149.0,
+   "mort_index": 1.078,
+   "smoking_20_64": 11.4,
+   "smoking_65plus": 9.5,
+   "ct_towns": [
+    "Porvoo"
+   ],
+   "served_share_no_campaign": 0.481,
+   "extra_wait_no_campaign": 2.8,
+   "extra_wait_campaign_2": 12.4,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA06",
+   "county": "Satakunta",
+   "eligible": 6809,
+   "pop50": 69574,
+   "lung_deaths_per_100k_50_74": 176.2,
+   "mort_index": 1.274,
+   "smoking_20_64": 15.1,
+   "smoking_65plus": 8.3,
+   "ct_towns": [
+    "Pori"
+   ],
+   "served_share_no_campaign": 0.484,
+   "extra_wait_no_campaign": 2.8,
+   "extra_wait_campaign_2": 12.2,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA07",
+   "county": "Kanta-Häme",
+   "eligible": 4526,
+   "pop50": 56999,
+   "lung_deaths_per_100k_50_74": 146.3,
+   "mort_index": 1.058,
+   "smoking_20_64": 12.1,
+   "smoking_65plus": 6.8,
+   "ct_towns": [
+    "Hämeenlinna",
+    "Riihimäki"
+   ],
+   "served_share_no_campaign": 0.52,
+   "extra_wait_no_campaign": 2.4,
+   "extra_wait_campaign_2": 11.9,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA04",
+   "county": "Vantaa and Kerava",
+   "eligible": 7282,
+   "pop50": 75758,
+   "lung_deaths_per_100k_50_74": 110.1,
+   "mort_index": 0.796,
+   "smoking_20_64": 13.6,
+   "smoking_65plus": 8.8,
+   "ct_towns": [
+    "Vantaa"
+   ],
+   "served_share_no_campaign": 0.531,
+   "extra_wait_no_campaign": 2.3,
+   "extra_wait_campaign_2": 10.1,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA09",
+   "county": "Päijät-Häme",
+   "eligible": 5235,
+   "pop50": 68271,
+   "lung_deaths_per_100k_50_74": 160.2,
+   "mort_index": 1.159,
+   "smoking_20_64": 13.1,
+   "smoking_65plus": 4.7,
+   "ct_towns": [
+    "Lahti"
+   ],
+   "served_share_no_campaign": 0.549,
+   "extra_wait_no_campaign": 2.1,
+   "extra_wait_campaign_2": 11.4,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA11",
+   "county": "South Karelia",
+   "eligible": 3315,
+   "pop50": 42416,
+   "lung_deaths_per_100k_50_74": 135.3,
+   "mort_index": 0.978,
+   "smoking_20_64": 12.3,
+   "smoking_65plus": 6.4,
+   "ct_towns": [
+    "Lappeenranta"
+   ],
+   "served_share_no_campaign": 0.555,
+   "extra_wait_no_campaign": 2.1,
+   "extra_wait_campaign_2": 11.4,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA21",
+   "county": "Lapland",
+   "eligible": 5213,
+   "pop50": 58881,
+   "lung_deaths_per_100k_50_74": 185.8,
+   "mort_index": 1.344,
+   "smoking_20_64": 12.9,
+   "smoking_65plus": 8.8,
+   "ct_towns": [
+    "Kemi",
+    "Rovaniemi"
+   ],
+   "served_share_no_campaign": 0.607,
+   "extra_wait_no_campaign": 1.7,
+   "extra_wait_campaign_2": 10.6,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA13",
+   "county": "North Savo",
+   "eligible": 5566,
+   "pop50": 81401,
+   "lung_deaths_per_100k_50_74": 119.7,
+   "mort_index": 0.866,
+   "smoking_20_64": 11.0,
+   "smoking_65plus": 5.4,
+   "ct_towns": [
+    "Iisalmi",
+    "Kuopio",
+    "Varkaus"
+   ],
+   "served_share_no_campaign": 0.612,
+   "extra_wait_no_campaign": 1.6,
+   "extra_wait_campaign_2": 10.5,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA05",
+   "county": "Southwest Finland",
+   "eligible": 11588,
+   "pop50": 148611,
+   "lung_deaths_per_100k_50_74": 143.1,
+   "mort_index": 1.035,
+   "smoking_20_64": 12.0,
+   "smoking_65plus": 6.3,
+   "ct_towns": [
+    "Turku"
+   ],
+   "served_share_no_campaign": 0.643,
+   "extra_wait_no_campaign": 1.4,
+   "extra_wait_campaign_2": 9.6,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA14",
+   "county": "North Karelia",
+   "eligible": 4091,
+   "pop50": 53892,
+   "lung_deaths_per_100k_50_74": 149.2,
+   "mort_index": 1.079,
+   "smoking_20_64": 11.3,
+   "smoking_65plus": 7.4,
+   "ct_towns": [
+    "Joensuu"
+   ],
+   "served_share_no_campaign": 0.654,
+   "extra_wait_no_campaign": 1.4,
+   "extra_wait_campaign_2": 10.2,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA02",
+   "county": "Central Uusimaa",
+   "eligible": 4561,
+   "pop50": 64676,
+   "lung_deaths_per_100k_50_74": 120.9,
+   "mort_index": 0.874,
+   "smoking_20_64": 11.0,
+   "smoking_65plus": 4.8,
+   "ct_towns": [
+    "Hyvinkää"
+   ],
+   "served_share_no_campaign": 0.652,
+   "extra_wait_no_campaign": 1.4,
+   "extra_wait_campaign_2": 9.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA12",
+   "county": "South Savo",
+   "eligible": 2745,
+   "pop50": 47905,
+   "lung_deaths_per_100k_50_74": 149.9,
+   "mort_index": 1.084,
+   "smoking_20_64": 8.5,
+   "smoking_65plus": 5.6,
+   "ct_towns": [
+    "Mikkeli",
+    "Savonlinna"
+   ],
+   "served_share_no_campaign": 0.667,
+   "extra_wait_no_campaign": 1.3,
+   "extra_wait_campaign_2": 11.0,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA18",
+   "county": "Central Ostrobothnia",
+   "eligible": 1372,
+   "pop50": 19906,
+   "lung_deaths_per_100k_50_74": 130.6,
+   "mort_index": 0.944,
+   "smoking_20_64": 9.4,
+   "smoking_65plus": 7.5,
+   "ct_towns": [
+    "Kokkola"
+   ],
+   "served_share_no_campaign": 0.669,
+   "extra_wait_no_campaign": 1.3,
+   "extra_wait_campaign_2": 9.3,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA19",
+   "county": "North Ostrobothnia",
+   "eligible": 8539,
+   "pop50": 117971,
+   "lung_deaths_per_100k_50_74": 140.5,
+   "mort_index": 1.016,
+   "smoking_20_64": 10.5,
+   "smoking_65plus": 6.9,
+   "ct_towns": [
+    "Kuusamo",
+    "Oulainen",
+    "Oulu",
+    "Raahe"
+   ],
+   "served_share_no_campaign": 0.698,
+   "extra_wait_no_campaign": 1.1,
+   "extra_wait_campaign_2": 8.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA20",
+   "county": "Kainuu",
+   "eligible": 1710,
+   "pop50": 24902,
+   "lung_deaths_per_100k_50_74": 158.2,
+   "mort_index": 1.144,
+   "smoking_20_64": 10.5,
+   "smoking_65plus": 6.4,
+   "ct_towns": [
+    "Kajaani"
+   ],
+   "served_share_no_campaign": 0.714,
+   "extra_wait_no_campaign": 1.0,
+   "extra_wait_campaign_2": 10.2,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA03",
+   "county": "West Uusimaa",
+   "eligible": 8849,
+   "pop50": 140818,
+   "lung_deaths_per_100k_50_74": 121.9,
+   "mort_index": 0.882,
+   "smoking_20_64": 8.7,
+   "smoking_65plus": 6.2,
+   "ct_towns": [
+    "Espoo",
+    "Lohja"
+   ],
+   "served_share_no_campaign": 0.788,
+   "extra_wait_no_campaign": 0.7,
+   "extra_wait_campaign_2": 8.1,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA91",
+   "county": "Åland",
+   "eligible": 529,
+   "pop50": 9927,
+   "lung_deaths_per_100k_50_74": 139.0,
+   "mort_index": 1.005,
+   "smoking_20_64": 7.5,
+   "smoking_65plus": 5.3,
+   "ct_towns": [
+    "Maarianhamina - Mariehamn"
+   ],
+   "served_share_no_campaign": 0.814,
+   "extra_wait_no_campaign": 0.6,
+   "extra_wait_campaign_2": 8.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA16",
+   "county": "South Ostrobothnia",
+   "eligible": 3548,
+   "pop50": 60923,
+   "lung_deaths_per_100k_50_74": 142.5,
+   "mort_index": 1.031,
+   "smoking_20_64": 9.3,
+   "smoking_65plus": 4.6,
+   "ct_towns": [
+    "Seinäjoki"
+   ],
+   "served_share_no_campaign": 0.873,
+   "extra_wait_no_campaign": 0.4,
+   "extra_wait_campaign_2": 8.5,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA08",
+   "county": "Pirkanmaa",
+   "eligible": 9168,
+   "pop50": 154873,
+   "lung_deaths_per_100k_50_74": 124.2,
+   "mort_index": 0.898,
+   "smoking_20_64": 7.4,
+   "smoking_65plus": 7.4,
+   "ct_towns": [
+    "Sastamala",
+    "Tampere",
+    "Valkeakoski"
+   ],
+   "served_share_no_campaign": 0.856,
+   "extra_wait_no_campaign": 0.4,
+   "extra_wait_campaign_2": 7.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA15",
+   "county": "Central Finland",
+   "eligible": 4887,
+   "pop50": 82736,
+   "lung_deaths_per_100k_50_74": 121.8,
+   "mort_index": 0.881,
+   "smoking_20_64": 8.6,
+   "smoking_65plus": 5.7,
+   "ct_towns": [
+    "Jyväskylä"
+   ],
+   "served_share_no_campaign": 0.876,
+   "extra_wait_no_campaign": 0.4,
+   "extra_wait_campaign_2": 8.1,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA17",
+   "county": "Ostrobothnia",
+   "eligible": 3030,
+   "pop50": 50556,
+   "lung_deaths_per_100k_50_74": 134.9,
+   "mort_index": 0.976,
+   "smoking_20_64": 8.6,
+   "smoking_65plus": 5.8,
+   "ct_towns": [
+    "Pietarsaari",
+    "Vaasa"
+   ],
+   "served_share_no_campaign": 0.855,
+   "extra_wait_no_campaign": 0.4,
+   "extra_wait_campaign_2": 7.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  },
+  {
+   "hva_code": "HVA90",
+   "county": "Helsinki",
+   "eligible": 9374,
+   "pop50": 175327,
+   "lung_deaths_per_100k_50_74": 129.0,
+   "mort_index": 0.933,
+   "smoking_20_64": 7.1,
+   "smoking_65plus": 5.9,
+   "ct_towns": [
+    "Helsinki"
+   ],
+   "served_share_no_campaign": 0.943,
+   "extra_wait_no_campaign": 0.2,
+   "extra_wait_campaign_2": 6.8,
+   "baseline_wait_weeks": 4,
+   "baseline_wait_is_data": false
+  }
+ ],
+ "area_national": {
+  "eligible": 119924,
+  "campaign": {
+   "no_campaign": {
+    "intensity": 0.0,
+    "triage": 0.6,
+    "priority_eligible": true,
+    "uptake_boost": 0.0,
+    "demand_eligible": 24998,
+    "demand_ineligible": 0,
+    "free_capacity": 16960,
+    "shortfall": 8038,
+    "counties_with_extra_wait_over_4_weeks": 0,
+    "longest_extra_wait": {
+     "county": "Kymenlaakso",
+     "weeks": 4.0
+    },
+    "truck_equivalents_of_shortfall": 2.8
+   },
+   "campaign_2": {
+    "intensity": 2.0,
+    "triage": 0.6,
+    "priority_eligible": true,
+    "uptake_boost": 0.6,
+    "demand_eligible": 39995,
+    "demand_ineligible": 37811,
+    "free_capacity": 16960,
+    "shortfall": 60847,
+    "counties_with_extra_wait_over_4_weeks": 23,
+    "longest_extra_wait": {
+     "county": "Kymenlaakso",
+     "weeks": 14.8
+    },
+    "truck_equivalents_of_shortfall": 21.2
+   }
+  },
+  "risk_group": {
+   "name": "Heavy current or recent former smokers, 50-74",
+   "age_min": 50,
+   "age_max": 74,
+   "pack_years_min": 20,
+   "quit_years_max": 15,
+   "basis": [
+    "US Preventive Services Task Force 2021 (50-80, >=20 pack-years, quit <=15 y)",
+    "EU Council Recommendation 2022 (current/former heavy smokers, 50-75; stepwise, further research)",
+    "NELSON (RR 0.76, 10-year) and NLST (20% reduction); Oulu pilot used >=15 cig/day x25y or >=10 x30y, age 50-74"
+   ],
+   "note": "Individuals cannot be identified from public data; the model estimates how many such people live in each municipality."
+  }
+ },
+ "pilot": {
+  "design": [
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.05,
+    "power": 0.8,
+    "n_per_arm": 1377,
+    "total": 2754,
+    "additionality_share": 0.143
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.05,
+    "power": 0.9,
+    "n_per_arm": 1842,
+    "total": 3684,
+    "additionality_share": 0.143
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.1,
+    "power": 0.8,
+    "n_per_arm": 356,
+    "total": 712,
+    "additionality_share": 0.25
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.1,
+    "power": 0.9,
+    "n_per_arm": 477,
+    "total": 954,
+    "additionality_share": 0.25
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.15,
+    "power": 0.8,
+    "n_per_arm": 163,
+    "total": 326,
+    "additionality_share": 0.333
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.15,
+    "power": 0.9,
+    "n_per_arm": 217,
+    "total": 434,
+    "additionality_share": 0.333
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.2,
+    "power": 0.8,
+    "n_per_arm": 93,
+    "total": 186,
+    "additionality_share": 0.4
+   },
+   {
+    "baseline_uptake": 0.3,
+    "uplift": 0.2,
+    "power": 0.9,
+    "n_per_arm": 124,
+    "total": 248,
+    "additionality_share": 0.4
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.05,
+    "power": 0.8,
+    "n_per_arm": 1534,
+    "total": 3068,
+    "additionality_share": 0.111
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.05,
+    "power": 0.9,
+    "n_per_arm": 2053,
+    "total": 4106,
+    "additionality_share": 0.111
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.1,
+    "power": 0.8,
+    "n_per_arm": 388,
+    "total": 776,
+    "additionality_share": 0.2
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.1,
+    "power": 0.9,
+    "n_per_arm": 519,
+    "total": 1038,
+    "additionality_share": 0.2
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.15,
+    "power": 0.8,
+    "n_per_arm": 173,
+    "total": 346,
+    "additionality_share": 0.273
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.15,
+    "power": 0.9,
+    "n_per_arm": 231,
+    "total": 462,
+    "additionality_share": 0.273
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.2,
+    "power": 0.8,
+    "n_per_arm": 97,
+    "total": 194,
+    "additionality_share": 0.333
+   },
+   {
+    "baseline_uptake": 0.4,
+    "uplift": 0.2,
+    "power": 0.9,
+    "n_per_arm": 130,
+    "total": 260,
+    "additionality_share": 0.333
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.05,
+    "power": 0.8,
+    "n_per_arm": 1565,
+    "total": 3130,
+    "additionality_share": 0.091
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.05,
+    "power": 0.9,
+    "n_per_arm": 2095,
+    "total": 4190,
+    "additionality_share": 0.091
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.1,
+    "power": 0.8,
+    "n_per_arm": 388,
+    "total": 776,
+    "additionality_share": 0.167
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.1,
+    "power": 0.9,
+    "n_per_arm": 519,
+    "total": 1038,
+    "additionality_share": 0.167
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.15,
+    "power": 0.8,
+    "n_per_arm": 170,
+    "total": 340,
+    "additionality_share": 0.231
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.15,
+    "power": 0.9,
+    "n_per_arm": 227,
+    "total": 454,
+    "additionality_share": 0.231
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.2,
+    "power": 0.8,
+    "n_per_arm": 93,
+    "total": 186,
+    "additionality_share": 0.286
+   },
+   {
+    "baseline_uptake": 0.5,
+    "uplift": 0.2,
+    "power": 0.9,
+    "n_per_arm": 124,
+    "total": 248,
+    "additionality_share": 0.286
+   }
+  ],
+  "example": {
+   "n_per_arm": 173,
+   "additionality": {
+    "additional_per_100_invitees": 15.000000000000002,
+    "would_have_happened_anyway_per_100": 40.0,
+    "additionality_share": 0.27272727272727276
+   },
+   "sim_clean": {
+    "n_per_arm": 171,
+    "power": 0.8333333333333334,
+    "mean_rd": 0.1471832358674464,
+    "sd_rd": 0.049213226871038435,
+    "true_itt_rd": 0.14999999999999997,
+    "ci_coverage": 0.95
+   },
+   "sim_leak": {
+    "n_per_arm": 171,
+    "power": 0.5283333333333333,
+    "mean_rd": 0.1020662768031189,
+    "sd_rd": 0.049947074421108344,
+    "true_itt_rd": 0.10500000000000004,
+    "ci_coverage": 0.9533333333333334
+   },
+   "before_after": {
+    "naive_additional_per_100": 27.0,
+    "randomised_additional_per_100": 15.000000000000002,
+    "overstatement_per_100": 12.0
+   }
+  }
+ },
+ "tags": {
+  "S": "sourced (link)",
+  "N": "team research notes or mentor interview, not re-verified in this project",
+  "A": "assumption"
+ },
+ "goal3": {
+  "title": "Strategy Goal 3: equal and effective cancer care",
+  "indicators": [
+   {
+    "id": "survival",
+    "label": "Five-year survival of poor-prognosis cancers reaches the Nordic level",
+    "detail": "Targets versus the 2023 NORDCAN level: lung +14 percentage points, pancreas +6, liver +14. Nordic level = average of Sweden and Norway.",
+    "tag": "S",
+    "source": "National Cancer Strategy 2026-2035 (strategy PDF, read directly)"
+   },
+   {
+    "id": "mortality",
+    "label": "Cancer mortality falls 10%",
+    "detail": "From about 13,300 deaths a year, so about 1,330 fewer. 13,490 cancer deaths were recorded in 2024.",
+    "tag": "S",
+    "source": "Strategy PDF; Syöpä 2024 via STT"
+   },
+   {
+    "id": "timeliness",
+    "label": "Patients reach treatment within target times",
+    "detail": "Median diagnosis-to-treatment 36-38 days (2018-2022); under 2% (600-700 patients) exceeded 180 days in 2024.",
+    "tag": "N",
+    "source": "Team notes (THL/Cancer Registry data)"
+   }
+  ]
+ },
+ "lung_survival": {
+  "title": "Lung cancer five-year relative survival, %",
+  "men": {
+   "Finland": 17,
+   "Denmark": 27,
+   "Sweden": 29,
+   "Norway": 30
+  },
+  "women": {
+   "Finland": 29,
+   "Denmark": 35,
+   "Sweden": 37,
+   "Norway": 37
+  },
+  "tag": "N",
+  "source": "IHE Cancer Dashboard Finland 2026 via team notes; not re-verified. NORDCAN is the primary source to check."
+ },
+ "pathway": [
+  {
+   "stage": "Detection",
+   "where_gap": true,
+   "items": [
+    {
+     "measure": "Share of cancers with stage recorded",
+     "finland": "42%",
+     "comparator": "target: 70% diagnosed at stage I-II, which cannot be measured today",
+     "tag": "N",
+     "source": "Team notes (Cancer Registry/strategy)"
+    },
+    {
+     "measure": "Lung cancer diagnosed at stage IV",
+     "finland": "59% (one centre, 2007-2019)",
+     "comparator": "no national figure",
+     "tag": "N",
+     "source": "Single-centre study via team notes; do not present as national"
+    },
+    {
+     "measure": "Screening participation, other native language vs domestic (breast)",
+     "finland": "60.8% vs 83.2%",
+     "comparator": "target 80% in every county",
+     "tag": "S",
+     "source": "Cancer Registry screening statistics 2024 (read directly)"
+    }
+   ]
+  },
+  {
+   "stage": "Primary care to specialist",
+   "where_gap": true,
+   "items": [
+    {
+     "measure": "Lung: days to a symptom appointment",
+     "finland": "14",
+     "comparator": "2-7 in Denmark, Norway, Sweden",
+     "tag": "N",
+     "source": "2025 Nordic lung study via team notes"
+    },
+    {
+     "measure": "Lung: specialist consultation",
+     "finland": "2-4 weeks",
+     "comparator": "1-2 weeks elsewhere",
+     "tag": "N",
+     "source": "2025 Nordic lung study via team notes"
+    },
+    {
+     "measure": "Health centres where 2-week access is rare",
+     "finland": "about 24% seen within two weeks at the worst stations",
+     "comparator": "n/a",
+     "tag": "N",
+     "source": "Iltalehti comparison via team notes"
+    }
+   ]
+  },
+  {
+   "stage": "Diagnosis",
+   "where_gap": null,
+   "items": [
+    {
+     "measure": "Time from first symptom to diagnosis by region; emergency presentations",
+     "finland": "not known",
+     "comparator": "n/a",
+     "tag": "N",
+     "source": "No Finnish data found; ask mentors"
+    },
+    {
+     "measure": "International lung benchmark: median symptom-to-treatment interval",
+     "finland": "n/a",
+     "comparator": "116 days in Wales; Denmark 49 days shorter (7 jurisdictions, Finland not included)",
+     "tag": "S",
+     "source": "ICBP Module 4, BMJ Open 2019 (search summary)"
+    }
+   ]
+  },
+  {
+   "stage": "Treatment start",
+   "where_gap": false,
+   "items": [
+    {
+     "measure": "Median diagnosis to treatment",
+     "finland": "36-38 days",
+     "comparator": "limit 180 days; under 2% exceeded it in 2024",
+     "tag": "N",
+     "source": "Team notes"
+    }
+   ]
+  }
+ ],
+ "recommendations": [
+  {
+   "id": "R1",
+   "action": "Record stage for at least 90% of cancers and set up the national quality registry",
+   "owner": "National (Cancer Registry, FICAN, THL)",
+   "evidence": "Stage is known for only 42% of cases, so the strategy's 70% stage I-II target cannot be tracked [N]; the strategy calls for a quality registry [S].",
+   "kpi": "Stage coverage 42% to 90%",
+   "tag": "S"
+  },
+  {
+   "id": "R2",
+   "action": "Publish a county 'pathway clock': days from first symptom visit to imaging and to diagnosis, by municipality",
+   "owner": "Wellbeing services counties",
+   "evidence": "Finnish data on symptom-to-diagnosis time by region do not exist; the largest delay is before diagnosis [N]. Breast cancer survival varies more within hospital districts than between them, which the Cancer Registry's researcher links to primary-care access or referral delays in some municipalities (via team notes) [N].",
+   "kpi": "Median and 90th-percentile days, per health centre",
+   "tag": "N"
+  },
+  {
+   "id": "R3",
+   "action": "Agree a fast pathway from health centre to chest CT for defined red-flag symptoms (persistent cough, haemoptysis) with a referral-to-CT time standard",
+   "owner": "Counties and health centres",
+   "evidence": "Health centres cannot order CT directly, so a specialist referral comes first [N, mentor]. IHE recommends expanding CT use in primary care [N]. Finland waits are longest in the Nordics for symptom appointment and specialist consultation [N].",
+   "kpi": "Days from first visit to CT; share of red-flag patients scanned within an agreed time",
+   "tag": "N"
+  },
+  {
+   "id": "R4",
+   "action": "Close participation gaps in existing screening: interpreters and outreach for language minorities, targeted effort in low-attending metropolitan areas and low-education groups",
+   "owner": "Counties",
+   "evidence": "Participation 53-61% for other native language vs 75-83% domestic across programmes; primary education 62-64% vs tertiary 79-86%; lowest counties Helsinki, Vantaa-Kerava, West Uusimaa [S].",
+   "kpi": "80% in every county; language-minority ratio of at least 0.85 (now 0.72-0.74)",
+   "tag": "S"
+  },
+  {
+   "id": "R5",
+   "action": "Run a two-year pilot of targeted lung LDCT delivery in one county, randomising invitations to measure how many scans a mobile or pop-up site adds",
+   "owner": "One county with a research partner; AstraZeneca interested in a follow-up",
+   "evidence": "NELSON and NLST show lung mortality reduction with LDCT in heavy smokers [S]; Finland has no public programme [S]; whether a truck adds participants is unknown and is the pilot's question [A]. Use the planner on the map page.",
+   "kpi": "Additional participants (uptake difference), minority uptake ratio, extra-imaging rate, time from positive scan to work-up",
+   "tag": "S"
+  },
+  {
+   "id": "R6",
+   "action": "Train primary-care staff in early diagnosis of lung and other low-symptom cancers",
+   "owner": "Counties, with national guidance",
+   "evidence": "Only seven EU+2 countries offer early-diagnosis training for primary care (OECD, via team notes) [N]; early lung cancer often has no symptoms [general clinical knowledge].",
+   "kpi": "Share of primary-care staff trained; red-flag CT referrals",
+   "tag": "N"
+  }
+ ],
+ "data_status": [
+  {
+   "item": "Lung-cancer deaths by wellbeing county, 2021-2025 (ICD-10 C32-C34)",
+   "status": "verified",
+   "how": "Statistics Finland table 13u5 (read via API). Includes larynx. Crude counts and rates; no age-standardisation by county in this table.",
+   "action": "Optionally request age-standardised county rates from the Cancer Registry."
+  },
+  {
+   "item": "Lung deaths per 100,000 aged 50-74 by county",
+   "status": "proxy",
+   "how": "All-age deaths divided by the 50-74 population, so counties with older populations look worse.",
+   "action": "Replace with age-standardised rates."
+  },
+  {
+   "item": "Daily smoking by county, ages 20-64 and 65+",
+   "status": "verified",
+   "how": "THL Sotkanet indicators 4405 and 4406, survey year 2024.",
+   "action": "Ask THL for 50-74 and for former smokers."
+  },
+  {
+   "item": "Population by municipality and age",
+   "status": "verified",
+   "how": "Statistics Finland table 11re, end of 2025.",
+   "action": "None."
+  },
+  {
+   "item": "Eligible high-risk people (age 50-74, >=20 pack-years, current or quit within 15 years) by municipality",
+   "status": "proxy",
+   "how": "Verified smoking prevalence x an assumed factor k (0.8; range 0.55-1.1). Central national estimate about 120,000, or 7% of people aged 50-74.",
+   "action": "Get the Finnish pack-year distribution (THL FinSote/Terve Suomi microdata via Findata)."
+  },
+  {
+   "item": "Finnish pack-year distribution",
+   "status": "gap",
+   "how": "No public pack-year data found.",
+   "action": "Request from THL / Findata. This is the main uncertainty in the eligible estimate."
+  },
+  {
+   "item": "Where hospital CT scanners are",
+   "status": "proxy",
+   "how": "Researched list of 36 towns (24 confirmed by a source, 12 likely). No national register found; private providers and many regional hospitals missing.",
+   "action": "Ask counties for their CT unit lists; STUK holds radiation-source licences."
+  },
+  {
+   "item": "CT examinations by county",
+   "status": "gap",
+   "how": "Not found. Eurostat national hospital CT exams per 100,000 swing between 3,300 and 9,300 over 2019-2024 (series breaks), so the model uses 35-90 per 1,000 inhabitants as a range.",
+   "action": "Request CT volumes by county from THL (Hilmo/Avohilmo) or the counties."
+  },
+  {
+   "item": "Spare CT capacity for screening",
+   "status": "assumed",
+   "how": "5% of CT volume (range 2-10%). No data.",
+   "action": "Ask radiology departments."
+  },
+  {
+   "item": "CT waiting times by county",
+   "status": "gap",
+   "how": "None found. The model assumes 4 weeks at baseline (range 2-8). 'Longest waits' on this page are MODELLED added waits under the capacity assumptions, not observed waits.",
+   "action": "Request imaging waiting times from counties; enter them in data/area/ct_waits.csv (template provided) and they replace the assumption."
+  },
+  {
+   "item": "Screening participation by county and group (breast, colorectal, cervical)",
+   "status": "verified",
+   "how": "Cancer Registry annual statistics tables, 2024 (read directly).",
+   "action": "None."
+  },
+  {
+   "item": "Effect of a campaign on uptake and on demand from people who are not eligible",
+   "status": "assumed",
+   "how": "+30% relative uptake and 3% of non-eligible people 50-74 seeking a scan, per unit of campaign intensity. No evidence found.",
+   "action": "Treat as scenarios; measure in the pilot."
+  },
+  {
+   "item": "Whether a mobile or pop-up site adds scans (additionality)",
+   "status": "gap",
+   "how": "Unknown; it is the pilot's primary question.",
+   "action": "Randomised-invitation pilot (see Pilot section)."
+  }
+ ],
+ "source": "Finnish Cancer Registry screening statistics 2024 (stats.cancerregistry.fi), extracted to data/screening; county cervical = sum of two unlabelled sub-tables"
+}

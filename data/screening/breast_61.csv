@@ -1,0 +1,8 @@
+Cancer detection mode,N,Of all cancers (%),Of cancers in screening age (%)
+,,,
+Screened cancer,3214,30.9,63.0
+Interval cancer,1219,11.7,23.9
+Unattended,629,6.0,12.3
+Not invited,43,0.4,0.8
+Younger than screening age,1286,12.4,--
+Older than screening age,4019,38.6,--

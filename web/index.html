@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile CT planner</title>
+<link rel="stylesheet" href="/vendor/leaflet.css">
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2430; --muted: #5b6676; --line: #dde2ea;
+    --accent: #c2410c; --accent-ink: #ffffff; --warn-bg: #fff4e0; --warn-ink: #6b3e00; --good: #0f766e; --bad: #b42318;
+    --chip: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f141b; --panel: #171e28; --ink: #e8edf4; --muted: #9aa6b8; --line: #2a3442;
+      --accent: #f97316; --accent-ink: #1b1206; --warn-bg: #2b2110; --warn-ink: #f6d9a5; --good: #5eead4; --bad: #fca5a5; --chip: #222c3a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 12px 16px 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 18px; margin: 0; font-weight: 650; }
+  header .sub { color: var(--muted); }
+  .banner { margin: 8px 16px 0; padding: 8px 12px; background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; font-size: 13px; }
+  main { display: grid; grid-template-columns: 300px minmax(0, 1fr) 340px; gap: 12px; padding: 12px 16px 16px; height: calc(100% - 96px); min-height: 640px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow: auto; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; font-weight: 650; }
+  h2:first-child { margin-top: 0; }
+  label { display: block; font-size: 13px; margin: 8px 0 2px; }
+  label .val { float: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select, input[type=text] { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font: inherit; }
+  .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .row label { margin: 0; }
+  button { font: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 650; width: 100%; margin-top: 12px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #map { height: 100%; border-radius: 10px; border: 1px solid var(--line); min-height: 480px; background: #e9edf2; }
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi { background: var(--chip); border-radius: 8px; padding: 8px 10px; }
+  .kpi .n { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+  .kpi.wide { grid-column: span 2; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .err { color: var(--bad); }
+  .legend { position: absolute; z-index: 500; left: 12px; bottom: 12px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; max-width: 230px; }
+  .legend .bar { height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgb(147,197,253), rgb(59,130,246), rgb(23,37,84)); margin: 4px 0 2px; }
+  .legend .scale { display: flex; justify-content: space-between; color: var(--muted); }
+  .stop-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .ct-sq { width: 10px; height: 10px; background: #111; border: 2px solid #fff; box-shadow: 0 0 0 1px #111; }
+  .mapwrap { position: relative; height: 100%; }
+  .spin { opacity: .5; pointer-events: none; }
+  .bar-row { display: grid; grid-template-columns: 1fr 92px 46px; gap: 6px; align-items: center; margin: 4px 0; font-size: 12.5px; }
+  .bar-row .track { background: var(--chip); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-row .fill { background: var(--accent); height: 100%; }
+  .bar-row .v { text-align: right; font-variant-numeric: tabular-nums; }
+  td.name-cell { text-align: left; }
+  textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); font: inherit; resize: vertical; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .chips button { font-size: 12px; padding: 3px 8px; border-radius: 12px; }
+  .chk { font-size: 12px; margin-left: auto; color: var(--muted); }
+  .answer { background: var(--chip); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .answer p { margin: 4px 0; } .answer ul { margin: 4px 0 4px 18px; padding: 0; }
+  .scn { display: flex; gap: 6px; align-items: center; margin-top: 6px; font-size: 12px; }
+  .scn span { flex: 1; } .scn button { font-size: 12px; padding: 3px 8px; }
+  .legend .bar2 { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #fef3c7, #f97316, #7c2d12); margin: 4px 0 2px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; height: auto; } #map { height: 60vh; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mobile CT screening planner</h1>
+  <nav style="font-weight:600"><a href="/" aria-current="page" style="color:var(--accent);margin-right:12px">Planner</a><a href="/gap" style="color:var(--accent)">Gap finder</a></nav>
+  <span class="sub">One unit, Finland. Where would it stop, and who would it reach that a hospital CT does not?</span>
+</header>
+<div class="banner" role="note"><strong>Illustrative model, not a forecast.</strong> The CT site list is researched but incomplete (or a placeholder, see the control), and uptake curves, eligible share and costs are assumptions (see <code>data/model/assumptions.csv</code>). Distances are straight line &times; 1.3. Use it to compare options, not to quote numbers.</div>
+
+<main>
+  <section class="panel" aria-label="Scenario controls">
+    <h2>Preset</h2>
+    <select id="preset" aria-label="Preset scenario">
+      <option value="national">Whole country</option>
+      <option value="helsinki">Helsinki metro (40 km)</option>
+      <option value="tampere" selected>Tampere region (100 km)</option>
+      <option value="seinajoki">Seinäjoki region (120 km)</option>
+      <option value="lapland">Lapland (150 km from Rovaniemi)</option>
+      <option value="custom" hidden>Custom</option>
+    </select>
+
+    <h2>Area</h2>
+    <label for="base">Base municipality</label>
+    <input id="base" type="text" list="munis" value="Tampere" autocomplete="off">
+    <datalist id="munis"></datalist>
+    <label for="radius">Radius <span class="val" id="radius_v"></span></label>
+    <input id="radius" type="range" min="20" max="300" step="10" value="100">
+    <div class="row"><input id="whole" type="checkbox"><label for="whole">Whole country (ignore base and radius)</label></div>
+
+    <h2>Goal</h2>
+    <select id="objective" aria-label="Objective">
+      <option value="weighted">Reach people fixed sites miss (equity-weighted)</option>
+      <option value="scans">Reach the most people (population-greedy)</option>
+    </select>
+    <label for="lam">Equity weight on language minorities <span class="val" id="lam_v"></span></label>
+    <input id="lam" type="range" min="0" max="3" step="0.25" value="0.5">
+    <label for="work_days">Working days per year <span class="val" id="work_days_v"></span></label>
+    <input id="work_days" type="range" min="50" max="260" step="10" value="200">
+    <label for="interval">Screening interval</label>
+    <select id="interval"><option value="2">Every 2 years</option><option value="1">Every year</option></select>
+
+    <h2>Assumptions</h2>
+    <label for="ct_sites">Which towns have a hospital CT</label>
+    <select id="ct_sites"><option value="confirmed+likely" selected>Researched: confirmed + likely (36 towns)</option><option value="confirmed">Researched: confirmed only (24 towns, stress test)</option><option value="placeholder">Placeholder list (37 towns)</option></select>
+    <label for="eligible_share">Eligible share of people aged 50-74 (uniform model only) <span class="val" id="eligible_share_v"></span></label>
+    <input id="eligible_share" type="range" min="0.02" max="0.15" step="0.01" value="0.07">
+    <label for="u0">Uptake when no barriers <span class="val" id="u0_v"></span></label>
+    <input id="u0" type="range" min="0.2" max="0.8" step="0.05" value="0.5">
+    <label for="d0_fixed">Distance decay, hospital CT (km) <span class="val" id="d0_fixed_v"></span></label>
+    <input id="d0_fixed" type="range" min="40" max="300" step="10" value="120">
+    <label for="d0_mobile">Distance decay, truck stop (km) <span class="val" id="d0_mobile_v"></span></label>
+    <input id="d0_mobile" type="range" min="8" max="60" step="2" value="25">
+    <label for="mf">Minority uptake with outreach (1 = no gap) <span class="val" id="mf_v"></span></label>
+    <input id="mf" type="range" min="0.7" max="1" step="0.05" value="0.9">
+
+    <h2>Campaign and capacity</h2>
+    <label for="risk_model">Who counts as high-risk</label>
+    <select id="risk_model"><option value="area">Smoking-based estimate by area, weighted by lung mortality</option><option value="uniform">Same share everywhere (legacy)</option></select>
+    <label for="camp">Awareness campaign intensity <span class="val" id="camp_v"></span></label>
+    <input id="camp" type="range" min="0" max="3" step="0.25" value="0">
+    <label for="triage">Ineligible requests filtered out <span class="val" id="triage_v"></span></label>
+    <input id="triage" type="range" min="0" max="0.9" step="0.1" value="0.6">
+    <div class="row"><input id="priority" type="checkbox" checked><label for="priority">Book eligible people first</label></div>
+    <label for="colour">Colour circles by</label>
+    <select id="colour"><option value="dist">Distance to hospital CT</option><option value="elig">Eligible high-risk people</option><option value="mort">Lung-cancer mortality (county)</option></select>
+
+    <h2>Compare</h2>
+    <div class="row"><input id="compare" type="checkbox" checked><label for="compare">Also run "reach the most people"</label></div>
+    <div class="row"><input id="mc" type="checkbox"><label for="mc">Show cost uncertainty (Monte Carlo)</label></div>
+    <h2>Robustness</h2>
+    <label for="rn">Assumption worlds to simulate</label>
+    <select id="rn"><option value="30">30 (fast)</option><option value="60" selected>60</option><option value="120">120 (slow for whole country)</option></select>
+    <button id="robust_btn" style="width:100%;margin-top:8px">Run robustness sweep</button>
+    <button class="primary" id="run">Run scenario</button>
+    <p class="note" id="status" aria-live="polite"></p>
+  </section>
+
+  <section class="mapwrap" aria-label="Map">
+    <div id="map" role="application" aria-label="Map of Finland with stops and route"></div>
+    <div class="legend" id="legend">
+      <strong>Distance to nearest hospital CT</strong> (list chosen in the controls)
+      <div class="bar"></div><div class="scale"><span>0</span><span>60</span><span>120+ km</span></div>
+      <div style="margin-top:6px">Circle size = people aged 50-74. Numbered markers = truck stops in route order. Ringed circles are served by a stop. Squares are towns on the CT list.</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Results" id="results" aria-live="polite">
+    <div id="analyst_box">
+      <h2>Ask the analyst</h2>
+      <textarea id="q" rows="3" maxlength="1000" placeholder="e.g. Where should a truck stop in Lapland, and what happens if Kemijärvi gets a CT?" aria-label="Question for the analyst"></textarea>
+      <div class="chips" id="chips"></div>
+      <div class="row"><button id="ask_btn" class="primary" style="margin-top:6px">Ask</button><button id="readout_btn" style="margin-top:6px" title="Rule-based summary of the current scenario; no AI, no API key">Readout (no AI)</button><label class="chk"><input id="use_cache" type="checkbox"> use recorded answer</label></div>
+      <div id="answer" class="answer" hidden></div>
+      <div id="scn_list"></div>
+      <p class="note" id="ask_foot"></p>
+    </div>
+    <div id="plan_view">
+    <h2>One year of operation</h2>
+    <div class="kpis" id="kpis"><div class="kpi wide"><div class="l">Loading...</div></div></div>
+    <div id="reach_box"></div>
+    <div id="camp_box"></div>
+    <div id="compare_box"></div>
+    <div id="mc_box"></div>
+    <h2>Stops in route order</h2>
+    <table id="stops"><thead><tr><th>#</th><th>Municipality</th><th>Days</th><th>Scans</th><th>Extra</th></tr></thead><tbody></tbody></table>
+    <p class="note">"Extra" = participants per year who would not be screened at a hospital CT under the model. This depends on the distance-decay assumptions, so treat it as a comparison between plans, not as evidence of impact.</p>
+    <p class="note" id="foot"></p>
+    </div>
+    <div id="robust_box" hidden></div>
+  </section>
+</main>
+
+<script src="/vendor/leaflet.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const fmt = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
+  const PRESETS = {
+    national:  { whole: true, base: "Tampere", radius: 100 },
+    helsinki:  { whole: false, base: "Helsinki", radius: 40 },
+    tampere:   { whole: false, base: "Tampere", radius: 100 },
+    seinajoki: { whole: false, base: "Seinäjoki", radius: 120 },
+    lapland:   { whole: false, base: "Rovaniemi", radius: 150 },
+  };
+  const sliders = { radius: v => v + " km", lam: v => (+v).toFixed(2), work_days: v => v, eligible_share: v => Math.round(v * 100) + "%",
+                    u0: v => Math.round(v * 100) + "%", camp: v => (+v).toFixed(2), triage: v => Math.round(v * 100) + "%", d0_fixed: v => v + " km", d0_mobile: v => v + " km", mf: v => (+v).toFixed(2) };
+
+  const map = window.ctmap = L.map("map", { zoomControl: true }).setView([64.5, 26], 5);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 12, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
+  const layer = L.layerGroup().addTo(map);
+  new ResizeObserver(() => map.invalidateSize()).observe($("map"));
+
+  function color(d) {            // 0 km light -> 120+ km dark
+    const t = Math.min(d / 120, 1);
+    const a = [147, 197, 253], m = [59, 130, 246], b = [23, 37, 84];
+    const [p, q, u] = t < .5 ? [a, m, t * 2] : [m, b, (t - .5) * 2];
+    return `rgb(${p.map((x, i) => Math.round(x + (q[i] - x) * u)).join(",")})`;
+  }
+
+  let pinned = null;     // scenario sent by the analyst; used as-is until the user touches a control
+  function scenario() {
+    if (pinned) { const s = JSON.parse(JSON.stringify(pinned)); s.name = "ui"; if ($("mc").checked) s.monte_carlo = { n: 1000, seed: 1 }; return s; }
+    const whole = $("whole").checked;
+    const s = {
+      name: "ui", objective: $("objective").value, ct_sites: $("ct_sites").value,
+      region: whole ? null : { base: $("base").value, radius_km: +$("radius").value },
+      risk_model: $("risk_model").value,
+      routing: { campaign_intensity: +$("camp").value, triage: +$("triage").value, priority_eligible: $("priority").checked, lam: +$("lam").value, work_days: +$("work_days").value, interval: +$("interval").value, eligible_share: +$("eligible_share").value,
+                 u0: +$("u0").value, d0_fixed: +$("d0_fixed").value, d0_mobile: +$("d0_mobile").value, minority_factor_mobile: +$("mf").value },
+    };
+    if ($("mc").checked) s.monte_carlo = { n: 1000, seed: 1 };
+    return s;
+  }
+  const post = async s => {
+    const r = await fetch("/scenario", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(s) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.statusText);
+    return j;
+  };
+
+  function kpi(n, l, wide) { const d = document.createElement("div"); d.className = "kpi" + (wide ? " wide" : ""); d.innerHTML = '<div class="n"></div><div class="l"></div>'; d.firstChild.textContent = n; d.lastChild.textContent = l; return d; }
+
+  let lastRun = null, lastCmp = null;
+  const legendHTML = $("legend").innerHTML;
+  function fillFor(m) {
+    const mode = $("colour").value;
+    if (mode === "elig") return warm(Math.min(1, Math.sqrt((m.eligible || 0) / 3000)));
+    if (mode === "mort") return warm(Math.max(0, Math.min(1, ((m.mort_index || 1) - 0.8) / 0.6)));
+    return color(m.d_fixed_km);
+  }
+  const LEGENDS = { dist: "<strong>Distance to nearest hospital CT</strong> (list chosen in the controls)<div class=\"bar\"></div><div class=\"scale\"><span>0</span><span>60</span><span>120+ km</span></div>",
+                    elig: "<strong>Eligible high-risk people</strong> (estimate)<div class=\"bar2\"></div><div class=\"scale\"><span>0</span><span>1,500</span><span>3,000+</span></div>",
+                    mort: "<strong>Lung-cancer deaths per 100k aged 50-74</strong> (county, 2021-25)<div class=\"bar2\"></div><div class=\"scale\"><span>0.8x national</span><span>1.1x</span><span>1.4x+</span></div>" };
+  function render(res, cmp) {
+    lastRun = res; lastCmp = cmp;
+    $("plan_view").hidden = false; $("robust_box").hidden = true; $("legend").innerHTML = LEGENDS[$("colour").value] + "<div style=\"margin-top:6px\">Circle size = people aged 50-74. Numbered markers = truck stops in route order. Ringed circles are served by a stop. Squares are towns on the CT list.</div>";
+    layer.clearLayers();
+    const L_ = res.layer;
+    const stops = res.route.stops;
+    const stopColor = {}; stops.forEach((s, i) => stopColor[s.name] = i);
+    L_.forEach(m => {
+      if (m.lat == null) return;
+      const served = m.stop != null;
+      const r = 3 + Math.sqrt(m.pop) / 16;
+      const ct = m.d_fixed_km === 0;
+      const mk = ct ? L.marker([m.lat, m.lon], { icon: L.divIcon({ className: "", html: '<div class="ct-sq"></div>', iconSize: [10, 10], iconAnchor: [5, 5] }), keyboard: false, zIndexOffset: -500 })
+                    : L.circleMarker([m.lat, m.lon], { radius: r, color: served ? "#c2410c" : "#334155", weight: served ? 2 : 1, fillColor: fillFor(m), fillOpacity: m.in_region ? .85 : .25 });
+      mk.bindTooltip(`<strong>${m.name}</strong><br>${fmt.format(m.pop)} people aged 50-74<br>${m.eligible ? "~" + fmt.format(m.eligible) + " eligible high-risk (estimate); county lung mortality " + (m.mort_index || 1).toFixed(2) + "x national<br>" : ""}${ct ? "placeholder CT town" : fmt.format(m.d_fixed_km) + " km to nearest CT (assumed)"}${served ? `<br>served from stop: ${m.stop}<br>~${m.additional} extra participants/yr` : ""}`);
+      mk.addTo(layer);
+      if (served && m.stop !== m.name) {
+        const st = stops.find(s => s.name === m.stop);
+        if (st) L.polyline([[m.lat, m.lon], [st.lat, st.lon]], { color: "#c2410c", weight: 1, opacity: .45 }).addTo(layer);
+      }
+    });
+    const pts = stops.map(s => [s.lat, s.lon]);
+    if (pts.length > 1) L.polyline(pts.concat([pts[0]]), { color: "#c2410c", weight: 3, dashArray: "7 6", opacity: .9 }).addTo(layer);
+    stops.forEach((s, i) => L.marker([s.lat, s.lon], { icon: L.divIcon({ className: "", html: `<div class="stop-num">${i + 1}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] }), keyboard: false })
+      .bindTooltip(`<strong>${i + 1}. ${s.name}</strong><br>${s.days.toFixed(1)} scanning days/yr<br>${fmt.format(s.scans)} scans, ~${fmt.format(s.additional)} extra`).addTo(layer));
+    const inReg = L_.filter(m => m.in_region && m.lat != null);
+    const fit = () => {
+      map.invalidateSize();
+      if (res.scenario.region && inReg.length) map.fitBounds(inReg.map(m => [m.lat, m.lon]), { padding: [30, 30], animate: false });
+      else map.fitBounds([[59.8, 20.0], [70.0, 31.5]], { padding: [10, 10], animate: false });
+    };
+    fit(); setTimeout(fit, 250);
+
+    const o = res.outcomes, c = res.cost, r = res.route;
+    const k = $("kpis"); k.replaceChildren(
+      kpi(fmt.format(o.scans), "scans per year"),
+      kpi(fmt.format(o.additional) + " (" + Math.round(100 * o.additional / Math.max(o.scans, 1)) + "%)", "extra participants per year"),
+      kpi(fmt.format(o.additional_in_places_over_60km_from_ct), "of those live >60 km from a CT"),
+      kpi(fmt.format(r.km_per_year) + " km", "driving per year"),
+      kpi(r.working_days.toFixed(0) + " of " + (((res.scenario || {}).routing || {}).work_days ?? 200), "working days used"),
+      kpi("€" + fmt.format(c.per_scan_eur), "cost per scan"),
+      kpi("€" + fmt.format(c.per_additional_eur), "cost per extra participant", true));
+
+    const rb = $("reach_box"); rb.replaceChildren(); const pbx = $("camp_box"); pbx.replaceChildren();
+    if (res.reach) {
+      const h2 = document.createElement("h2"); h2.textContent = "Reach of the high-risk group (" + res.reach.scope + ")"; rb.append(h2);
+      const R_ = res.reach, line = t => { const p = document.createElement("p"); p.className = "note"; p.style.color = "var(--ink)"; p.textContent = t; rb.append(p); };
+      line(`About ${fmt.format(R_.eligible_persons)} eligible people (estimate: verified smoking rates x an assumed factor). Covering them takes about ${fmt.format(R_.annual_scans_needed)} scans a year.`);
+      line(`Existing hospital CTs (modelled capacity): ${fmt.format(R_.screened_fixed_only)} a year, ${Math.round(100 * R_.coverage_fixed_only)}% of the need.`);
+      line(`With this truck plan: ${fmt.format(R_.screened_with_truck)} a year, ${Math.round(100 * R_.coverage_with_truck)}%.`);
+      const cp = res.campaign, h3 = document.createElement("h2");
+      h3.textContent = cp.intensity > 0 ? "Campaign pressure on CT (modelled)" : "Where free CT capacity is tightest (modelled)"; pbx.append(h3);
+      const t = document.createElement("table"); t.innerHTML = "<thead><tr><th>County</th><th>Eligible</th><th>Free</th><th>Wanted</th><th>+wait wk</th></tr></thead>"; const tb = document.createElement("tbody");
+      res.counties.slice(0, 6).forEach(c => { const tr = document.createElement("tr"); [c.county, fmt.format(c.eligible), fmt.format(c.spare), fmt.format(c.demand_eligible + c.demand_ineligible), c.extra_wait_weeks.toFixed(1)].forEach(v => { const td = document.createElement("td"); td.textContent = v; tr.appendChild(td); }); tb.appendChild(tr); });
+      t.appendChild(tb); pbx.append(t);
+      const n = document.createElement("p"); n.className = "note";
+      n.textContent = `Free = assumed screening capacity per year; Wanted = scans eligible people and campaign spill-over want. National: wanted ${fmt.format(cp.demand_eligible + cp.demand_ineligible)} vs free ${fmt.format(cp.free_capacity)} a year; longest added wait ${cp.longest_extra_wait.weeks} wk (${cp.longest_extra_wait.county}). These are modelled, not observed waits (no county CT wait data exists; see Gap finder, data status).`;
+      pbx.append(n);
+    }
+    const cb = $("compare_box"); cb.replaceChildren();
+    if (cmp) {
+      const row = (n, a) => `<tr><td>${n}</td><td></td><td>${fmt.format(a.outcomes.additional)}</td><td>${fmt.format(a.route.km_per_year)}</td><td>€${fmt.format(a.cost.per_additional_eur)}</td></tr>`;
+      cb.innerHTML = '<h2>Compared with reaching the most people</h2><table><thead><tr><th>Plan</th><th></th><th>Extra/yr</th><th>km</th><th>€/extra</th></tr></thead><tbody>' +
+        row("This plan", res) + row("Population-greedy", cmp) + "</tbody></table>";
+    }
+    const mb = $("mc_box"); mb.replaceChildren();
+    if (res.model_monte_carlo) {
+      const g = (scope, metric) => res.model_monte_carlo.find(x => x.scope === scope && x.metric === metric);
+      const line = (label, x, pre = "€") => `<tr><td>${label}</td><td></td><td>${pre}${fmt.format(x.p5)}</td><td>${pre}${fmt.format(x.p50)}</td><td>${pre}${fmt.format(x.p95)}</td></tr>`;
+      mb.innerHTML = '<h2>Cost uncertainty (one unit, all assumptions varied)</h2><table><thead><tr><th>Metric</th><th></th><th>5th</th><th>Median</th><th>95th</th></tr></thead><tbody>' +
+        line("€ per scan", g("unit", "cost_per_scan")) + line("€ per extra scan", g("unit", "cost_per_additional_scan")) + line("€ per death avoided", g("unit", "cost_per_death_avoided")) +
+        '</tbody></table><p class="note">Model-level, not specific to this route. Cost per death avoided uses the NELSON mortality effect and assumes it transfers to Finland.</p>';
+    }
+    const tb = document.querySelector("#stops tbody"); tb.replaceChildren();
+    stops.forEach((s, i) => { const tr = document.createElement("tr"); [i + 1, s.name, s.days.toFixed(1), fmt.format(s.scans), fmt.format(s.additional)].forEach(v => { const td = document.createElement("td"); td.textContent = v; tr.appendChild(td); }); tb.appendChild(tr); });
+    $("foot").textContent = `Scenario ${res.scenario_hash}, engine ${res.version}, ${res.seconds}s. ${res.warnings.join(". ")}.` + (pinned ? " Showing the analyst's scenario exactly; the controls on the left may not reflect every setting (for example CT what-ifs). Touch a control to return to manual mode." : "");
+  }
+
+  let seq = 0;
+  async function run() {
+    const my = ++seq, s = scenario();
+    $("status").textContent = "Running..."; $("results").classList.add("spin");
+    try {
+      const res = await post(s);
+      const cmp = $("compare").checked && s.objective !== "scans" ? await post({ ...s, objective: "scans", monte_carlo: undefined }) : null;
+      if (my !== seq) return;
+      render(res, cmp);
+      $("status").textContent = "";
+    } catch (e) {
+      if (my !== seq) return;
+      $("status").innerHTML = ""; const sp = document.createElement("span"); sp.className = "err"; sp.textContent = "Could not run: " + e.message; $("status").appendChild(sp);
+    } finally { if (my === seq) $("results").classList.remove("spin"); }
+  }
+
+  // ---------------------------------------------------------------- robustness sweep
+  const NAMES = { eligible_share: "Eligible share of people aged 50-74", u0: "Uptake when no barriers", d0_fixed: "Distance decay, hospital CT",
+                  d0_mobile: "Distance decay, truck stop", minority_factor_mobile: "Minority uptake with outreach", ct_sites: "Which towns really have CT capacity",
+                  k_elig: "Eligible persons per smoker (pack-year proxy)", ct_per_1000: "CT volume per 1000 inhabitants", spare_share: "Share of CT capacity free for screening", spill_per_int: "Campaign spill-over demand" };
+  const planName = n => n === "central-optimal" ? "Best plan for central assumptions" : n.startsWith("consensus") ? "Consensus: stops picked in " + n.split(">= ")[1] + " of worlds" : "Best plan for random world " + n.split("#")[1];
+  const warm = f => { const t = Math.min(f, 1); const a = [254, 243, 199], m = [249, 115, 22], b = [124, 45, 18]; const [p, q, u] = t < .5 ? [a, m, t * 2] : [m, b, (t - .5) * 2]; return `rgb(${p.map((x, i) => Math.round(x + (q[i] - x) * u)).join(",")})`; };
+  const cell = (tr, v, cls) => { const td = document.createElement("td"); td.textContent = v; if (cls) td.className = cls; tr.appendChild(td); };
+  function table(heads, rows) {
+    const t = document.createElement("table"), h = document.createElement("tr");
+    heads.forEach((x, i) => { const th = document.createElement("th"); th.textContent = x; if (i === 0) th.style.textAlign = "left"; h.appendChild(th); });
+    const th = document.createElement("thead"); th.appendChild(h); t.appendChild(th);
+    const tb = document.createElement("tbody");
+    rows.forEach(r => { const tr = document.createElement("tr"); r.forEach((v, i) => cell(tr, v, i === 0 ? "name-cell" : "")); tb.appendChild(tr); });
+    t.appendChild(tb); return t;
+  }
+  const pct1 = x => (100 * x).toFixed(0) + "%";
+
+  function renderRobust(r) {
+    $("plan_view").hidden = true; const box = $("robust_box"); box.hidden = false; box.replaceChildren();
+    const by = new Map(r.stability.map(m => [m.code, m]));
+    layer.clearLayers();
+    lastRun.layer.forEach(m => {
+      if (m.lat == null) return;
+      const st = by.get(m.code), f = st ? st.select_freq : 0;
+      const mk = L.circleMarker([m.lat, m.lon], { radius: 3 + Math.sqrt(m.pop) / 16, color: f > 0 ? "#7c2d12" : "#64748b", weight: f > 0 ? 1.5 : .6,
+                                                   fillColor: f > 0 ? warm(f) : "#cbd5e1", fillOpacity: m.in_region ? (f > 0 ? .9 : .35) : .12 });
+      mk.bindTooltip(`<strong>${m.name}</strong><br>${fmt.format(m.pop)} people aged 50-74` + (st ? `<br>chosen as a stop in ${pct1(st.select_freq)} of worlds<br>served in ${pct1(st.served_freq)} of worlds (~${st.mean_additional} extra/yr on average)` : "<br>never chosen"));
+      mk.addTo(layer);
+    });
+    const rp = r.recommended_plan, pts = rp.stops.map(s => [s.lat, s.lon]);
+    if (pts.length > 1) L.polyline(pts.concat([pts[0]]), { color: "#111", weight: 2, dashArray: "6 6", opacity: .7 }).addTo(layer);
+    rp.stops.forEach((s, i) => L.circleMarker([s.lat, s.lon], { radius: 4, color: "#fff", weight: 1.5, fillColor: "#111", fillOpacity: 1 }).bindTooltip(`${i + 1}. ${s.name} (stop of the picked plan)`).addTo(layer));
+    $("legend").innerHTML = `<strong>How often a municipality is chosen as a stop</strong><div class="bar2"></div><div class="scale"><span>0%</span><span>50%</span><span>100%</span></div><div style="margin-top:6px">Across ${r.n} simulated worlds. Black dots and dashed line = the plan with the lowest 90th-percentile regret on ${r.n_validation} fresh worlds.</div>`;
+
+    const back = document.createElement("button"); back.textContent = "Back to plan view"; back.addEventListener("click", () => render(lastRun, lastCmp)); box.appendChild(back);
+    const h = t => { const e = document.createElement("h2"); e.textContent = t; return e; };
+    const p = (t, cls = "note") => { const e = document.createElement("p"); e.className = cls; e.textContent = t; return e; };
+
+    box.appendChild(h("What to measure first"));
+    box.appendChild(p("Expected loss in benefit from planning on the central assumptions instead of knowing this one. Bigger bar = more worth measuring in a pilot."));
+    const mx = Math.max(...r.voi.map(v => v.expected_regret_pct), 1);
+    r.voi.forEach(v => { const row = document.createElement("div"); row.className = "bar-row"; row.innerHTML = '<span></span><div class="track"><div class="fill"></div></div><span class="v"></span>';
+      row.children[0].textContent = NAMES[v.param] || v.param; row.children[1].firstChild.style.width = Math.max(1, 100 * v.expected_regret_pct / mx) + "%"; row.children[2].textContent = v.expected_regret_pct.toFixed(1) + "%"; box.appendChild(row); });
+
+    box.appendChild(h("Plans scored on fresh worlds"));
+    box.appendChild(table(["Plan", "Stops", "Mean regret", "90th pct", "Extra/yr 5th-95th"],
+      r.plans.slice(0, 6).map(x => [planName(x.name) + (x.name === r.recommended ? " (picked)" : ""), x.stops, pct1(x.mean_regret), pct1(x.p90_regret), fmt.format(x.additional_p5) + "-" + fmt.format(x.additional_p95)])));
+    box.appendChild(p("Regret = benefit lost compared with the best plan found for that world. Differences of a few points between plans are within the noise of " + r.n_validation + " validation worlds; the plan list is shown so you can see the spread, not to pick a winner."));
+
+    box.appendChild(h("Most reliable stops"));
+    box.appendChild(table(["Municipality", "Chosen", "Served"], r.stability.slice(0, 8).map(m => [m.name, pct1(m.select_freq), pct1(m.served_freq)])));
+    box.appendChild(p(r.notes.join(" ")));
+  }
+
+  async function runRobust() {
+    const my = ++seq, s = scenario(); delete s.monte_carlo;
+    if (!lastRun) { await run(); }
+    $("status").textContent = "Running robustness sweep (can take 10-30 s for the whole country)..."; $("results").classList.add("spin");
+    try {
+      const resp = await fetch("/robust", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scenario: s, n: +$("rn").value, seed: 1, voi_n: 20 }) });
+      const r = await resp.json(); if (!resp.ok) throw new Error(r.error || resp.statusText);
+      if (my !== seq) return;
+      renderRobust(r); $("status").textContent = "";
+    } catch (e) { $("status").textContent = "Could not run sweep: " + e.message; }
+    finally { $("results").classList.remove("spin"); }
+  }
+  $("robust_btn").addEventListener("click", runRobust);
+
+
+  // ---------------------------------------------------------------- analyst
+  const EXAMPLES = ["Where should one truck stop in Lapland, and is it worth it?", "Compare reaching the most people with reaching people hospital CTs miss, around Tampere.",
+                    "What should we measure first before a pilot?", "What if Kajaani had no CT?"];
+  EXAMPLES.forEach(t => { const b = document.createElement("button"); b.textContent = t.length > 38 ? t.slice(0, 36) + "..." : t; b.title = t; b.addEventListener("click", () => { $("q").value = t; }); $("chips").appendChild(b); });
+  let chat = [];
+  function mdTo(el, text) {      // tiny safe markdown: **bold**, bullets, paragraphs; textContent only
+    el.replaceChildren(); let ul = null;
+    text.split("\n").forEach(line => {
+      const m = line.match(/^\s*[-*]\s+(.*)/);
+      const target = m ? (ul = ul || el.appendChild(document.createElement("ul"))) : (ul = null, el);
+      if (!m && !line.trim()) return;
+      const node = document.createElement(m ? "li" : "p");
+      (m ? m[1] : line).split(/(\*\*[^*]+\*\*)/).forEach(part => {
+        if (part.startsWith("**") && part.endsWith("**")) { const b = document.createElement("strong"); b.textContent = part.slice(2, -2); node.appendChild(b); }
+        else node.appendChild(document.createTextNode(part));
+      });
+      target.appendChild(node);
+    });
+  }
+  function applyScenario(scn) {
+    const r = scn.routing || {};
+    $("whole").checked = !scn.region;
+    if (scn.region) { $("base").value = scn.region.base; $("radius").value = scn.region.radius_km; }
+    $("objective").value = scn.objective === "scans" ? "scans" : "weighted";
+    if (scn.ct_sites) $("ct_sites").value = scn.ct_sites;
+    $("risk_model").value = scn.risk_model || "area"; $("priority").checked = r.priority_eligible !== false;
+    const map_ = { campaign_intensity: "camp", triage: "triage", lam: "lam", work_days: "work_days", eligible_share: "eligible_share", u0: "u0", minority_factor_mobile: "mf", interval: "interval" };
+    Object.entries(map_).forEach(([k, id]) => { if (r[k] != null) $(id).value = r[k]; });
+    Object.entries(sliders).forEach(([id, f]) => { $(id + "_v").textContent = f($(id).value); });
+    $("preset").value = "custom"; pinned = scn; run();
+  }
+  async function ask() {
+    const q = $("q").value.trim(); if (!q) return;
+    $("ask_btn").disabled = true; $("ask_foot").textContent = "Thinking and running scenarios (10-60 s)...";
+    try {
+      const resp = await fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q, history: chat.slice(-6), use_cache: $("use_cache").checked }) });
+      const r = await resp.json().catch(() => ({})); if (!resp.ok) throw new Error(r.error || resp.statusText || ("HTTP " + resp.status));
+      chat.push({ role: "user", content: q }, { role: "assistant", content: r.answer });
+      $("answer").hidden = false; mdTo($("answer"), r.answer);
+      const list = $("scn_list"); list.replaceChildren();
+      r.scenarios.forEach(sc => { const d = document.createElement("div"); d.className = "scn"; const sp = document.createElement("span"); sp.textContent = sc.label; const b = document.createElement("button"); b.textContent = "Show on map"; b.addEventListener("click", () => applyScenario(sc.scenario)); d.append(sp, b); list.appendChild(d); });
+      const u = r.usage; $("ask_foot").textContent = `${r.model}${r.cached ? " (recorded answer)" : ""}: ${u.api_calls} calls, ${u.input} in / ${u.output} out tokens. Numbers come from the scenario runs and the facts card; the CT list and uptake curves are assumptions.`;
+    } catch (e) { await readoutFallback("AI analyst unavailable (" + e.message + "). "); }
+    finally { $("ask_btn").disabled = false; }
+  }
+  async function readoutFallback(prefix) {
+    try {
+      const s = scenario(); delete s.monte_carlo;
+      const resp = await fetch("/readout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(s) });
+      const r = await resp.json(); if (!resp.ok) throw new Error(r.error || resp.statusText);
+      showAnswer(r, prefix + "Showing the rule-based readout of the current scenario (no AI; it ignores your question text). ");
+    } catch (e) { $("ask_foot").textContent = prefix + "Readout also failed: " + e.message; }
+  }
+  function showAnswer(r, prefix) {
+    $("answer").hidden = false; mdTo($("answer"), r.answer);
+    const list = $("scn_list"); list.replaceChildren();
+    r.scenarios.forEach(sc => { const d = document.createElement("div"); d.className = "scn"; const sp = document.createElement("span"); sp.textContent = sc.label; const b = document.createElement("button"); b.textContent = "Show on map"; b.addEventListener("click", () => applyScenario(sc.scenario)); d.append(sp, b); list.appendChild(d); });
+    $("ask_foot").textContent = (prefix || "") + `${r.model}. Numbers come from the scenario runs and the facts card; the CT list and uptake curves are assumptions.`;
+  }
+  $("ask_btn").addEventListener("click", ask);
+  $("readout_btn").addEventListener("click", () => readoutFallback(""));
+
+  let t; const later = () => { clearTimeout(t); t = setTimeout(run, 350); };
+
+  Object.entries(sliders).forEach(([id, f]) => { const el = $(id), out = $(id + "_v"); const upd = () => out.textContent = f(el.value); upd(); el.addEventListener("input", () => { upd(); markCustom(); later(); }); });
+  ["base", "whole", "objective", "interval", "compare", "mc", "ct_sites", "risk_model", "priority"].forEach(id => $(id).addEventListener("change", () => { if (id !== "compare" && id !== "mc") markCustom(); later(); }));
+  $("run").addEventListener("click", run);
+  $("colour").addEventListener("change", () => { if (lastRun) render(lastRun, lastCmp); });
+  function markCustom() { if (!applying) { $("preset").value = "custom"; pinned = null; } }
+  let applying = false;
+  $("preset").addEventListener("change", e => {
+    const p = PRESETS[e.target.value]; if (!p) return;
+    pinned = null; applying = true; $("whole").checked = p.whole; $("base").value = p.base; $("radius").value = p.radius; $("radius_v").textContent = sliders.radius(p.radius); applying = false; run();
+  });
+  fetch("/municipalities").then(r => r.json()).then(rows => { $("munis").replaceChildren(...rows.map(r => { const o = document.createElement("option"); o.value = r.name; return o; })); }).catch(() => {});
+  run();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"name": "campaign-national-intensity-2", "objective": "weighted", "region": null, "ct_sites": "confirmed+likely", "routing": {"campaign_intensity": 2.0, "triage": 0.6, "priority_eligible": true}}

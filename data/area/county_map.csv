@@ -1,0 +1,309 @@
+code,municipality,hva_code,county
+005,Alajärvi,HVA16,South Ostrobothnia
+009,Alavieska,HVA19,North Ostrobothnia
+010,Alavus,HVA16,South Ostrobothnia
+016,Asikkala,HVA09,Päijät-Häme
+018,Askola,HVA01,East Uusimaa
+019,Aura,HVA05,Southwest Finland
+020,Akaa,HVA08,Pirkanmaa
+035,Brändö,HVA91,Åland
+043,Eckerö,HVA91,Åland
+046,Enonkoski,HVA12,South Savo
+047,Enontekiö,HVA21,Lapland
+049,Espoo,HVA03,West Uusimaa
+050,Eura,HVA06,Satakunta
+051,Eurajoki,HVA06,Satakunta
+052,Evijärvi,HVA16,South Ostrobothnia
+060,Finström,HVA91,Åland
+061,Forssa,HVA07,Kanta-Häme
+062,Föglö,HVA91,Åland
+065,Geta,HVA91,Åland
+069,Haapajärvi,HVA19,North Ostrobothnia
+071,Haapavesi,HVA19,North Ostrobothnia
+072,Hailuoto,HVA19,North Ostrobothnia
+074,Halsua,HVA18,Central Ostrobothnia
+075,Hamina,HVA10,Kymenlaakso
+076,Hammarland,HVA91,Åland
+077,Hankasalmi,HVA15,Central Finland
+078,Hanko,HVA03,West Uusimaa
+079,Harjavalta,HVA06,Satakunta
+081,Hartola,HVA09,Päijät-Häme
+082,Hattula,HVA07,Kanta-Häme
+086,Hausjärvi,HVA07,Kanta-Häme
+090,Heinävesi,HVA14,North Karelia
+091,Helsinki,HVA90,Helsinki
+092,Vantaa,HVA04,Vantaa and Kerava
+097,Hirvensalmi,HVA12,South Savo
+098,Hollola,HVA09,Päijät-Häme
+102,Huittinen,HVA06,Satakunta
+103,Humppila,HVA07,Kanta-Häme
+105,Hyrynsalmi,HVA20,Kainuu
+106,Hyvinkää,HVA02,Central Uusimaa
+108,Hämeenkyrö,HVA08,Pirkanmaa
+109,Hämeenlinna,HVA07,Kanta-Häme
+111,Heinola,HVA09,Päijät-Häme
+139,Ii,HVA19,North Ostrobothnia
+140,Iisalmi,HVA13,North Savo
+142,Iitti,HVA09,Päijät-Häme
+143,Ikaalinen,HVA08,Pirkanmaa
+145,Ilmajoki,HVA16,South Ostrobothnia
+146,Ilomantsi,HVA14,North Karelia
+148,Inari,HVA21,Lapland
+149,Inkoo,HVA03,West Uusimaa
+151,Isojoki,HVA16,South Ostrobothnia
+152,Isokyrö,HVA16,South Ostrobothnia
+153,Imatra,HVA11,South Karelia
+165,Janakkala,HVA07,Kanta-Häme
+167,Joensuu,HVA14,North Karelia
+169,Jokioinen,HVA07,Kanta-Häme
+170,Jomala,HVA91,Åland
+171,Joroinen,HVA13,North Savo
+172,Joutsa,HVA15,Central Finland
+176,Juuka,HVA14,North Karelia
+177,Juupajoki,HVA08,Pirkanmaa
+178,Juva,HVA12,South Savo
+179,Jyväskylä,HVA15,Central Finland
+181,Jämijärvi,HVA06,Satakunta
+182,Jämsä,HVA15,Central Finland
+186,Järvenpää,HVA02,Central Uusimaa
+202,Kaarina,HVA05,Southwest Finland
+204,Kaavi,HVA13,North Savo
+205,Kajaani,HVA20,Kainuu
+208,Kalajoki,HVA19,North Ostrobothnia
+211,Kangasala,HVA08,Pirkanmaa
+213,Kangasniemi,HVA12,South Savo
+214,Kankaanpää,HVA06,Satakunta
+216,Kannonkoski,HVA15,Central Finland
+217,Kannus,HVA18,Central Ostrobothnia
+218,Karijoki,HVA16,South Ostrobothnia
+224,Karkkila,HVA03,West Uusimaa
+226,Karstula,HVA15,Central Finland
+230,Karvia,HVA06,Satakunta
+231,Kaskinen,HVA17,Ostrobothnia
+232,Kauhajoki,HVA16,South Ostrobothnia
+233,Kauhava,HVA16,South Ostrobothnia
+235,Kauniainen,HVA03,West Uusimaa
+236,Kaustinen,HVA18,Central Ostrobothnia
+239,Keitele,HVA13,North Savo
+240,Kemi,HVA21,Lapland
+241,Keminmaa,HVA21,Lapland
+244,Kempele,HVA19,North Ostrobothnia
+245,Kerava,HVA04,Vantaa and Kerava
+249,Keuruu,HVA15,Central Finland
+250,Kihniö,HVA08,Pirkanmaa
+256,Kinnula,HVA15,Central Finland
+257,Kirkkonummi,HVA03,West Uusimaa
+260,Kitee,HVA14,North Karelia
+261,Kittilä,HVA21,Lapland
+263,Kiuruvesi,HVA13,North Savo
+265,Kivijärvi,HVA15,Central Finland
+271,Kokemäki,HVA06,Satakunta
+272,Kokkola,HVA18,Central Ostrobothnia
+273,Kolari,HVA21,Lapland
+275,Konnevesi,HVA15,Central Finland
+276,Kontiolahti,HVA14,North Karelia
+280,Korsnäs,HVA17,Ostrobothnia
+284,Koski Tl,HVA05,Southwest Finland
+285,Kotka,HVA10,Kymenlaakso
+286,Kouvola,HVA10,Kymenlaakso
+287,Kristiinankaupunki,HVA17,Ostrobothnia
+288,Kruunupyy,HVA17,Ostrobothnia
+290,Kuhmo,HVA20,Kainuu
+291,Kuhmoinen,HVA08,Pirkanmaa
+295,Kumlinge,HVA91,Åland
+297,Kuopio,HVA13,North Savo
+300,Kuortane,HVA16,South Ostrobothnia
+301,Kurikka,HVA16,South Ostrobothnia
+304,Kustavi,HVA05,Southwest Finland
+305,Kuusamo,HVA19,North Ostrobothnia
+309,Outokumpu,HVA14,North Karelia
+312,Kyyjärvi,HVA15,Central Finland
+316,Kärkölä,HVA09,Päijät-Häme
+317,Kärsämäki,HVA19,North Ostrobothnia
+318,Kökar,HVA91,Åland
+320,Kemijärvi,HVA21,Lapland
+322,Kemiönsaari,HVA05,Southwest Finland
+398,Lahti,HVA09,Päijät-Häme
+399,Laihia,HVA17,Ostrobothnia
+400,Laitila,HVA05,Southwest Finland
+402,Lapinlahti,HVA13,North Savo
+403,Lappajärvi,HVA16,South Ostrobothnia
+405,Lappeenranta,HVA11,South Karelia
+407,Lapinjärvi,HVA01,East Uusimaa
+408,Lapua,HVA16,South Ostrobothnia
+410,Laukaa,HVA15,Central Finland
+416,Lemi,HVA11,South Karelia
+417,Lemland,HVA91,Åland
+418,Lempäälä,HVA08,Pirkanmaa
+420,Leppävirta,HVA13,North Savo
+421,Lestijärvi,HVA18,Central Ostrobothnia
+422,Lieksa,HVA14,North Karelia
+423,Lieto,HVA05,Southwest Finland
+425,Liminka,HVA19,North Ostrobothnia
+426,Liperi,HVA14,North Karelia
+430,Loimaa,HVA05,Southwest Finland
+433,Loppi,HVA07,Kanta-Häme
+434,Loviisa,HVA01,East Uusimaa
+435,Luhanka,HVA15,Central Finland
+436,Lumijoki,HVA19,North Ostrobothnia
+438,Lumparland,HVA91,Åland
+440,Luoto,HVA17,Ostrobothnia
+441,Luumäki,HVA11,South Karelia
+444,Lohja,HVA03,West Uusimaa
+445,Parainen,HVA05,Southwest Finland
+475,Maalahti,HVA17,Ostrobothnia
+478,Maarianhamina - Mariehamn,HVA91,Åland
+480,Marttila,HVA05,Southwest Finland
+481,Masku,HVA05,Southwest Finland
+483,Merijärvi,HVA19,North Ostrobothnia
+484,Merikarvia,HVA06,Satakunta
+489,Miehikkälä,HVA10,Kymenlaakso
+491,Mikkeli,HVA12,South Savo
+494,Muhos,HVA19,North Ostrobothnia
+495,Multia,HVA15,Central Finland
+498,Muonio,HVA21,Lapland
+499,Mustasaari,HVA17,Ostrobothnia
+500,Muurame,HVA15,Central Finland
+503,Mynämäki,HVA05,Southwest Finland
+504,Myrskylä,HVA01,East Uusimaa
+505,Mäntsälä,HVA02,Central Uusimaa
+507,Mäntyharju,HVA12,South Savo
+508,Mänttä-Vilppula,HVA08,Pirkanmaa
+529,Naantali,HVA05,Southwest Finland
+531,Nakkila,HVA06,Satakunta
+535,Nivala,HVA19,North Ostrobothnia
+536,Nokia,HVA08,Pirkanmaa
+538,Nousiainen,HVA05,Southwest Finland
+541,Nurmes,HVA14,North Karelia
+543,Nurmijärvi,HVA02,Central Uusimaa
+545,Närpiö,HVA17,Ostrobothnia
+560,Orimattila,HVA09,Päijät-Häme
+561,Oripää,HVA05,Southwest Finland
+562,Orivesi,HVA08,Pirkanmaa
+563,Oulainen,HVA19,North Ostrobothnia
+564,Oulu,HVA19,North Ostrobothnia
+576,Padasjoki,HVA09,Päijät-Häme
+577,Paimio,HVA05,Southwest Finland
+578,Paltamo,HVA20,Kainuu
+580,Parikkala,HVA11,South Karelia
+581,Parkano,HVA08,Pirkanmaa
+583,Pelkosenniemi,HVA21,Lapland
+584,Perho,HVA18,Central Ostrobothnia
+592,Petäjävesi,HVA15,Central Finland
+593,Pieksämäki,HVA12,South Savo
+595,Pielavesi,HVA13,North Savo
+598,Pietarsaari,HVA17,Ostrobothnia
+599,Pedersören kunta,HVA17,Ostrobothnia
+601,Pihtipudas,HVA15,Central Finland
+604,Pirkkala,HVA08,Pirkanmaa
+607,Polvijärvi,HVA14,North Karelia
+608,Pomarkku,HVA06,Satakunta
+609,Pori,HVA06,Satakunta
+611,Pornainen,HVA02,Central Uusimaa
+614,Posio,HVA21,Lapland
+615,Pudasjärvi,HVA19,North Ostrobothnia
+616,Pukkila,HVA01,East Uusimaa
+619,Punkalaidun,HVA08,Pirkanmaa
+620,Puolanka,HVA20,Kainuu
+623,Puumala,HVA12,South Savo
+624,Pyhtää,HVA10,Kymenlaakso
+625,Pyhäjoki,HVA19,North Ostrobothnia
+626,Pyhäjärvi,HVA19,North Ostrobothnia
+630,Pyhäntä,HVA19,North Ostrobothnia
+631,Pyhäranta,HVA05,Southwest Finland
+635,Pälkäne,HVA08,Pirkanmaa
+636,Pöytyä,HVA05,Southwest Finland
+638,Porvoo,HVA01,East Uusimaa
+678,Raahe,HVA19,North Ostrobothnia
+680,Raisio,HVA05,Southwest Finland
+681,Rantasalmi,HVA12,South Savo
+683,Ranua,HVA21,Lapland
+684,Rauma,HVA06,Satakunta
+686,Rautalampi,HVA13,North Savo
+687,Rautavaara,HVA13,North Savo
+689,Rautjärvi,HVA11,South Karelia
+691,Reisjärvi,HVA19,North Ostrobothnia
+694,Riihimäki,HVA07,Kanta-Häme
+697,Ristijärvi,HVA20,Kainuu
+698,Rovaniemi,HVA21,Lapland
+700,Ruokolahti,HVA11,South Karelia
+702,Ruovesi,HVA08,Pirkanmaa
+704,Rusko,HVA05,Southwest Finland
+707,Rääkkylä,HVA14,North Karelia
+710,Raasepori,HVA03,West Uusimaa
+729,Saarijärvi,HVA15,Central Finland
+732,Salla,HVA21,Lapland
+734,Salo,HVA05,Southwest Finland
+736,Saltvik,HVA91,Åland
+738,Sauvo,HVA05,Southwest Finland
+739,Savitaipale,HVA11,South Karelia
+740,Savonlinna,HVA12,South Savo
+742,Savukoski,HVA21,Lapland
+743,Seinäjoki,HVA16,South Ostrobothnia
+746,Sievi,HVA19,North Ostrobothnia
+747,Siikainen,HVA06,Satakunta
+748,Siikajoki,HVA19,North Ostrobothnia
+749,Siilinjärvi,HVA13,North Savo
+751,Simo,HVA21,Lapland
+753,Sipoo,HVA01,East Uusimaa
+755,Siuntio,HVA03,West Uusimaa
+758,Sodankylä,HVA21,Lapland
+759,Soini,HVA16,South Ostrobothnia
+761,Somero,HVA05,Southwest Finland
+762,Sonkajärvi,HVA13,North Savo
+765,Sotkamo,HVA20,Kainuu
+766,Sottunga,HVA91,Åland
+768,Sulkava,HVA12,South Savo
+771,Sund,HVA91,Åland
+777,Suomussalmi,HVA20,Kainuu
+778,Suonenjoki,HVA13,North Savo
+781,Sysmä,HVA09,Päijät-Häme
+783,Säkylä,HVA06,Satakunta
+785,Vaala,HVA19,North Ostrobothnia
+790,Sastamala,HVA08,Pirkanmaa
+791,Siikalatva,HVA19,North Ostrobothnia
+831,Taipalsaari,HVA11,South Karelia
+832,Taivalkoski,HVA19,North Ostrobothnia
+833,Taivassalo,HVA05,Southwest Finland
+834,Tammela,HVA07,Kanta-Häme
+837,Tampere,HVA08,Pirkanmaa
+844,Tervo,HVA13,North Savo
+845,Tervola,HVA21,Lapland
+846,Teuva,HVA16,South Ostrobothnia
+848,Tohmajärvi,HVA14,North Karelia
+849,Toholampi,HVA18,Central Ostrobothnia
+850,Toivakka,HVA15,Central Finland
+851,Tornio,HVA21,Lapland
+853,Turku,HVA05,Southwest Finland
+854,Pello,HVA21,Lapland
+857,Tuusniemi,HVA13,North Savo
+858,Tuusula,HVA02,Central Uusimaa
+859,Tyrnävä,HVA19,North Ostrobothnia
+886,Ulvila,HVA06,Satakunta
+887,Urjala,HVA08,Pirkanmaa
+889,Utajärvi,HVA19,North Ostrobothnia
+890,Utsjoki,HVA21,Lapland
+892,Uurainen,HVA15,Central Finland
+893,Uusikaarlepyy,HVA17,Ostrobothnia
+895,Uusikaupunki,HVA05,Southwest Finland
+905,Vaasa,HVA17,Ostrobothnia
+908,Valkeakoski,HVA08,Pirkanmaa
+915,Varkaus,HVA13,North Savo
+918,Vehmaa,HVA05,Southwest Finland
+921,Vesanto,HVA13,North Savo
+922,Vesilahti,HVA08,Pirkanmaa
+924,Veteli,HVA18,Central Ostrobothnia
+925,Vieremä,HVA13,North Savo
+927,Vihti,HVA03,West Uusimaa
+931,Viitasaari,HVA15,Central Finland
+934,Vimpeli,HVA16,South Ostrobothnia
+935,Virolahti,HVA10,Kymenlaakso
+936,Virrat,HVA08,Pirkanmaa
+941,Vårdö,HVA91,Åland
+946,Vöyri,HVA17,Ostrobothnia
+976,Ylitornio,HVA21,Lapland
+977,Ylivieska,HVA19,North Ostrobothnia
+980,Ylöjärvi,HVA08,Pirkanmaa
+981,Ypäjä,HVA07,Kanta-Häme
+989,Ähtäri,HVA16,South Ostrobothnia
+992,Äänekoski,HVA15,Central Finland

@@ -1,0 +1,2 @@
+county,facility,municipality,facility_type,ct_status,n_scanners,evidence,source_url,source_date,notes
+Åland (ÅHS),Ålands centralsjukhus,Maarianhamina - Mariehamn,central,likely,,"121-bed public central hospital with an emergency department; no source found that names CT",https://wiki.krisyotam.com/content/wikipedia_en_all_nopic_2026-03/%C3%85land_Central_Hospital,2026,"Inferred from hospital size only; a search for Åland CT found no direct statement. Added so the planner does not treat Åland as having no CT. Check with ÅHS (ahs.ax)."

@@ -1,0 +1,10 @@
+Region of birth,Invited,Attended (of invited),Follow-up recommendation (of those who participated),Referral to colposcopy (of those who participated),Attended colposcopy (of those referred),Histological HSIL or worse (of those who had colposcopy)
+,N,N,%,N,%,N,%,N,%,N,%
+Africa,2149,1036,48.2,52,5.0,25,2.4,25,100.0,10,40.0
+Oceania,102,57,55.9,2,3.5,2,3.5,2,100.0,1,50.0
+Americas,1181,659,55.8,39,5.9,19,2.9,18,94.7,6,33.3
+Asia,8538,4959,58.1,260,5.2,136,2.7,128,94.1,57,44.5
+Europe excl. Finland,17463,11148,63.8,637,5.7,297,2.7,280,94.3,111,39.6
+Finland,238869,178822,74.9,10213,5.7,4580,2.6,4316,94.2,1395,32.3
+Unknown,75,46,61.3,3,6.5,1,2.2,1,100.0,0,0.0
+Total,268377,196727,73.3,11206,5.7,5060,2.6,4770,94.3,1580,33.1

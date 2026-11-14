@@ -1,0 +1,10 @@
+Region of birth,Invitation to diagnostic examinations (of attendees),Referral to specialized healthcare (of examined),Benign (of referred),Malignant (of referred),Other cancer (of referred),Missing information (of referred)
+,N,N,%,N,%,N,%,N,%,N,%
+Africa,13,1,7.7,1,100.0,0,0.0,0,0.0,0,0.0
+Oceania,1,0,0.0,0,–,0,–,0,–,0,–
+Americas,12,2,16.7,0,0.0,2,100.0,0,0.0,0,0.0
+Asia,106,15,14.2,5,33.3,10,66.7,0,0.0,0,0.0
+Europe excl. Finland,304,61,20.1,14,23.0,45,73.8,0,0.0,2,3.3
+Finland,7631,2112,27.7,344,16.3,1698,80.4,15,0.7,55,2.6
+Unknown,0,0,–,0,–,0,–,0,–,0,–
+Total,8067,2191,27.2,364,16.6,1755,80.1,15,0.7,57,2.6

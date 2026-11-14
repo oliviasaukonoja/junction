@@ -1,0 +1,6 @@
+Education,Invitation to diagnostic examinations (of attendees),Referral to specialized healthcare (of examined),Benign (of referred),Malignant (of referred),Other cancer (of referred),Missing information (of referred)
+,N,N,%,N,%,N,%,N,%,N,%
+Primary education/unknown,708,227,32.1,42,18.5,168,74.0,2,0.9,15,6.6
+Intermediate/secondary,3109,993,31.9,144,14.5,794,80.0,6,0.6,49,4.9
+Tertiary/higher education,4459,1238,27.8,231,18.7,942,76.1,7,0.6,58,4.7
+Total,8276,2458,29.7,417,17.0,1904,77.5,15,0.6,122,5.0

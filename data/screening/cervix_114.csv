@@ -1,0 +1,5 @@
+Test type,Attended,Referral to colposcopy,Follow-up recommendation,Normal result,Inadequate/missing
+,N,N,%,N,%,N,%,N,%
+Pap test,64289,564,0.9,1764,2.7,61954,96.4,7,0
+HPV test,118094,1065,0.9,7998,6.8,109021,92.3,10,0
+Total,182383,1629,0.9,9762,5.4,170975,93.7,17,0

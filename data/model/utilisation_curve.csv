@@ -1,0 +1,9 @@
+fill_rate,scans_per_year,cost_per_scan_eur,cost_per_additional_scan_eur_at_central_additionality
+0.3,1148,619,1142
+0.4,1530,516,848
+0.5,1912,454,671
+0.6,2295,413,554
+0.7,2678,384,470
+0.8,3060,362,407
+0.9,3442,345,358
+1.0,3825,331,319

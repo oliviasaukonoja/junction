@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cancer care gap finder</title>
+<style>
+  :root { --bg:#f6f7f9; --panel:#fff; --ink:#1b2430; --muted:#5b6676; --line:#dde2ea; --accent:#c2410c; --chip:#eef1f5; --red:#b42318; --amber:#b45309; --green:#0f766e; --bar:#1e40af; --bar2:#93c5fd; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f141b; --panel:#171e28; --ink:#e8edf4; --muted:#9aa6b8; --line:#2a3442; --accent:#f97316; --chip:#222c3a; --red:#fca5a5; --amber:#fcd34d; --green:#5eead4; --bar:#60a5fa; --bar2:#1e3a8a; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  header { padding:12px 16px; display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; }
+  h1 { font-size:18px; margin:0; } nav a { color:var(--accent); margin-right:12px; font-weight:600; text-decoration:none; } nav a[aria-current] { text-decoration:underline; }
+  main { max-width:1180px; margin:0 auto; padding:0 16px 32px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-top:12px; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px; }
+  .hero { font-size:20px; line-height:1.3; font-weight:650; margin:0 0 6px; } .sub { color:var(--muted); margin:0; }
+  .grid { display:grid; gap:12px; } .g3 { grid-template-columns:repeat(3,1fr); } .g4 { grid-template-columns:repeat(4,1fr); } .g2 { grid-template-columns:1fr 1fr; }
+  .card { background:var(--chip); border-radius:8px; padding:10px 12px; } .card .n { font-size:22px; font-weight:700; }
+  .tag { display:inline-block; font-size:11px; padding:0 6px; border-radius:8px; background:var(--chip); border:1px solid var(--line); color:var(--muted); margin-left:4px; vertical-align:middle; }
+  .tag.S { color:var(--green); } .tag.N { color:var(--amber); } .tag.A { color:var(--red); }
+  .stage { border-top:5px solid var(--line); background:var(--chip); border-radius:8px; padding:10px 12px; } .stage.gap { border-top-color:var(--red); } .stage.ok { border-top-color:var(--green); } .stage.unk { border-top-color:var(--amber); }
+  .stage h3 { margin:0 0 6px; font-size:15px; } .stage .flag { font-size:12px; font-weight:600; margin-bottom:6px; }
+  .item { margin:8px 0; font-size:13px; } .item b { display:block; font-weight:600; } .item small { color:var(--muted); display:block; }
+  .barrow { display:grid; grid-template-columns:150px 1fr 54px; gap:8px; align-items:center; margin:3px 0; font-size:12.5px; } .track { background:var(--chip); border-radius:3px; height:12px; position:relative; } .fill { height:100%; border-radius:3px; background:var(--bar); } .fill.low { background:var(--red); } .fill.alt { background:var(--bar2); } .target { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--accent); }
+  .tabs button { font:inherit; padding:4px 10px; border:1px solid var(--line); background:var(--chip); color:var(--ink); border-radius:12px; cursor:pointer; margin-right:6px; } .tabs button[aria-pressed=true] { background:var(--accent); color:#fff; border-color:var(--accent); }
+  table { width:100%; border-collapse:collapse; font-size:13px; } th,td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--line); } th { color:var(--muted); font-weight:600; }
+  .note { color:var(--muted); font-size:12px; margin:6px 0 0; }
+  .st { display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:8px; text-transform:uppercase; letter-spacing:.03em; }
+  .st.verified { background:#0f766e; color:#fff; } .st.proxy { background:#b45309; color:#fff; } .st.assumed { background:#6d28d9; color:#fff; } .st.gap { background:#b42318; color:#fff; }
+  th.sortable { cursor:pointer; } th.sortable:hover { color:var(--accent); }
+  .num { text-align:right; font-variant-numeric:tabular-nums; } .mini { display:inline-block; height:8px; border-radius:3px; background:var(--bar); vertical-align:middle; }
+  .calc { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:8px 0; } .calc label { display:block; font-size:12px; color:var(--muted); } .calc input, .calc select { width:100%; padding:5px 7px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink); font:inherit; }
+  details { margin-top:6px; } summary { cursor:pointer; font-weight:600; }
+  @media (max-width:900px) { .g3,.g4,.g2 { grid-template-columns:1fr; } .barrow { grid-template-columns:110px 1fr 46px; } }
+</style>
+</head>
+<body>
+<header><h1>Cancer care gap finder</h1><nav><a href="/">Mobile CT planner</a><a href="/gap" aria-current="page">Gap finder</a></nav><span class="sub" id="ver"></span></header>
+<main>
+  <section>
+    <p class="hero" id="hero"></p>
+    <p class="sub" id="hero_src"></p>
+    <p class="sub">Where the care pathway loses people, where the evidence is weak, and what a county or health centre could do about it. Every number carries a tag: <span class="tag S">S</span> sourced, <span class="tag N">N</span> team notes or mentor interview (not re-verified), <span class="tag A">A</span> assumption.</p>
+  </section>
+  <section><h2>Strategy Goal 3 indicators</h2><div class="grid g3" id="goal3"></div></section>
+  <section id="data-status"><h2>Data status: what is verified, what is a proxy, what is assumed, what is missing</h2>
+    <table id="dstatus"><thead><tr><th>Item</th><th>Status</th><th>How we know it</th><th>To confirm</th></tr></thead><tbody></tbody></table>
+    <p class="note"><span class="st verified">verified</span> read from an official source by us. <span class="st proxy">proxy</span> derived from verified data with a stated shortcut. <span class="st assumed">assumed</span> our planning value, no evidence. <span class="st gap">gap</span> not found; needs a data request.</p></section>
+  <section><h2 id="surv_title"></h2><div class="grid g2" id="survival"></div><p class="note" id="surv_note"></p></section>
+  <section><h2>Where on the pathway the gap is</h2><div class="grid g4" id="pathway"></div><p class="note">Red = the gap emerges here on the evidence we have; amber = no Finnish data; green = not the main problem. Evidence is thinnest exactly where the gap is largest, which is itself a finding (stage is recorded for only 42% of cases).</p></section>
+  <section><h2>Equity: who attends screening (2024, Cancer Registry tables read directly)</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="grid g2" style="margin-top:10px"><div><h2 style="margin-top:0">By wellbeing services county</h2><div id="counties"></div></div><div><h2 style="margin-top:0">By group</h2><div id="groups"></div></div></div>
+    <p class="note" id="eq_note"></p></section>
+  <section><h2>Where the high-risk people live, lung-cancer deaths and CT pressure by county</h2>
+    <p class="sub" id="risk_def"></p>
+    <table id="areatab"><thead><tr><th class="sortable" data-k="county">County</th><th class="sortable num" data-k="eligible">Eligible high-risk (est.)</th><th class="sortable num" data-k="lung_deaths_per_100k_50_74">Lung deaths per 100k aged 50-74</th><th class="sortable num" data-k="smoking_20_64">Smokers 20-64 %</th><th class="sortable num" data-k="ct_n">CT towns on list</th><th class="sortable num" data-k="extra_wait_no_campaign">Modelled added wait, no campaign (wk)</th><th class="sortable num" data-k="extra_wait_campaign_2">Modelled added wait, campaign x2 with triage (wk)</th></tr></thead><tbody></tbody></table>
+    <p class="note" id="area_note"></p></section>
+  <section><h2>Campaign demand versus CT capacity (national, modelled)</h2><div class="grid g2" id="campcards"></div><p class="note" id="camp_note"></p></section>
+  <section id="pilot"><h2>Pilot: randomised invitations to measure how many scans are genuinely additional</h2>
+    <div class="grid g2"><div id="pilot_text"></div><div>
+      <div class="calc"><div><label for="pA">Uptake in control arm</label><input id="pA" type="number" min="0.05" max="0.9" step="0.05" value="0.40"></div><div><label for="pD">Uplift to detect</label><input id="pD" type="number" min="0.02" max="0.4" step="0.01" value="0.15"></div><div><label for="pP">Power</label><select id="pP"><option value="0.8">80%</option><option value="0.9">90%</option></select></div><div><label>Invitees per arm</label><div class="card" style="padding:5px 8px"><span class="n" id="pN" style="font-size:20px"></span></div></div></div>
+      <div id="pilot_out" class="note"></div><div id="pilot_sim" style="margin-top:8px"></div></div></div>
+    <details><summary>Sample sizes (80% and 90% power, two-sided 5%)</summary><table id="pdesign"><thead><tr><th>Control uptake</th><th>Uplift</th><th>Power</th><th class="num">Per arm</th><th class="num">Total</th><th class="num">Additionality share</th></tr></thead><tbody></tbody></table></details>
+    <p class="note">Full protocol: docs/pilot_design.md. The simulation uses planning values and shows what contamination and a before/after design would do to the answer.</p></section>
+  <section><h2>What to do</h2><table id="recs"><thead><tr><th>#</th><th>Action</th><th>Owner</th><th>Evidence</th><th>KPI</th></tr></thead><tbody></tbody></table>
+    <p class="note">R5 can be explored on the <a href="/">Mobile CT planner</a>. Recommendations follow the evidence tags; none claims a measured effect on survival in Finland.</p></section>
+</main>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const tag = t => el("span", "tag " + t, t);
+  const d = await (await fetch("/gapdata")).json();
+  const ls = d.lung_survival;
+  const nordic = o => (o.Sweden + o.Norway) / 2;
+  $("hero").textContent = `Finland loses lung cancer patients before diagnosis, not between diagnosis and treatment: five-year survival is ${ls.men.Finland}% for men vs about ${nordic(ls.men).toFixed(0)}% in Sweden and Norway, while treatment starts a median of 36-38 days after diagnosis.`;
+
+  $("hero_src").append("Survival figures and the 36-38 day median are tag N: team notes, not re-verified here. NORDCAN and the Cancer Registry are the sources to check before quoting them.");
+  d.goal3.indicators.forEach(i => { const c = el("div", "card"); const t = el("div", null, i.label); t.append(tag(i.tag)); c.append(t, el("div", "note", i.detail), el("div", "note", "Source: " + i.source)); $("goal3").append(c); });
+
+  $("surv_title").textContent = ls.title;
+  ["men", "women"].forEach(g => {
+    const box = el("div"); box.append(el("div", null, g === "men" ? "Men" : "Women"));
+    Object.entries(ls[g]).sort((a, b) => a[1] - b[1]).forEach(([c, v]) => { const r = el("div", "barrow"); r.append(el("span", null, c)); const tr = el("div", "track"), f = el("div", "fill" + (c === "Finland" ? " low" : "")); f.style.width = (v / 40 * 100) + "%"; tr.append(f); r.append(tr, el("span", null, v + "%")); box.append(r); });
+    box.append(el("div", "note", `Gap to the Sweden-Norway average: ${(nordic(ls[g]) - ls[g].Finland).toFixed(1)} percentage points`));
+    $("survival").append(box);
+  });
+  $("surv_note").textContent = "Tag N: " + ls.source;
+
+  d.pathway.forEach(st => {
+    const box = el("div", "stage " + (st.where_gap === true ? "gap" : st.where_gap === false ? "ok" : "unk"));
+    box.append(el("h3", null, st.stage), el("div", "flag", st.where_gap === true ? "Gap emerges here" : st.where_gap === false ? "Not the main problem" : "No Finnish data"));
+    st.items.forEach(i => { const it = el("div", "item"); const b = el("b", null, i.measure); b.append(tag(i.tag)); it.append(b, el("span", null, "Finland: " + i.finland), el("small", null, "Compare: " + i.comparator), el("small", null, i.source)); box.append(it); });
+    $("pathway").append(box);
+  });
+
+  const progs = [["breast", "Breast"], ["colorectal", "Colorectal"], ["cervical", "Cervical"]];
+  let cur = "breast";
+  function drawCounties() {
+    const box = $("counties"); box.replaceChildren();
+    const rows = d.counties.filter(c => c[cur] != null).sort((a, b) => a[cur] - b[cur]);
+    rows.forEach(c => { const r = el("div", "barrow"); r.append(el("span", null, c.county)); const tr = el("div", "track"), f = el("div", "fill" + (c[cur] < d.target_pct ? " alt" : "")); f.style.width = c[cur] + "%"; const t = el("div", "target"); t.style.left = d.target_pct + "%"; tr.append(f, t); r.append(tr, el("span", null, c[cur].toFixed(1) + "%")); box.append(r); });
+    box.append(el("div", "note", `Orange line = ${d.target_pct}% target in every county. Paler bars are below it. National: ${d.national[cur] ?? "n/a"}%.`));
+  }
+  progs.forEach(([k, label]) => { const b = el("button", null, label); b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { cur = k; [...$("tabs").children].forEach(x => x.setAttribute("aria-pressed", x === b)); drawCounties(); drawGroups(); }); $("tabs").append(b); });
+  function pair(box, label, a, b, aName, bName) {
+    box.append(el("div", null, label));
+    [[aName, a], [bName, b]].forEach(([n, v], i) => { const r = el("div", "barrow"); r.append(el("span", null, n)); const tr = el("div", "track"), f = el("div", "fill" + (i ? " low" : "")); f.style.width = v + "%"; tr.append(f); r.append(tr, el("span", null, v + "%")); box.append(r); });
+    box.append(el("div", "note", `Ratio ${(b / a).toFixed(2)}`));
+  }
+  function drawGroups() {
+    const box = $("groups"); box.replaceChildren();
+    const L = d.groups.language[cur]; pair(box, "Native language", L["Domestic"], L["Other/missing"], "Finnish/Swedish/Sámi", "Other or missing");
+    const E = d.groups.education[cur];
+    if (E) { box.append(el("div", "note", " ")); pair(box, "Education level", E["Tertiary/higher education"], E["Primary education/unknown"], "Tertiary", "Primary"); }
+    else box.append(el("div", "note", "Education breakdown not extracted for this programme."));
+  }
+  drawCounties(); drawGroups();
+  $("eq_note").textContent = d.source + ". The language group 'other/missing' includes people whose language is missing from the register. Participation is not a lung-cancer measure; it shows where access barriers are documented.";
+
+
+  // ---- data status
+  d.data_status.forEach(r => { const tr = el("tr"); tr.append(el("td", null, r.item)); const st = el("td"); st.append(el("span", "st " + r.status, r.status)); tr.append(st, el("td", null, r.how), el("td", null, r.action)); $("dstatus").tBodies[0].append(tr); });
+  // ---- area table
+  const rg = d.area_national.risk_group;
+  $("risk_def").textContent = `Risk group: ${rg.name} (age ${rg.age_min}-${rg.age_max}, at least ${rg.pack_years_min} pack-years, current smoker or quit within ${rg.quit_years_max} years). Basis: ${rg.basis.join("; ")}. ${rg.note}`;
+  let sortKey = "extra_wait_campaign_2", sortDir = -1;
+  d.area.forEach(r => { r.ct_n = r.ct_towns.length; });
+  function drawArea() {
+    const tb = $("areatab").tBodies[0]; tb.replaceChildren();
+    const maxE = Math.max(...d.area.map(r => r.eligible)), maxM = Math.max(...d.area.map(r => r.lung_deaths_per_100k_50_74));
+    [...d.area].sort((a, b) => sortKey === "county" ? sortDir * a.county.localeCompare(b.county) : sortDir * (a[sortKey] - b[sortKey])).forEach(r => {
+      const tr = el("tr"); tr.append(el("td", null, r.county));
+      const e = el("td", "num", r.eligible.toLocaleString("en")); tr.append(e);
+      const m = el("td", "num"); const bar = el("span", "mini"); bar.style.width = (60 * r.lung_deaths_per_100k_50_74 / maxM) + "px"; bar.style.background = "var(--red)"; m.append(r.lung_deaths_per_100k_50_74.toFixed(0) + " ", bar); tr.append(m);
+      tr.append(el("td", "num", r.smoking_20_64.toFixed(1)), el("td", "num", r.ct_n), el("td", "num", r.extra_wait_no_campaign.toFixed(1)), el("td", "num", r.extra_wait_campaign_2.toFixed(1)));
+      tb.append(tr);
+    });
+  }
+  document.querySelectorAll("#areatab th.sortable").forEach(th => th.addEventListener("click", () => { const k = th.dataset.k; sortDir = sortKey === k ? -sortDir : -1; sortKey = k; drawArea(); }));
+  drawArea();
+  $("area_note").textContent = `Eligible = verified smoking prevalence x an assumed factor (proxy); lung deaths are Statistics Finland 2021-2025 (verified) divided by the 50-74 population (proxy, not age-standardised). Modelled added waits come from assumed CT volume, 5% spare capacity and a 4-week baseline: they are NOT observed waits, which no source provides. Total eligible estimate: ${d.area_national.eligible.toLocaleString("en")} people.`;
+  // ---- campaign cards
+  const cp = d.area_national.campaign;
+  [["No campaign", cp.no_campaign], ["Campaign intensity 2, 60% of ineligible requests filtered, eligible booked first", cp.campaign_2]].forEach(([t, c]) => {
+    const card = el("div", "card"); card.append(el("div", null, t));
+    [["Scans wanted by eligible people / year", c.demand_eligible], ["Scans wanted by ineligible people / year", c.demand_ineligible], ["Free CT capacity (assumed) / year", c.free_capacity], ["Shortfall / year", c.shortfall]].forEach(([k, v]) => { const r = el("div", "note", k + ": " + Math.round(v).toLocaleString("en")); card.append(r); });
+    card.append(el("div", "note", `Longest added wait: ${c.longest_extra_wait.weeks} weeks (${c.longest_extra_wait.county}); counties over +4 weeks: ${c.counties_with_extra_wait_over_4_weeks} of 23; shortfall equals about ${c.truck_equivalents_of_shortfall} truck-years of scanning.`));
+    $("campcards").append(card);
+  });
+  $("camp_note").textContent = "A campaign mostly adds demand from people who are not eligible. Filtering requests and booking eligible people first protects screening of the high-risk group but does not remove the queue: the shortfall must be met by capacity or by pacing invitations. All inputs are assumptions (see data status).";
+  // ---- pilot
+  const pt = $("pilot_text");
+  [["Design", "Eligible residents of one county are randomised 1:1, stratified by distance to the nearest CT, language group and sex. Arm A: invited to book at an existing hospital CT. Arm B: the same invitation plus a slot at a mobile or pop-up site near home."],
+   ["Primary outcome", "A completed screening scan within 6 months, verified from booking and imaging records. Additional scans per 100 invitees = 100 x (uptake B - uptake A). Scans that would have happened anyway = uptake A."],
+   ["Why randomise", "A campaign raises uptake in both arms and cancels in the difference. A before/after count would credit the campaign's effect to the site."],
+   ["Keeping it clean", "Mobile slots bookable only with the invitation code; control arm keeps normal hospital access with reserved slots; self-referrals and leakage are logged."]].forEach(([h, t]) => { const p = el("p", null); p.append(el("strong", null, h + ". "), document.createTextNode(t)); pt.append(p); });
+  const zq = p => { const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239], b = [-54.47609879822406, 161.5858368580409, -155.6989798598506, 66.80131188771972, -13.28068155288572], c = [-0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783], dd = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416]; const pl = 0.02425; let q, r; if (p < pl) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((dd[0] * q + dd[1]) * q + dd[2]) * q + dd[3]) * q + 1); } if (p > 1 - pl) { q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((dd[0] * q + dd[1]) * q + dd[2]) * q + dd[3]) * q + 1); } q = p - 0.5; r = q * q; return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1); };
+  function calc() {
+    const pA = +$("pA").value, dl = +$("pD").value, pw = +$("pP").value, pB = pA + dl;
+    if (!(pA > 0 && pB < 1 && dl > 0)) { $("pN").textContent = "-"; $("pilot_out").textContent = "Uptake plus uplift must be below 100%."; return; }
+    const pb = (pA + pB) / 2, n = Math.ceil(Math.pow(zq(1 - 0.025) * Math.sqrt(2 * pb * (1 - pb)) + zq(pw) * Math.sqrt(pA * (1 - pA) + pB * (1 - pB)), 2) / (dl * dl));
+    $("pN").textContent = n.toLocaleString("en");
+    $("pilot_out").textContent = `${(2 * n).toLocaleString("en")} invitees in total. Additional scans per 100 invitees: ${(100 * dl).toFixed(0)}; would have happened anyway: ${(100 * pA).toFixed(0)}; additionality share of arm B's scans: ${(100 * dl / pB).toFixed(0)}%. Individual randomisation, no dropout inflation.`;
+  }
+  ["pA", "pD", "pP"].forEach(id => $(id).addEventListener("input", calc)); calc();
+  const ex = d.pilot.example, ps = $("pilot_sim");
+  ps.append(el("div", "note", `Simulation at control 40%, uplift 15%, ${ex.n_per_arm} per arm (stratified, ${ex.sim_clean.power >= 0 ? "600" : ""} repeats): power ${(100 * ex.sim_clean.power).toFixed(0)}%, estimate ${ex.sim_clean.mean_rd.toFixed(3)} (true 0.150).`),
+          el("div", "note", `If 30% of the control arm leaks to the mobile offer: estimate falls to ${ex.sim_leak.mean_rd.toFixed(3)} and power to ${(100 * ex.sim_leak.power).toFixed(0)}%.`),
+          el("div", "note", `With a +30% campaign, a before/after comparison reports ${ex.before_after.naive_additional_per_100.toFixed(0)} additional scans per 100 invitees; the randomised answer is ${ex.before_after.randomised_additional_per_100.toFixed(0)}.`));
+  d.pilot.design.filter(r => r.baseline_uptake === 0.4 || r.baseline_uptake === 0.3).forEach(r => { const tr = el("tr"); tr.append(el("td", null, (100 * r.baseline_uptake).toFixed(0) + "%"), el("td", null, "+" + (100 * r.uplift).toFixed(0) + " pts"), el("td", null, (100 * r.power).toFixed(0) + "%"), el("td", "num", r.n_per_arm), el("td", "num", r.total), el("td", "num", (100 * r.additionality_share).toFixed(0) + "%")); $("pdesign").tBodies[0].append(tr); });
+
+  d.recommendations.forEach(r => { const tr = el("tr"); const a = el("td", null, r.action); a.append(tag(r.tag)); tr.append(el("td", null, r.id), a, el("td", null, r.owner), el("td", null, r.evidence), el("td", null, r.kpi)); $("recs").tBodies[0].append(tr); });
+})().catch(e => { document.body.append(Object.assign(document.createElement("p"), { textContent: "Could not load gap data: " + e.message, style: "padding:16px;color:#b42318" })); });
+</script>
+</body>
+</html>

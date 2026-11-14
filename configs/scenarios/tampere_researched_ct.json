@@ -1,0 +1,1 @@
+{"name": "tampere-researched-ct-list", "objective": "weighted", "region": {"base": "Tampere", "radius_km": 100}, "monte_carlo": {"n": 2000, "seed": 1}, "ct_sites": "confirmed+likely"}

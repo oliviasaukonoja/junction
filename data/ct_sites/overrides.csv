@@ -1,0 +1,13 @@
+facility,field,value,reason
+Kymenlaakso Central Hospital nuclear medicine,ct_status,likely,Evidence is a SPECT-CT camera tender; shows a CT component but not stand-alone diagnostic CT access
+Päijät-Hämeen keskussairaala isotooppilääketiede,ct_status,likely,Evidence is a PET/CT tender; hybrid scanner only
+Satakunnan keskussairaala isotooppilääketiede,ct_status,likely,Evidence is a SPECT/CT tender; hybrid scanner only
+Mehiläinen Tomodent,counts_for_routing,no,Dental/sinus cone-beam CT clinic; not usable for lung screening
+Mehiläinen Kuopio Matkus,counts_for_routing,no,Coronary CT only; private
+Päijät-Hämeen keskussairaala radiologia,ct_status,confirmed,"Verification 2026-11-14: wellbeing county diagnostics brochure lists CT at the central hospital (verify_south_west.csv)"
+Riihimäen sairaala,ct_status,confirmed,"Verification: Kanta-Häme radiation safety document valid from 2023-01-01 names a CT Riihimäki unit"
+Pietarsaaren sairaala,ct_status,confirmed,"Verification: suomi.fi service point listing for the imaging unit includes CT; undated"
+Forssan sairaala,counts_for_routing,no,"Verification: Kanta-Häme safety document names CT only in Hämeenlinna and Riihimäki; weak negative evidence, not proof"
+Kuusamon sairaala,ct_status,likely,"Verification: Pohde CT booking guides name Raahe and Oulaskangas but not Kuusamo; a 2026 tender covers a new CT at Kuusamo, service start unverified"
+Iisalmen sairaala,ct_status,likely,"Verification found no newer source; earlier evidence was an old page seen only as a snippet"
+Varkauden sairaala,ct_status,likely,"Verification found no newer source; earlier evidence was an old page seen only as a snippet"

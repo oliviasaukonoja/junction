@@ -1,0 +1,10 @@
+Region of birth,Invited,Attended (of invited),Invitation to diagnostic examinations (of attendees),Referral to specialized healthcare (of examined)
+,N,N,%,N,%,N,%
+Africa,1242,558,44.9,18,3.2,2,11.1
+Oceania,83,53,63.9,4,7.5,0,0.0
+Americas,846,531,62.8,19,3.6,5,26.3
+Asia,5062,3053,60.3,78,2.6,10,12.8
+Europe excl. Finland,17428,11595,66.5,316,2.7,82,25.9
+Finland,328343,272177,82.9,7637,2.8,2234,29.3
+Unknown,78,49,62.8,0,0.0,0,–
+Total,353082,288016,81.6,8072,2.8,2333,28.9

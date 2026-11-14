@@ -1,0 +1,43 @@
+parameter,low,central,high,unit,tag,note
+pop_50_74,1695391,1695391,1695391,persons,SRC,"Statistics Finland table 11re, 31 Dec 2025 (data/routing/municipalities.csv)"
+eligible_share,0.04,0.07,0.12,share of 50-74,ASSUME,"No Finnish pack-year analysis found. Oulu pilot used >=15 cig/d x25y or >=10 x30y, age 50-74. US 2021 criteria roughly double eligibility vs 2013"
+uptake_first,0.3,0.5,0.72,share of invited scanned,SRC,London invitation cohort 31% responded; Yorkshire trial 56.5-73.2% depending on reminder stage. Oulu 96.7% was volunteers - not used
+interval_years,1.0,2.0,2.0,years between scans,ASSUME,NELSON-style ~2y vs NLST annual
+repeat_adherence,0.55,0.66,0.8,share returning,SRC,Atrium Health mobile unit: 66% returned for 2nd scan
+baseline_mort_per1000py,2.0,3.3,4.5,lung deaths /1000 person-yr,SRC,NELSON control arm 3.30; Finnish eligible-group rate unknown (low/high are assumptions)
+rate_ratio,0.94,0.76,0.61,RR lung-cancer death,SRC,NELSON 10y RR 0.76 (95% CI 0.61-0.94); NLST 20% reduction (CI 6.8-26.7). Women: 0.67 (CI 0.38-1.14) not significant
+detect_rate_per_scan,0.008,0.01,0.015,cancers per scan,MEM,"Trial prevalence-round yields ~1%; recalled, not re-verified"
+slot_minutes,30,20,15,min per participant,ASSUME,"Scan itself ~10 min per one UK source; add check-in, consent, smoking history"
+op_hours_per_day,7.0,7.5,8.0,hours,ASSUME,
+scan_days_per_year,120,170,200,days,ASSUME,"Winter (-25C), relocation days, servicing, holidays"
+fill_rate,0.55,0.75,0.9,booked slots attended,ASSUME,No-shows and empty slots at small stops
+capex_vehicle,250000,400000,700000,EUR,ASSUME,"Vehicle/trailer, shielding, power, heating. US sources: unit $300k-1.5M all-in"
+capex_scanner,250000,350000,550000,EUR,ASSUME,US source: LDCT scanner $150-300k; mobile premium + install + QA
+life_years,6,8,10,years,ASSUME,
+discount_rate,0.03,0.03,0.03,rate,ASSUME,Common health-economics default
+residual_share,0.0,0.1,0.2,share of capex,ASSUME,
+scanner_service_share,0.07,0.1,0.12,of scanner price/yr,ASSUME,Typical service contract range
+vehicle_maint,10000,18000,30000,EUR/yr,ASSUME,
+km_per_year,20000,45000,70000,km,ASSUME,Depends on route design
+eur_per_km,0.5,0.8,1.2,EUR/km,ASSUME,"Diesel + generator/heating + tyres, heavy vehicle"
+insurance,8000,14000,25000,EUR/yr,ASSUME,
+fte,3.0,3.5,4.5,FTE,ASSUME,2 radiographers + driver/assistant + part-time coordinator/cessation nurse
+salary_month,3400,3600,4000,EUR/month,SRC,"Radiographer: Duunitori 3,576 avg (wellbeing counties, 2024); Tyomarkkinatori median 3,557"
+oncost_mult,1.3,1.35,1.45,x,ASSUME,Employer on-costs
+cover_factor,1.0,1.15,1.25,x,ASSUME,Sick/holiday cover
+stops_per_year,40,60,100,stops,ASSUME,
+cost_per_stop,300,600,1500,EUR,ASSUME,"Host site, heated shelter, power hook-up, signage"
+read_minutes,2.5,4.0,8.0,min per scan,ASSUME,Incl. double reading where used
+radiologist_hour,110,150,220,EUR/h,ASSUME,No Finnish radiologist cost found
+admin_per_scan,5,10,25,EUR,ASSUME,"Invitation, booking, IT, letters"
+p_extra_ct,0.05,0.1,0.23,per scan,SRC,NELSON: 9.2% had >=1 extra CT; NLST per-round false positive 23.3% (Lung-RADS lower)
+cost_extra_ct,150,200,300,EUR,ASSUME,
+p_workup,0.015,0.025,0.05,per scan,SRC,NELSON referral 2.1%
+cost_workup,2000,3500,6000,EUR,ASSUME,"PET-CT, biopsy, MDT"
+p_incidental_secondary,0.02,0.04,0.08,per scan,SRC,SUMMIT: ~1 in 25 may need secondary-care review
+cost_incidental_secondary,200,400,800,EUR,ASSUME,
+p_incidental_primary,0.03,0.05,0.08,per scan,SRC,SUMMIT: ~1 in 20 need primary-care review
+cost_incidental_primary,50,80,150,EUR,ASSUME,
+cessation_per_scan,20,60,150,EUR,ASSUME,Brief advice/referral; not all smokers
+fixed_site_scan_cost,80,130,200,EUR,ASSUME,Marginal acquisition cost at an existing hospital CT with spare capacity. No Finnish figure found
+additionality,0.15,0.35,0.6,share of mobile scans who would NOT attend a fixed site,ASSUME,The key unknown. Pilot must measure it

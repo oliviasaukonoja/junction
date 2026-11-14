@@ -1,0 +1,13 @@
+Sex,Previous result,Picked,Attended,Test positives,Attended colonoscopy (of test positives),Surgical/neoadjuvant treatment (of those who had colonoscopy)
+,,N,N,%,N,%,N,%,N,%
+Men,Negative,12535,11600,92.5,591,5.1,473,80.0,22,4.7
+Men,Positivet,657,440,67.0,73,16.6,20,27.4,1,5.0
+Men,Did not attend,4687,1055,22.5,98,9.3,62,63.3,4,6.5
+Men,First invitation,188165,130528,69.4,8825,6.8,7047,79.9,557,7.9
+Men,Total,206044,143623,69.7,9587,6.7,7602,79.3,584,7.7
+Women,Negative,16041,15078,94.0,498,3.3,404,81.1,20,5.0
+Women,Positivet,477,342,71.7,40,11.7,8,20.0,1,12.5
+Women,Did not attend,3570,965,27.0,62,6.4,43,69.4,3,7.0
+Women,First invitation,196518,154295,78.5,6314,4.1,4914,77.8,367,7.5
+Women,Total,216606,170680,78.8,6914,4.1,5369,77.7,391,7.3
+Total,Total,422650,314303,74.4,16501,5.3,12971,78.6,975,7.5

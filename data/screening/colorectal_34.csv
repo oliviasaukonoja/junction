@@ -1,0 +1,10 @@
+Sex,Interval cancer type,N,%
+,,,
+Men,Non-attender,169,23.1
+Men,"Interval cancer, negative",83,11.3
+Men,"Interval cancer, positive",48,6.5
+Men,Screen-detected,433,59.1
+Women,Non-attender,90,17.7
+Women,"Interval cancer, negative",93,18.3
+Women,"Interval cancer, positive",39,7.7
+Women,Screen-detected,286,56.3

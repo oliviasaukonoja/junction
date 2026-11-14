@@ -1,0 +1,1 @@
+{"name": "helsinki-metro-40km", "objective": "weighted", "region": {"base": "Helsinki", "radius_km": 40}, "routing": {"lam": 0.5, "minority_factor_mobile": 0.95}}

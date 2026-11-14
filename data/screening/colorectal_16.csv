@@ -1,0 +1,10 @@
+Region of birth,Picked,Attended,Test positives,Attended colonoscopy (of test positives),Surgical/neoadjuvant treatment (of those who had colonoscopy)
+,N,N,%,N,%,N,%,N,%
+Africa,1453,588,40.5,22,3.7,15,68.2,0,0.0
+Oceania,74,44,59.5,1,2.3,1,100.0,0,0.0
+Americas,837,464,55.4,16,3.4,12,75.0,0,0.0
+Asia,3889,2156,55.4,106,4.9,76,71.7,3,3.9
+Europe excl. Finland,14654,8301,56.6,384,4.6,261,68.0,15,5.7
+Finland,400375,298265,74.5,13554,4.5,9879,72.9,530,5.4
+Unknown,83,53,63.9,0,0.0,0,–,0,–
+Total,421365,309871,73.5,14083,4.5,10244,72.7,548,5.3

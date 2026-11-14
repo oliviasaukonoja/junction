@@ -1,0 +1,18 @@
+[project]
+name = "ctsim"
+version = "0.1.0"
+description = "Simulation and planning toolkit for a mobile low-dose CT lung screening unit in Finland (Junction 2026, AstraZeneca challenge)"
+requires-python = ">=3.10"
+dependencies = []          # core engine is standard library only
+
+[project.optional-dependencies]
+api = ["modal"]            # api/modal_app.py (untested stub)
+db = ["mariadb"]           # db/schema.sql loader (untested stub)
+ai = ["anthropic"]         # Claude analyst (src/ctsim/analyst.py)
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,13 @@
+scope,scenario,stops,scans_per_year,additional_participants_per_year,additional_in_municipalities_over_60km_from_CT,km_per_year,working_days_used,cost_per_scan_eur,cost_per_additional_participant_eur
+national,A max scans (population-greedy),30,2778,565,202,2332,199.2,365,474
+national,"B max additional, no equity weight",50,2205,1170,1170,8713,198.6,419,492
+national,"C max additional, equity weight 0.5",49,2209,1178,1166,9132,198.7,419,490
+national,"D max additional, equity weight 2.0",42,2324,1150,986,9474,199.3,405,473
+pilot,Helsinki metro (40km),6,3240,264,0,242,198.2,333,286
+pilot,Kajaani 150km (Kainuu/N.Karelia),25,1048,267,157,2694,92.6,620,1446
+pilot,Rovaniemi 150km (Lapland),12,702,139,78,1728,57.2,800,2671
+pilot,Seinäjoki 120km,33,1863,448,265,2394,148.2,445,783
+pilot,Jyväskylä 120km,28,1774,395,265,2207,137.6,453,856
+pilot,Tampere 100km,27,2844,578,159,1795,199.0,360,449
+pilot,Oulu 150km,20,1774,214,105,2027,129.2,447,1247
+pilot,Kuopio 120km,23,1601,268,172,1977,121.8,476,1162

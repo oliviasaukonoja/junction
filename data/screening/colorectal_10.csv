@@ -1,0 +1,9 @@
+Native language,Sex,Picked,Attended,Test positives,Attended colonoscopy (of test positives),Surgical/neoadjuvant treatment (of those who had colonoscopy)
+,,N,N,%,N,%,N,%,N,%
+Domestic,Men,196117,137637,70.2,7829,5.7,5672,72.4,284,5.0
+Domestic,Women,205528,161710,78.7,5759,3.6,4231,73.5,245,5.8
+Domestic,Total,401645,299347,74.5,13588,4.5,9903,72.9,529,5.3
+Other/missing,Men,9085,4285,47.2,245,5.7,160,65.3,11,6.9
+Other/missing,Women,10635,6239,58.7,250,4.0,181,72.4,8,4.4
+Other/missing,Total,19720,10524,53.4,495,4.7,341,68.9,19,5.6
+Total,Total,421365,309871,73.5,14083,4.5,10244,72.7,548,5.3
