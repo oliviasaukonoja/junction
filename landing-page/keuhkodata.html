@@ -634,7 +634,7 @@ function headline(){
 function go(t,s){cur={t,s:s||null};render();window.scrollTo({top:0});}
 function buildNav(pg){
   const nav=document.getElementById('mainnav');
-  nav.innerHTML=`<a class="mt" href="/kartta">${L({fi:'Pilottikartta',sv:'Pilotkarta',en:'Pilot map'})}</a>`;
+  nav.innerHTML='';nav.closest('.navbar').classList.add('hidden');   // pilot map link lives in the shared top navigation
 }
 function stepcards(){
   const hi=D.smr.filter(r=>r[2]>1).map(r=>nmN(r[0])).join(', ');
