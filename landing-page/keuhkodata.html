@@ -51,7 +51,11 @@ main{padding-bottom:var(--s10)}
 .mapcap .src{color:var(--on-ink-2);display:block;margin-top:6px}
 @media (max-width:900px){
   .ovhead{grid-template-columns:1fr;min-height:0;gap:0}
-  .ovtext{padding:var(--s6) 0 var(--s3)}
+  .ovtext{display:contents}
+  .ovtext h1{padding-top:var(--s6)}
+  .ovtext .lead{margin-bottom:var(--s2)}
+  .globe{order:2}
+  .headline{order:3;margin:0 0 var(--s6)}
   .globe{margin-inline:calc(-1 * var(--s2))}
   .globe .stage{flex:none;min-height:0;height:min(118vw,560px)}
   .mapcap{margin:0 var(--s2) var(--s5);max-width:none}
@@ -145,7 +149,7 @@ th{color:var(--sec);font-weight:500;font-size:13px}
 .sm{font-size:14px;margin-top:2px}.sc{font-family:var(--mono);font-size:11.5px;color:var(--sec);margin-top:4px}
 
 /* recommendations */
-.reco-card{border-color:var(--ink);border-width:1px 1px 1px 1px;background:var(--sheet)}
+.reco-card{background:var(--sheet)}
 .reco{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
 @media(max-width:900px){.reco{grid-template-columns:1fr}}
 .rc{padding:var(--s2) var(--s3) var(--s2) 0;border-inline-end:1px solid var(--line);margin-inline-end:var(--s3)}
@@ -525,13 +529,13 @@ function body(v){
   if(v.kind==='reco'){
     const R={
      fi:[['Seulontabussi','Bussipilotti Lapissa, jossa matka-aika on este (47 % niistä, jotka bussi tavoittaisi, asuu yli tunnin päässä TT-laitteesta). Kymenlaaksossa ja Satakunnassa aloitetaan sairaalan TT-kutsuilla; bussi lisäisi lähinnä kapasiteettia, mikä on oletus. Kohderyhmä: 50–74-vuotiaat tupakoivat ja tupakoineet.','Bussi ei ole halvempi kuin sairaalan TT; se kannattaa vain, jos se tavoittaa ihmisiä, joita sairaalan TT ei tavoita. Pilotti satunnaistaa kutsut ja mittaa osallistumista sekä etäisyyden että kielen mukaan.'],
-         ['Pilottikartta','Sairaalan TT-pilotti alueille, joilta on enintään 45 minuutin ajomatka TT-laitteelle; sen ulkopuolella seulontabussi. Lapissa 15 kunnasta 21:stä on yli 45 minuutin päässä. <a href="/kartta">Avaa pilottikartta →</a>','Matka-ajat OpenStreetMap/OSRM, ei talviolosuhteita; TT-paikat ovat tutkittu lista, eivät virallinen rekisteri.'],
+         ['Pilottikartta','Sairaalan TT-pilotti alueille, joilta on enintään 45 minuutin ajomatka TT-laitteelle; sen ulkopuolella seulontabussi. Lapissa 15 kunnasta 21:stä on yli 45 minuutin päässä. <a href="/kartta">Avaa pilottikartta&nbsp;→</a>','Matka-ajat OpenStreetMap/OSRM, ei talviolosuhteita; TT-paikat ovat tutkittu lista, eivät virallinen rekisteri.'],
          ['Mittarit','Aika oireesta TT:hen; I–II-vaiheessa todettujen osuus (nyt 42 %, tavoite 70 %); seulontaan osallistuminen kielen ja koulutuksen mukaan.','Seurataan alueittain, jotta ero näkyy.']],
      sv:[['Screeningbuss','Busspilot i Lappland, där restiden är hindret (47 % av dem som bussen skulle nå bor mer än en timme från en DT). I Kymmenedalen och Satakunta börjar man med inbjudningar till sjukhusets DT; en buss skulle främst ge mer kapacitet, vilket är ett antagande. Målgrupp: rökare och tidigare rökare, 50–74 år.','Bussen är inte billigare än sjukhusets DT; den lönar sig bara om den når personer som sjukhusets DT inte når. Piloten randomiserar inbjudningarna och mäter deltagandet efter både avstånd och språk.'],
-         ['Pilotkarta','Pilot med sjukhusets DT inom 45 minuters bilresa från en DT-apparat; längre bort en screeningbuss. I Lappland ligger 15 av 21 kommuner mer än 45 minuter bort. <a href="/kartta">Öppna pilotkartan →</a>','Restider från OpenStreetMap/OSRM, utan vinterförhållanden; DT-platserna är en undersökt lista, inte ett officiellt register.'],
+         ['Pilotkarta','Pilot med sjukhusets DT inom 45 minuters bilresa från en DT-apparat; längre bort en screeningbuss. I Lappland ligger 15 av 21 kommuner mer än 45 minuter bort. <a href="/kartta">Öppna pilotkartan&nbsp;→</a>','Restider från OpenStreetMap/OSRM, utan vinterförhållanden; DT-platserna är en undersökt lista, inte ett officiellt register.'],
          ['Mått','Tid från symtom till DT; andel upptäckta i stadium I–II (nu 42 %, mål 70 %); screeningdeltagande per språk och utbildning.','Följs upp per område så att skillnaden syns.']],
      en:[['Screening bus','Bus pilot in Lapland, where travel time is the barrier (47% of the people the bus would reach live more than an hour from a CT). In Kymenlaakso and Satakunta start with hospital-CT invitations; a bus would mainly add capacity, which is an assumption. Target group: current and former smokers aged 50–74.','The bus is not cheaper than a hospital CT; it only pays off if it reaches people a hospital CT does not. The pilot randomises invitations and measures participation by both distance and language.'],
-         ['Pilot map','Hospital CT pilot within 45 minutes\' drive of a CT scanner; screening bus beyond. In Lapland, 15 of 21 municipalities are more than 45 minutes away. <a href="/kartta">Open the pilot map →</a>','Travel times OpenStreetMap/OSRM, no winter; CT sites are a researched list, not an official register.'],
+         ['Pilot map','Hospital CT pilot within 45 minutes\' drive of a CT scanner; screening bus beyond. In Lapland, 15 of 21 municipalities are more than 45 minutes away. <a href="/kartta">Open the pilot map&nbsp;→</a>','Travel times OpenStreetMap/OSRM, no winter; CT sites are a researched list, not an official register.'],
          ['Measures','Time from symptoms to CT; share found at stage I–II (now 42%, target 70%); screening participation by language and education.','Tracked by area so the gap stays visible.']]}[lang];
     return `<div class="reco">${R.map((r,i)=>`<div class="rc"><h3>${i+1}. ${r[0]}</h3><p>${r[1]}</p><p class="why">${r[2]}</p></div>`).join('')}</div>`;}
   if(v.kind==='goal3') return `<div class="goal">${GOAL3.map(x=>`<div><b>${L(x.b)} ${tagHTML(x.tag)}</b><span>${L(x.s)}</span></div>`).join('')}</div>`;
@@ -649,9 +653,10 @@ function hero3d(){
   }).catch(showStill);
   if(document.readyState==='complete') setTimeout(start,50); else addEventListener('load',()=>setTimeout(start,50),{once:true});
 }
+const glue = x => String(x).replace(/ (\S+ ?[→←])$/,'\u00a0$1').replace(/ ([→←])/g,'\u00a0$1');
 function stephead(pg){
   const back={fi:'← Yleiskuva',sv:'← Översikt',en:'← Overview'}[lang];
-  const map=pg.id==='do'?`<p style="margin:0"><a class="mapbtn" href="/kartta?county=HVA21">${L({fi:'Avaa Lapin pilottikartta →',sv:'Öppna pilotkartan för Lappland →',en:'Open the pilot map for Lapland →'})}</a></p>`:'';
+  const map=pg.id==='do'?`<p style="margin:0"><a class="mapbtn" href="/kartta?county=HVA21">${glue(L({fi:'Avaa Lapin pilottikartta →',sv:'Öppna pilotkartan för Lappland →',en:'Open the pilot map for Lapland →'}))}</a></p>`:'';
   const no=pg.n?`<div class="no" aria-hidden="true">${pg.n}<small>/ 4</small></div>`:'<div></div>';
   document.getElementById('pghead').innerHTML=`<p class="back"><a href="#t=ov" data-back>${back}</a></p>${no}<div><h1>${pg.n?`<span class="sr">${pg.n} / 4. </span>`:''}${L(pg.t)}</h1>${pg.d?`<p class="lead">${L(pg.d)}</p>`:''}${map}</div>`;
   document.querySelector('#pghead [data-back]').onclick=e=>{e.preventDefault();go('ov');};
@@ -664,7 +669,7 @@ function stepcards(){
     who:{fi:`Matalasti koulutetut ja muuta kieltä puhuvat. Seulontaan osallistuu ${gp} prosenttiyksikköä vähemmän.`,sv:`Lågutbildade och personer med annat språk. Deltagandet i screening är ${gp} procentenheter lägre.`,en:`People with less education or another language. Screening participation is ${gp} points lower.`},
     do:{fi:'Bussipilotti Lapissa, sairaalan TT-kutsut ensin Kymenlaaksossa ja Satakunnassa, ja pilottikartta, joka näyttää, missä sairaalan TT riittää ja missä tarvitaan bussia.',sv:'En busspilot i Lappland, inbjudningar till sjukhusets DT först i Kymmenedalen och Satakunta, och en pilotkarta som visar var sjukhusets DT räcker och var en buss behövs.',en:'A bus pilot in Lapland, hospital-CT invitations first in Kymenlaakso and Satakunta, and a pilot map that shows where a hospital CT is enough and where a bus is needed.'}};
   const open={fi:'Avaa',sv:'Öppna',en:'Open'}[lang];
-  document.getElementById('stepcards').innerHTML=NAV.filter(n=>n.n).map(n=>`<button class="stc${n.id==='do'?' dark':''}" data-go="${n.id}"><span class="num">${n.n}</span><h3>${L(n.t)}</h3><p>${L(F[n.id])}</p><span class="open">${open} →</span></button>`).join('');
+  document.getElementById('stepcards').innerHTML=NAV.filter(n=>n.n).map(n=>`<button class="stc${n.id==='do'?' dark':''}" data-go="${n.id}"><span class="num">${n.n}</span><h3>${L(n.t)}</h3><p>${L(F[n.id])}</p><span class="open">${open}&nbsp;→</span></button>`).join('');
   document.querySelectorAll('#stepcards [data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 function render(){

@@ -31,7 +31,7 @@ html{scroll-behavior:smooth}
 .stat-cap,.stat{padding-block:var(--s3);padding-inline:0 var(--s3)}
 .stat-cap{font-size:15px;font-weight:600;color:var(--ink);line-height:1.4}
 .stat{padding-inline-start:var(--s3);border-inline-start:1px solid var(--line)}
-.stat b{display:block;font-family:var(--serif);font-weight:400;font-size:44px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums;color:var(--ink)}
+.stat b{display:block;font-family:var(--sans);font-weight:600;font-size:36px;line-height:1.1;letter-spacing:-.01em;font-variant-numeric:tabular-nums lining-nums;color:var(--ink)}
 .stat span{display:block;margin-top:var(--s1);font-size:15px;color:var(--sec);line-height:1.4}
 .uk .src{margin:var(--s2) 0 0;max-width:none}
 .uk.block{padding-bottom:var(--s6)}
@@ -41,7 +41,7 @@ html{scroll-behavior:smooth}
 .join-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s6);align-items:start}
 .join-side{position:sticky;top:calc(64px + var(--s4))}
 .count{margin-top:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
-#countN{font-family:var(--serif);font-size:48px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums lining-nums;color:var(--accent)}
+#countN{font-family:var(--sans);font-weight:600;font-size:40px;line-height:1.1;letter-spacing:-.01em;font-variant-numeric:tabular-nums lining-nums;color:var(--accent)}
 .count .count-t{margin-top:var(--s1);color:var(--sec);font-size:15px}
 .count p{margin:var(--s2) 0 0;font-size:16px}
 .form-sheet{padding:var(--s5)}
@@ -83,7 +83,7 @@ form>.btn{align-self:flex-start}
   .stats{grid-template-columns:minmax(0,1fr)}
   .stat{display:flex;align-items:baseline;gap:var(--s2);padding:var(--s2) 0;border-inline-start:0;border-top:1px solid var(--line)}
   .stat:nth-child(2){border-top:0}
-  .stat b{font-size:36px;min-width:4.2ch}
+  .stat b{font-size:30px;min-width:4.2ch}
   .stat span{margin:0}
   .form-sheet{padding:var(--s3) var(--s2)}
   .hero-acts .btn{width:100%}
@@ -107,7 +107,7 @@ form>.btn{align-self:flex-start}
           <span class="tag" data-t="badge"></span>
           <span class="tag" data-t="free"></span>
         </div>
-        <p id="mtNote" class="hidden"></p>
+        <p id="mtNote" class="hidden" lang="en" dir="ltr"></p>
       </div>
       <svg class="bus" viewBox="0 0 440 250" role="img" aria-label="Polku hoitoon bus">
         <path d="M0 226H440" stroke="#22303C" stroke-width="2"/>
@@ -146,9 +146,9 @@ form>.btn{align-self:flex-start}
       </div>
       <div class="stats">
         <div class="stat-cap" data-t="stats_h"></div>
-        <div class="stat"><b>76&nbsp;%</b><span data-t="s1"></span></div>
-        <div class="stat"><b>5&nbsp;000+</b><span data-t="s2"></span></div>
-        <div class="stat"><b>2019</b><span data-t="s3"></span></div>
+        <div class="stat"><b dir="ltr">76&nbsp;%</b><span data-t="s1"></span></div>
+        <div class="stat"><b dir="ltr">5&nbsp;000+</b><span data-t="s2"></span></div>
+        <div class="stat"><b dir="ltr">2019</b><span data-t="s3"></span></div>
       </div>
       <p class="src">NHS England / GOV.UK 2023 · <a href="https://www.gov.uk/government/news/new-lung-cancer-screening-roll-out-to-detect-cancer-sooner">GOV.UK</a> · <a href="https://www.england.nhs.uk/2022/04/hundreds-of-people-diagnosed-with-cancer-early-through-life-saving-nhs-lung-checks/">NHS England</a> · Finland vs Norway: <a href="https://ihe.se/app/uploads/2026/04/IHE-Cancer-Dashboard-Finland_.pdf">IHE Cancer Dashboard Finland 2026</a></p>
     </div>

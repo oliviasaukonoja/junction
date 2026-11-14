@@ -190,7 +190,7 @@ details.fold+details.fold{margin-top:0}
 /* chat */
 .chat{display:flex;flex-direction:column;min-height:0}
 .chat h2{margin-top:var(--s1)}
-.chat .log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;margin:var(--s2) 0;min-height:120px}
+.chat .log{flex:1;overflow:auto;position:relative;border-top:1px solid var(--on-ink-line);padding-top:var(--s1);display:flex;flex-direction:column;gap:12px;margin:var(--s2) 0;min-height:120px}
 .msg{white-space:pre-wrap;font-size:14.5px;line-height:1.5}
 .msg.u{align-self:flex-end;max-width:88%;background:var(--ink-3);padding:8px 12px;border-radius:var(--r-lg)}
 .msg.a{align-self:stretch;padding:0 0 12px;border-bottom:1px solid var(--on-ink-line)}
@@ -430,7 +430,7 @@ function hullOf(pts){pts=pts.map(p=>[p[1],p[0]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1
 function drawStatic(){
   ['hull','bub','ct'].forEach(k=>G[k].clearLayers());
   D.meta.priority.forEach(c=>{
-    if(O.hull){const h=hullOf(munis(c).map(m=>[m.lat,m.lon]));if(h)L.polygon(h,{color:COL[c],weight:sel===c?2:1,opacity:.7,dashArray:'4 4',fillColor:COL[c],fillOpacity:.04,interactive:false}).addTo(G.hull)}
+    if(O.hull){const h=hullOf(munis(c).map(m=>[m.lat,m.lon]));if(h)L.polygon(h,{color:'#F2EFE8',weight:1,opacity:sel===c?.32:.16,fillColor:COL[c],fillOpacity:sel===c?.07:.03,interactive:false})   /* area outline: quiet hairline, the route colour is for the road route only */.addTo(G.hull)}
     if(O.bub)munis(c).forEach(m=>{const h=isHosp(m),unc=h&&m.ct_status!=='confirmed';
       L.circleMarker([m.lat,m.lon],{radius:3+Math.sqrt(m.eligible)*.42,color:unc?'#F2EFE8':'#0F1A24',weight:unc?1.2:.8,dashArray:unc?'2 3':null,fillColor:h?HOSP_COL:COL[c],fillOpacity:(sel&&sel!==c&&sel!=='custom')?.18:.5})
        .addTo(G.bub).bindPopup(()=>muniPop(m)).bindTooltip(esc(m.name),{direction:'top'})});
@@ -672,7 +672,8 @@ function chatRender(){
   const log=$('chatLog');log.innerHTML='';
   if(chatOK===false){const d=document.createElement('div');d.className='msg sys';d.textContent=t('chat_off');log.appendChild(d)}
   chat.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='user'?'u':'a');if(m.role==='user')d.textContent=m.content;else d.innerHTML=esc(m.content).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^#+\s*/gm,'');log.appendChild(d)});
-  log.scrollTop=log.scrollHeight;
+  const lastA=log.lastElementChild;   // show the start of the newest message, not its end
+  log.scrollTop=lastA&&lastA.classList.contains('a')?Math.max(0,lastA.offsetTop-8):log.scrollHeight;
   $('qchips').innerHTML=['q1','q2','q3'].map(q=>`<button type="button" data-q="${q}">${t(q)}</button>`).join('');
   $('qchips').querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{$('chatIn').value=t(b.dataset.q);$('chatIn').focus()}));
   $('chatSend').disabled=chatOK===false;$('chatNote').textContent=chatOK?t('chat_note'):'';
