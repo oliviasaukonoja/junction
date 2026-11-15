@@ -53,6 +53,13 @@ def facts_text(pub: dict) -> str:
         for s in b["stops"]:
             lines.append(f"  {s['n']}. {s['name']}: {s['days']} days, {s['additional']} extra, catchment eligible {s['catchment_eligible']}, {s['tt_ct_min']} min to CT {s['nearest_ct']} ({s['ct_status']}), "
                          f"role {s['kind']}, other-language {round(s['foreign_share'] * 100, 1)}%, basic-education 55-74 {round(s['basic_share'] * 100, 1)}%, in plan in {round(s.get('stability', {}).get('share', 0) * 100)}% of {c.get('scenarios')} scenarios.")
+    towns = sorted(pub.get("ct_towns", []), key=lambda x: x["town"])
+    if towns:
+        lines.append(f"\nAll {len(towns)} CT towns on the map, whole of Finland (from the researched CT-site list; 'likely' = inferred, not confirmed): "
+                     + ", ".join(f"{x['town']} ({x['status']})" for x in towns) + ".")
+        lines.append("Scope: only Lapland, Kymenlaakso and Satakunta are modelled (municipalities, risk group, travel times, routes, hospital pilots). "
+                     "A CT town elsewhere, for example Oulu, is shown on the map but no pilot can be planned around it here: say it has CT (confirmed or likely, per the list) "
+                     "and that its region is outside this map's model.")
     la = pub["counties"].get("HVA21", {}).get("bus", {}).get("totals", {})
     if la.get("additional"):
         lines.append(f"\nTeam recommendation (Polku Labs, not yours to change): bus pilot in Lapland, where travel time is the barrier ({round(100 * la['additional_far'] / la['additional'])}% of the people the bus would reach live more than an hour from a CT). "
