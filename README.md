@@ -1,37 +1,56 @@
-# Junction 2026 monorepo
+# Polku hoitoon · Junction 2026
 
-**Product direction (decided 2026-11-14).** There is no data specific to cancer types and to how the care pathway runs, so gaps in the pathway cannot be identified. The main product is therefore a **data bank**: a backend that joins pathway data by cancer type, built separate from Omakanta but designed to connect to it, with a **dashboard that gives recommendations to professionals**. Its first and largest recommendation is a **screening pilot**. The visible product is a mobile CT **bus pilot in Lapland, Kymenlaakso and Satakunta**, which the demo video features most. Built so far: the lung-screening planner and Gap finder (`ct-sim/`), the Keuhkodata dashboard (`landing-page/`) and public-data analyses. Not built: the data bank itself and any Omakanta/Kanta connection. See [ct-sim/docs/demo_script.md](ct-sim/docs/demo_script.md) for the story and the rules on what to claim.
+**Team Polku Labs** (Olivia Saukonoja, Ida Oittinen, Kristine Saralidze, Eugeniu Vezeteu) · AstraZeneca challenge *Equal Care Across Finland* · live at **[polkuhoitoon.fi](https://polkuhoitoon.fi)**
 
-Four separate components live here. Each has its own folder; only `ct-sim/` is documented in detail in the repo itself.
+Lung cancer in Finland is found late as delays build up for patients and in healthcare. We show decision-makers where, screen those most at risk, and help doctors spot it earlier.
 
-| Folder | What it is | Main author (from git) | Start here |
+## The solution
+
+| Part | For whom | What it does | Where |
 |---|---|---|---|
-| [`ct-sim/`](ct-sim/) | Mobile low-dose CT lung-cancer screening planner for Finland (AstraZeneca challenge): simulator, routing, area model, Claude analyst, map front end, gap finder, pilot design and the data analyses behind them | Ida Oittinen | [ct-sim/README.md](ct-sim/README.md), then [ct-sim/mobile_ct_screening_report.md](ct-sim/mobile_ct_screening_report.md) |
-| [`landing-page/`](landing-page/) | "Polku hoitoon" public pages and waitlist, plus the Keuhkodata dashboard, with sign-up, feedback and analyst APIs | Olivia Saukonoja, Kristine Saralidze | [landing-page/app.py](landing-page/app.py) |
-| [`calmsight/`](calmsight/) | Calmsight: an AI coach backend (`brain/`) and an Android app (`stepcloser/`) for guided fear exposure on smart glasses. The repo does not say how it relates to the AstraZeneca challenge | Kristine Saralidze | [calmsight/stepcloser/README.md](calmsight/stepcloser/README.md) |
-| [`map/`](map/) | Pilot map for the website: hospital CT and screening-bus pilot areas in Lapland, Kymenlaakso and Satakunta, with an animated bus route, per-stop explanations and a password-protected tools layer. Includes a Modal preview app | Ida Oittinen | [map/README.md](map/README.md) |
+| **Keuhkodata dashboard** | Decision-makers | Brings scattered public data into one view: age-standardised mortality by region (SMR), the care pathway, risk group, inequality. An AI analyst explains each region using only cited facts. | [`/keuhkodata`](https://polkuhoitoon.fi/keuhkodata) |
+| **Screening bus** | 50–74-year-olds who smoke or have smoked | Low-dose CT close to home, first as a randomised-invitation pilot in Lapland, with hospital-CT invitations in Kymenlaakso and Satakunta. | [`/`](https://polkuhoitoon.fi) (waitlist), [`/kartta`](https://polkuhoitoon.fi/kartta) (pilot map) |
+| **AI flagging** | Health-centre professionals | Concept: connects warning signs scattered across visits and systems and shows one flag in the doctor's view. Decision support, not diagnosis. Starts as a timeline (not a medical device); the AI flag would be a CE-marked medical device after a silent-mode study. | [`/ammattilaisille`](https://polkuhoitoon.fi/ammattilaisille) (linked from the footer only) |
 
-## ct-sim (lung screening planner)
-- Python engine in `ct-sim/src/ctsim/` (standard library only, Python 3.10 or newer), plus a local server and a map front end in `ct-sim/web/`.
-- Evidence is tagged in the report and in `ct-sim/data/analyst/facts.md`: sourced, assumed or not known.
-- Docs in `ct-sim/docs/`:
-  - `pilot_design.md`: randomised-invitation pilot and fit with the national cancer strategy.
-  - `demo_script.md`: demo flow and Q&A.
-  - `gap_analysis_and_cost.md`: gap analysis, cost and lives-saved estimates.
-  - `wait_times_syopataudit_2023_2026.md` and `incidence_by_area_2020_2024.md`: oncology queues, referrals, cancer incidence and deaths by welfare area.
-- Reproducible analysis scripts in `ct-sim/docs/analysis/`. Raw registry data in `ct-sim/data/registry/`.
+**Key numbers** (all sourced on the site): about 155 days from symptoms to treatment in Finland vs 67 in Denmark (Yle MOT 2026, unpublished); Lapland has 29% more lung cancer deaths than its age structure predicts (our SMR from Statistics Finland, 95% CI +19% to +41%); Kymenlaakso, Satakunta and East Uusimaa are also significantly above the national level.
 
-## landing-page (Polku hoitoon)
-- One Modal app (`landing-page/app.py`, app name `vayla-waitlist`) serves the pages and the APIs. Pages: `/` (bus), `/sovellus` (app), `/ammattilaisille` (professionals), `/paattajille` (decision-makers), `/keuhkodata` (the data dashboard: regions, risk, recommendation, AI analyst), `/ukk`, `/meista`, `/palaute`, `/tietosuoja`. APIs: `POST /api/signup`, `GET /api/count`, `GET /api/regions`, `POST /api/analyst`, `POST /api/feedback`. Region data is in `regions.json`. `polku-hoitoon-pitch-context.md` is the team's pitch and video context.
-- Deploy: `modal deploy app.py` from `landing-page/`. Sign-ups are stored in a Modal Volume and are readable only with your own Modal login: `python signups.py` (summary without contact details) or `python signups.py --csv` (includes names and contacts, kept out of git).
-- There is deliberately no admin page on the website.
-- The decision-makers page says this is a concept made for a hackathon challenge, not a real service. The sign-up should reserve nothing and promise no screening; keep that wording on every page (I only checked `/paattajille`).
+**Not built:** a national pathway data bank and any real Kanta connection. Every page says this is a hackathon concept: the sign-up reserves nothing and promises no screening.
 
-## calmsight
-- `brain/calmsight_brain.py`: a Modal-hosted coach backend with endpoints such as `/start`, `/turn`, `/feedback`, `/insights/{uid}` and `/glasses`. It learns per person which technique helps, using a Thompson-sampling bandit with safety guardrails. API keys live in Modal Secrets, never in the repo.
-- `stepcloser/`: the Android project (Meta Ray-Ban Display glasses or phone preview) with its own README, changelog and tests.
-- `deploy.sh` deploys the brain to Modal and pushes `calmsight/` to GitHub. `voice.sh` re-voices the guide clips.
+## Repository
+
+| Folder | What it is | Main author | Start here |
+|---|---|---|---|
+| [`landing-page/`](landing-page/) | The website and its Modal app: bus page and waitlist, Keuhkodata, professional view, FAQ, about, feedback, privacy, and the APIs | Olivia Saukonoja, Kristine Saralidze | [`landing-page/app.py`](landing-page/app.py), [`DESIGN_RULES.md`](landing-page/DESIGN_RULES.md) |
+| [`map/`](map/) | Pilot map (`/kartta`): bus routes in Lapland, Kymenlaakso and Satakunta, impact cards, AI route chat and a password-protected tools layer | Ida Oittinen | [map/README.md](map/README.md) |
+| [`ct-sim/`](ct-sim/) | Lung-screening planner: simulator, routing, area model, gap finder, pilot design and the data analyses behind the site | Ida Oittinen | [ct-sim/README.md](ct-sim/README.md), [mobile_ct_screening_report.md](ct-sim/mobile_ct_screening_report.md) |
+| [`calmsight/`](calmsight/) | Separate project: AI coach backend and Android app for guided fear exposure on smart glasses; not part of the AstraZeneca entry | Kristine Saralidze | [calmsight/stepcloser/README.md](calmsight/stepcloser/README.md) |
+
+Product framing and users: [PRODUCT.md](PRODUCT.md). Demo flow and what to claim: [ct-sim/docs/demo_script.md](ct-sim/docs/demo_script.md).
+
+## Website (`landing-page/`)
+
+One Modal app (`app.py`, app name `vayla-waitlist`), proxied to polkuhoitoon.fi through a Cloudflare Worker.
+
+- **Pages:** `/` bus and waitlist (8 languages) · `/keuhkodata` (also `/data`) · `/kartta` pilot map · `/ammattilaisille` (also `/pro`) professional view · `/ukk` · `/meista` · `/palaute` · `/tietosuoja`. `/sovellus` redirects to `/`, `/paattajille` to `/keuhkodata`.
+- **APIs:** `POST /api/signup`, `GET /api/count`, `POST /api/feedback`, `GET /api/regions`, `POST /api/analyst`, `POST /api/ai`; map chat and tools are served from `map/map_server.py`.
+- **Shared look:** `site.css` and `layout.js` (header, footer, languages). Fonts and libraries are self-hosted; no CDN at runtime.
+
+### Deploy
+
+```
+cd junction && git pull
+pip install anthropic
+python3 ct-sim/docs/analysis/build_pilot_map_data.py   # builds map/private/pilot_map_advanced.json (not in git)
+git checkout map/pilot_map.json                        # undo the script's change to the tracked file
+cd landing-page && modal deploy app.py
+```
+
+**Modal secret `polku-ai`:** `ANTHROPIC_API_KEY` (analyst and map chat; paste the full key) and `MAP_PASSWORD` (map tools; any password you choose). Without them the AI panels show their fallback messages and the map tools stay locked.
+
+**Sign-ups** live in a Modal Volume, readable only with your own Modal login: `python signups.py` (summary) or `python signups.py --csv` (includes contacts; kept out of git). There is deliberately no admin page.
 
 ## Working in this repo
-- Secrets and `.env` files are ignored; do not commit keys.
-- Pull before you push: several people commit to `main` and to short branches such as `polku-no-promise`.
+
+- Secrets and `.env` files are ignored; never commit keys.
+- Several people push to `main`: pull before you push, and keep commits small.
+- Every number on the site carries its source and a tag (observed, model or assumption). Keep it that way.
