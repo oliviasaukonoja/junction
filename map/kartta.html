@@ -215,6 +215,79 @@ details.fold+details.fold{margin-top:0}
   .legend{bottom:12px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== redesign: route cards, data cards, insights, chat ===== */
+.panel{background:#fff;border-color:var(--line)}
+.panel h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sec);margin:var(--s4) 0 var(--s1)}
+.pk{border-radius:999px;min-height:40px;background:#fff;border-color:var(--line-2)}
+.pk[aria-pressed=true]{background:var(--ink);border-color:var(--ink)}
+.pk[aria-pressed=true] .dot{box-shadow:0 0 0 2px #fff}
+.hero{border:0;gap:8px}
+.hk,.hk+.hk{background:var(--surf-2);border:0;border-radius:12px;padding:12px 12px 10px}
+.hk .n{font-size:24px}
+.rcards{display:grid;gap:10px;margin-top:var(--s2)}
+.rcard{position:relative;display:grid;gap:8px;text-align:start;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px 12px;cursor:pointer;overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s;animation:rcIn .5s var(--ease) both;animation-delay:calc(var(--i) * 80ms)}
+.rcard::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--c)}
+.rcard:hover{transform:translateY(-2px);box-shadow:0 14px 30px -18px rgba(15,26,36,.35);border-color:var(--c)}
+@keyframes rcIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rc-h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15.5px}
+.rc-go{color:var(--sec);transition:transform .25s var(--ease)}.rcard:hover .rc-go{transform:translateX(4px);color:var(--ink)}
+.rc-main{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rc-big{font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.rc-big small,.rc-ring small{display:block;font-size:12px;font-weight:400;color:var(--sec);letter-spacing:0;margin-top:4px}
+.rc-ring{display:grid;grid-template-columns:52px auto;grid-template-rows:auto auto;column-gap:8px;align-items:center}
+.rc-ring svg{grid-row:1/3}.rc-ring b{font-size:16px;font-variant-numeric:tabular-nums;align-self:end}.rc-ring small{margin:0;align-self:start;max-width:11ch;line-height:1.2}
+.rc-cov{position:relative;height:8px;border-radius:4px;background:#EEF0F0;overflow:hidden}
+.rc-cov i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#9AA3A8}
+.rc-cov i.b{background:var(--c);opacity:.9;z-index:0}.rc-cov i:not(.b){z-index:1}
+.rc-cl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--sec)}.rc-cl b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rc-f{display:flex;gap:6px;flex-wrap:wrap}.rc-f span{font-size:12px;background:var(--surf-2);border-radius:999px;padding:3px 9px;color:var(--ink);font-variant-numeric:tabular-nums}
+.insc li{background:var(--surf-2);border:0;border-radius:12px;margin:0 0 8px;padding:12px 14px 12px 34px;font-size:14px;line-height:1.45}
+.insc li::before{inset-inline-start:14px;top:18px}
+.dcards{display:grid;gap:10px}
+.dcard{border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.dc-h{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.dc-h::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c);margin-inline-end:8px}
+.dc-h{justify-content:flex-start}.dc-h span{margin-inline-start:auto;font-weight:400;font-size:13px;color:var(--sec)}.dc-h span b{color:var(--worse);font-size:15px}
+.dc-ci{position:relative;height:16px;margin:8px 0 10px}
+.dc-ci::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:#EEF0F0}
+.dc-ci .one{position:absolute;top:0;bottom:0;width:1px;background:var(--ink)}
+.dc-ci .rng{position:absolute;top:5px;height:6px;border-radius:3px;background:var(--worse);opacity:.3}
+.dc-ci .pt{position:absolute;top:2px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--worse);border:2px solid #fff;box-shadow:0 0 0 1px rgba(15,26,36,.15)}
+.dc-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.dc-g span{font-size:12px;color:var(--sec);line-height:1.3}.dc-g b{display:block;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+details.fold{border-top:1px solid var(--line)}
+#toolsSec{display:flex;align-items:center;gap:6px}
+#pwForm{background:var(--surf-2);border-radius:14px;padding:14px}
+#pwForm input{border-radius:999px;background:#fff!important}
+/* chat */
+.chatp{padding:var(--s3) var(--s2) var(--s2)}
+.ch-h{display:flex;gap:12px;align-items:flex-start;padding:0 6px}
+.ch-h h2{margin:0;text-transform:none;letter-spacing:0;font-size:16px;color:var(--ink)}
+.ch-h .sub{font-size:13px;line-height:1.4;margin-top:2px}
+.orb,.em-orb{flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#9BE2DA,var(--teal) 55%,var(--accent-d));box-shadow:0 0 0 0 rgba(43,163,154,.4);animation:orb 2.8s ease-in-out infinite}
+@keyframes orb{0%,100%{box-shadow:0 0 0 0 rgba(43,163,154,.35)}50%{box-shadow:0 0 0 9px rgba(43,163,154,0)}}
+.chat .log{border-top:0;margin:var(--s2) 0 var(--s1);padding:0 6px}
+.empty{margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;max-width:26ch;color:var(--sec);font-size:13.5px;line-height:1.45}
+.empty b{color:var(--ink);font-size:15px}
+.em-orb{width:56px;height:56px;margin-bottom:6px}
+.msg{font-size:14.5px;animation:rcIn .35s var(--ease) both}
+.msg.u{background:var(--ink);color:#fff;border-radius:16px 16px 4px 16px;padding:9px 13px}
+.msg.a{background:var(--surf-2);border:0;border-radius:16px 16px 16px 4px;padding:10px 13px;align-self:flex-start;max-width:94%}
+.msg.a.wait{color:var(--sec)}
+.msg.a.wait::after{content:"";display:inline-block;width:6px;height:6px;margin-inline-start:6px;border-radius:50%;background:var(--teal);animation:orb 1s infinite}
+.msg.sys{background:#FBF0DF;border:0;color:#6B4710;border-radius:12px;font-size:13.5px}
+.qchips{flex-direction:row;flex-wrap:wrap;gap:6px;padding:0 6px}
+.qchips button{min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;text-align:start;background:#fff;border-color:var(--line-2)}
+.qchips button:hover{background:var(--surf-2);border-color:var(--ink)}
+.pill{display:flex;align-items:flex-end;gap:6px;margin:var(--s1) 6px 0;border:1px solid var(--line-2);border-radius:22px;padding:5px 5px 5px 14px;background:#fff;transition:border-color .2s,box-shadow .2s}
+.pill:focus-within{border-color:var(--teal);box-shadow:0 0 0 4px var(--accent-t)}
+.chat .pill textarea{border:0!important;box-shadow:none!important;outline:none;min-height:36px;max-height:120px;padding:8px 0;resize:none;background:none!important;font-size:14.5px}
+.sendb{flex:none;width:38px;height:38px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background-color .2s,transform .2s}
+.sendb:hover{background:var(--accent-d);transform:translateX(1px)}
+.sendb[disabled]{background:#C9CFD1;cursor:not-allowed;transform:none}
+.chat .send{margin:4px 6px 0}
+@media (prefers-reduced-motion:reduce){.rcard,.msg{animation:none}.orb,.em-orb{animation:none}}
 </style>
 </head>
 <body data-languages="fi,sv,en">
@@ -233,12 +306,11 @@ details.fold+details.fold{margin-top:0}
     <details class="legend" id="legend"><summary data-t="legend"></summary><div id="legendBody"></div></details>
   </div>
   <aside class="panel chat chatp" id="chatPanel" aria-label="Chat">
-    <h2 data-t="chat_h"></h2>
-    <div class="sub" data-t="chat_sub"></div>
+    <div class="ch-h"><span class="orb" aria-hidden="true"></span><div><h2 data-t="chat_h"></h2><div class="sub" data-t="chat_sub"></div></div></div>
     <div class="log" id="chatLog" aria-live="polite"></div>
     <div class="qchips" id="qchips"></div>
-    <form id="chatForm"><label for="chatIn" class="sr">Question</label><textarea id="chatIn" maxlength="2000"></textarea>
-      <div class="send"><button class="btn p" type="submit" id="chatSend" data-t="send"></button><span class="sub" id="chatNote"></span></div></form>
+    <form id="chatForm"><label for="chatIn" class="sr">Question</label><div class="pill"><textarea id="chatIn" maxlength="2000" rows="1"></textarea><button class="sendb" type="submit" id="chatSend" aria-label="Send"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 10h12M10 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr" data-t="send"></span></button></div>
+      <div class="send"><span class="sub" id="chatNote"></span></div></form>
   </aside>
 </div>
 <div id="site-footer"></div>
@@ -248,7 +320,7 @@ const T={
 fi:{title:'Polku hoitoon · Pilottikartta',tagline:'Missä keuhkosyövän TT-seulontapilotit kannattaisi aloittaa?',adv:'Lisätyökalut',why_rec:'Miksi tämä suositus? Katso data →',area_note:'Reitti alueella {town} ({r} km, {n} kuntaa) on laskettu ct-sim-kansallismallilla: samat oletukset, mutta matka-ajat ovat linnuntie-arvio (×1,3, 60 km/h), eivät tiereittejä. Karkeampi kuin kolmen alueen reitit, ei tiimin suositus.',
  banner:'Konsepti, ei lupausta seulonnasta. Luvut on merkitty: havaittu julkinen data, mallinnettu arvio tai oletus. Mallin oletukset ja rajoitukset löytyvät vasemman paneelin lopusta.',
  obs:'Havaittu',mod:'Mallinnettu',ass:'Oletus',all_fi:'Koko Suomi',replay:'Toista animaatio',legend:'Selite',
- all_short:'Kaikki',imp_h:'Vaikutus',imp_sub_all:'Kolme ehdotettua bussireittiä, yksi bussi kullakin alueella. Luvut ovat mallinnettuja.',imp_extra:'lisäosallistujaa / v',imp_extra_s:'ihmisiä, joita sairaalan TT ei tavoittaisi; {s} kuvausta / v',imp_far:'asuu yli 60 min päässä TT:stä',imp_far_s:'{n} lisäosallistujaa / v',imp_buses:'bussia',imp_buses_s:'{d} työpäivää / v yhteensä',imp_cov:'kattavuuden kasvu',imp_cov_s:'riskiryhmän vuosittaisesta tarpeesta: sairaala {a} % → bussin kanssa {b} %',pp:'%-yks.',cov_h:'Sairaalan TT',cov_b:'+ bussi',imp_note:'Mallinnettu; kustannus perustuu oletuksiin. Valitse rivi avataksesi reitin.',imp_drive:'josta ajoa {d} pv',th_route:'Reitti',th_extra:'Lisää / v',th_farp:'> 60 min',th_cov:'Kattavuus',th_km:'km',th_cost:'€ / lisä',why_h:'Miksi tämä reitti',why_smoke_k:'Päivittäin tupakoivia 20–64-v.',routes_h:'Reitit',all_routes:'Kaikki kolme reittiä',all_routes_m:'Animaatio piirtää kaikki reitit. Valitse reitti nähdäksesi tiedot.',custom_route:'Oma reitti',
+ all_short:'Kaikki',rc_pp:'osallistuja',imp_h:'Vaikutus',imp_sub_all:'Kolme ehdotettua bussireittiä, yksi bussi kullakin alueella. Luvut ovat mallinnettuja.',imp_extra:'lisäosallistujaa / v',imp_extra_s:'ihmisiä, joita sairaalan TT ei tavoittaisi; {s} kuvausta / v',imp_far:'asuu yli 60 min päässä TT:stä',imp_far_s:'{n} lisäosallistujaa / v',imp_buses:'bussia',imp_buses_s:'{d} työpäivää / v yhteensä',imp_cov:'kattavuuden kasvu',imp_cov_s:'riskiryhmän vuosittaisesta tarpeesta: sairaala {a} % → bussin kanssa {b} %',pp:'%-yks.',cov_h:'Sairaalan TT',cov_b:'+ bussi',imp_note:'Mallinnettu; kustannus perustuu oletuksiin. Valitse rivi avataksesi reitin.',imp_drive:'josta ajoa {d} pv',th_route:'Reitti',th_extra:'Lisää / v',th_farp:'> 60 min',th_cov:'Kattavuus',th_km:'km',th_cost:'€ / lisä',why_h:'Miksi tämä reitti',why_smoke_k:'Päivittäin tupakoivia 20–64-v.',routes_h:'Reitit',all_routes:'Kaikki kolme reittiä',all_routes_m:'Animaatio piirtää kaikki reitit. Valitse reitti nähdäksesi tiedot.',custom_route:'Oma reitti',
  rc_meta:'{a} → {b} · {s} pysäkkiä · {km} km / kierros · {x} lisäosallistujaa / v',
  ins_h:'Havainnot',data_h:'Data',info_h:'Reitin tiedot',
  ins_far:'{r}: {p} % mallinnetuista lisäosallistujista asuu yli 60 min päässä TT:stä. Matka-aika tukee bussia.',
@@ -297,7 +369,7 @@ fi:{title:'Polku hoitoon · Pilottikartta',tagline:'Missä keuhkosyövän TT-seu
 sv:{title:'Polku hoitoon · Pilotkarta',tagline:'Var kunde piloter för CT-screening av lungcancer börja?',adv:'Extra verktyg',why_rec:'Varför den här rekommendationen? Se datan →',area_note:'Rutten kring {town} ({r} km, {n} kommuner) är beräknad med ct-sims nationella modell: samma antaganden, men restiderna är en fågelvägsuppskattning (×1,3, 60 km/h), inte vägrutter. Grövre än rutterna i de tre regionerna, ingen rekommendation från teamet.',
  banner:'Koncept, inget löfte om screening. Siffrorna är märkta: observerade offentliga data, modellerad uppskattning eller antagande. Modellens antaganden och begränsningar finns sist i vänstra panelen.',
  obs:'Observerat',mod:'Modellerat',ass:'Antagande',all_fi:'Hela Finland',replay:'Spela animationen',legend:'Teckenförklaring',
- all_short:'Alla',imp_h:'Effekt',imp_sub_all:'Tre föreslagna bussrutter, en buss per region. Siffrorna är modellerade.',imp_extra:'extra deltagare / år',imp_extra_s:'personer som sjukhus-CT inte skulle nå; {s} undersökningar / år',imp_far:'bor över 60 min från CT',imp_far_s:'{n} extra deltagare / år',imp_buses:'bussar',imp_buses_s:'{d} arbetsdagar / år totalt',imp_cov:'ökad täckning',imp_cov_s:'av riskgruppens årliga behov: sjukhus {a} % → med buss {b} %',pp:'p.e.',cov_h:'Sjukhus-CT',cov_b:'+ buss',imp_note:'Modellerat; kostnaden bygger på antaganden. Välj en rad för att öppna rutten.',imp_drive:'varav körning {d} d',th_route:'Rutt',th_extra:'Extra / år',th_farp:'> 60 min',th_cov:'Täckning',th_km:'km',th_cost:'€ / extra',why_h:'Varför den här rutten',why_smoke_k:'Dagligrökare 20–64 år',routes_h:'Rutter',all_routes:'Alla tre rutter',all_routes_m:'Animationen ritar alla rutter. Välj en rutt för detaljer.',custom_route:'Egen rutt',
+ all_short:'Alla',rc_pp:'deltagare',imp_h:'Effekt',imp_sub_all:'Tre föreslagna bussrutter, en buss per region. Siffrorna är modellerade.',imp_extra:'extra deltagare / år',imp_extra_s:'personer som sjukhus-CT inte skulle nå; {s} undersökningar / år',imp_far:'bor över 60 min från CT',imp_far_s:'{n} extra deltagare / år',imp_buses:'bussar',imp_buses_s:'{d} arbetsdagar / år totalt',imp_cov:'ökad täckning',imp_cov_s:'av riskgruppens årliga behov: sjukhus {a} % → med buss {b} %',pp:'p.e.',cov_h:'Sjukhus-CT',cov_b:'+ buss',imp_note:'Modellerat; kostnaden bygger på antaganden. Välj en rad för att öppna rutten.',imp_drive:'varav körning {d} d',th_route:'Rutt',th_extra:'Extra / år',th_farp:'> 60 min',th_cov:'Täckning',th_km:'km',th_cost:'€ / extra',why_h:'Varför den här rutten',why_smoke_k:'Dagligrökare 20–64 år',routes_h:'Rutter',all_routes:'Alla tre rutter',all_routes_m:'Animationen ritar alla rutter. Välj en rutt för detaljer.',custom_route:'Egen rutt',
  rc_meta:'{a} → {b} · {s} hållplatser · {km} km / varv · {x} extra deltagare / år',
  ins_h:'Iakttagelser',data_h:'Data',info_h:'Ruttens uppgifter',
  ins_far:'{r}: {p} % av de modellerade extra deltagarna bor över 60 min från CT. Restiden stöder bussen.',
@@ -346,7 +418,7 @@ sv:{title:'Polku hoitoon · Pilotkarta',tagline:'Var kunde piloter för CT-scree
 en:{title:'Polku hoitoon · Pilot map',tagline:'Where could lung-cancer CT screening pilots start?',adv:'Advanced tools',why_rec:'Why this recommendation? See the data →',area_note:'The route around {town} ({r} km, {n} municipalities) comes from ct-sim\'s national model: same assumptions, but travel times are a straight-line estimate (×1.3, 60 km/h), not road routes. Rougher than the three regions\' routes and not a team recommendation.',
  banner:'A concept, no promise of screening. Figures are labelled: observed public data, modelled estimate or assumption. The model\'s assumptions and limitations are at the end of the left panel.',
  obs:'Observed',mod:'Modelled',ass:'Assumption',all_fi:'All of Finland',replay:'Replay animation',legend:'Legend',
- all_short:'All',imp_h:'Impact',imp_sub_all:'Three proposed bus routes, one bus per region. Figures are modelled.',imp_extra:'extra participants / yr',imp_extra_s:'people a hospital CT would not reach; {s} scans / yr',imp_far:'live over 60 min from a CT',imp_far_s:'{n} extra participants / yr',imp_buses:'buses',imp_buses_s:'{d} working days / yr in total',imp_cov:'coverage gain',imp_cov_s:'of the risk group\'s yearly need: hospital {a}% → with the bus {b}%',pp:'pp',cov_h:'Hospital CT',cov_b:'+ bus',imp_note:'Modelled; cost rests on assumptions. Pick a row to open the route.',imp_drive:'of which driving {d} days',th_route:'Route',th_extra:'Extra / yr',th_farp:'> 60 min',th_cov:'Coverage',th_km:'km',th_cost:'€ / extra',why_h:'Why this route',why_smoke_k:'Daily smokers aged 20–64',routes_h:'Routes',all_routes:'All three routes',all_routes_m:'The animation draws every route. Pick a route for details.',custom_route:'Custom route',
+ all_short:'All',rc_pp:'participant',imp_h:'Impact',imp_sub_all:'Three proposed bus routes, one bus per region. Figures are modelled.',imp_extra:'extra participants / yr',imp_extra_s:'people a hospital CT would not reach; {s} scans / yr',imp_far:'live over 60 min from a CT',imp_far_s:'{n} extra participants / yr',imp_buses:'buses',imp_buses_s:'{d} working days / yr in total',imp_cov:'coverage gain',imp_cov_s:'of the risk group\'s yearly need: hospital {a}% → with the bus {b}%',pp:'pp',cov_h:'Hospital CT',cov_b:'+ bus',imp_note:'Modelled; cost rests on assumptions. Pick a row to open the route.',imp_drive:'of which driving {d} days',th_route:'Route',th_extra:'Extra / yr',th_farp:'> 60 min',th_cov:'Coverage',th_km:'km',th_cost:'€ / extra',why_h:'Why this route',why_smoke_k:'Daily smokers aged 20–64',routes_h:'Routes',all_routes:'All three routes',all_routes_m:'The animation draws every route. Pick a route for details.',custom_route:'Custom route',
  rc_meta:'{a} → {b} · {s} stops · {km} km per pass · {x} extra participants / yr',
  ins_h:'Insights',data_h:'Data',info_h:'Route information',
  ins_far:'{r}: {p}% of the modelled extra participants live more than 60 min from a CT. Travel time supports the bus.',
@@ -550,8 +622,13 @@ function impactHTML(){
   if(sel===null){
     const R_=P.map(routeOf),sum=f=>R_.reduce((a,r)=>a+r.totals[f],0),add=sum('additional'),far=sum('additional_far');
     return `<h2>${t('imp_h')} ${chip('mod')}</h2><div class="sub">${t('imp_sub_all')}</div><div class="hero">${hero(n0(add),t('imp_extra'),t('imp_extra_s',{s:n0(sum('scans'))}))}${hero(pc(far/(add||1))+' %',t('imp_far'),t('imp_far_s',{n:n0(far)}))}${hero(P.length,t('imp_buses'),t('imp_buses_s',{d:n0(sum('working_days'))}))}</div>
-     <table class="cmp"><thead><tr><th>${t('th_route')}</th><th>${t('th_extra')}</th><th>${t('th_farp')}</th><th>${t('th_cov')}</th><th>${t('th_km')}</th><th>${t('th_cost')}</th></tr></thead><tbody>${keys.map(k=>{const T_=routeOf(k).totals;
-       return `<tr class="click" data-sel="${k}"><td><span class="sw" style="background:${COL[k]}"></span> ${k==='custom'?t('custom_route'):esc(cn(k))}</td><td><b>${n0(T_.additional)}</b></td><td>${pc(T_.additional_far/(T_.additional||1))} %</td><td>${pc(T_.coverage_hospital_only)} → <b>${pc(T_.coverage_with_bus)} %</b></td><td>${n0(T_.path_km)}</td><td>${n0(T_.cost_per_additional_eur)}</td></tr>`}).join('')}</tbody></table>
+     <div class="rcards">${keys.map((k,i)=>{const T_=routeOf(k).totals,far=T_.additional_far/(T_.additional||1),r=17,cf=2*Math.PI*r;
+       return `<button class="rcard" type="button" data-sel="${k}" style="--c:${COL[k]};--i:${i}"><span class="rc-h"><span class="rc-n">${k==='custom'?t('custom_route'):esc(cn(k))}</span><span class="rc-go" aria-hidden="true">→</span></span>
+        <span class="rc-main"><span class="rc-big">${n0(T_.additional)}<small>${t('imp_extra')}</small></span>
+         <span class="rc-ring" title="${t('th_farp')}"><svg viewBox="0 0 44 44" width="52" height="52"><circle cx="22" cy="22" r="${r}" fill="none" stroke="#E7EAEA" stroke-width="6"/><circle cx="22" cy="22" r="${r}" fill="none" stroke="${COL[k]}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${Math.max(.01,far)*cf} ${cf}" transform="rotate(-90 22 22)"/></svg><b>${pc(far)}%</b><small>${t('th_farp')}</small></span></span>
+        <span class="rc-cov"><i style="width:${pc(T_.coverage_hospital_only)}%"></i><i class="b" style="width:${pc(T_.coverage_with_bus)}%"></i></span>
+        <span class="rc-cl"><span>${t('th_cov')}</span><b>${pc(T_.coverage_hospital_only)} → ${pc(T_.coverage_with_bus)} %</b></span>
+        <span class="rc-f"><span>${n0(T_.path_km)} km</span><span>${n0(T_.cost_per_additional_eur)} € / ${t('rc_pp')}</span></span></button>`}).join('')}</div>
      <div class="legendchips">${t('imp_note')}</div>`;
   }
   const r=routeOf(sel),T_=r.totals,col=COL[sel],far=T_.additional_far/(T_.additional||1),gain=T_.coverage_with_bus-T_.coverage_hospital_only;
@@ -563,9 +640,9 @@ function impactHTML(){
 function renderLeft(){
   const P=D.meta.priority,keys=[...P,...(CUSTOM?['custom']:[])];
   let h=`<div class="picker" role="group" aria-label="${t('routes_h')}"><button class="pk" aria-pressed="${sel===null}" data-sel="all"><span class="dot"></span>${t('all_short')}</button>${keys.map(k=>`<button class="pk" style="--c:${COL[k]}" aria-pressed="${sel===k}" data-sel="${k}"><span class="dot"></span>${k==='custom'?t('custom_route'):esc(cn(k))}</button>`).join('')}</div>`;
-  if(sel!==null&&sel!=='custom')h+=`<p class="sub" style="margin:12px 0 0"><a href="/keuhkodata#t=do">${t('why_rec')}</a></p>`;
+  if(sel!==null&&sel!=='custom')h+=`<p class="sub" style="margin:12px 0 0"><a href="/keuhkodata">${t('why_rec')}</a></p>`;
   h+=impactHTML();
-  h+=`<h2>${t(sel===null?'ins_h':'why_h')}</h2><ul class="ins">${(sel===null?P.map(k=>insights(k,true)):[insights(sel)]).join('')}</ul>`;
+  h+=`<h2>${t(sel===null?'ins_h':'why_h')}</h2><ul class="ins insc">${(sel===null?P.map(k=>insights(k,true)):[insights(sel)]).join('')}</ul>`;
   if(sel!==null){const r=routeOf(sel),col=COL[sel];
     if(sel==='custom'&&r.area)h+=`<div class="notice">${t('area_note',{town:esc(r.area.town),r:n0(r.area.radius_km),n:r.area.municipalities})}</div>`;
     if(r.schematic_legs)h+=`<div class="notice">${t('schem',{n:r.schematic_legs})}</div>`;
@@ -575,9 +652,11 @@ function renderLeft(){
   }
   h+=`<h2>${t('data_h')}</h2>`;
   if(sel===null||sel==='custom'){
-    h+=`<table><thead><tr><th>${t('th_region')}</th><th>${t('th_pop50')}</th><th>${t('th_elig')}</th><th>${t('th_deaths')}</th><th>${t('th_smr')}</th><th>${t('th_inc')}</th></tr></thead><tbody>`+
-      P.map(c=>{const f=D.counties[c].facts;return `<tr><td><span class="sw" style="background:${COL[c]}"></span> ${esc(cn(c))}</td><td>${n0(f.pop_50_74)}</td><td>~${n0(D.counties[c].model.eligible)}</td><td>${n0(f.lung_deaths_per_year)}</td><td>${n2(f.smr.smr)}</td><td>${n0(f.lung_asr.men)} / ${n0(f.lung_asr.women)}</td></tr>`}).join('')+
-      `</tbody></table><div class="legendchips"><span>${t('th_pop50')}, ${t('th_deaths')}, ${t('th_smr')}, ${t('th_inc')}: ${chip('obs')}</span><span>${t('th_elig')}: ${chip('mod')}</span></div>`;
+    const mx=Math.max(...P.map(c=>D.counties[c].facts.smr.hi));
+    h+=`<div class="dcards">`+P.map(c=>{const f=D.counties[c].facts,X=v=>((v-.8)/(mx-.8+.05))*100;
+      return `<div class="dcard" style="--c:${COL[c]}"><div class="dc-h">${esc(cn(c))}<span>SMR <b>${n2(f.smr.smr)}</b></span></div>
+       <div class="dc-ci"><i class="one" style="left:${X(1)}%"></i><i class="rng" style="left:${X(f.smr.lo)}%;width:${X(f.smr.hi)-X(f.smr.lo)}%"></i><i class="pt" style="left:${X(f.smr.smr)}%"></i></div>
+       <div class="dc-g"><span><b>${n0(f.pop_50_74)}</b>${t('th_pop50')}</span><span><b>~${n0(D.counties[c].model.eligible)}</b>${t('th_elig')}</span><span><b>${n0(f.lung_deaths_per_year)}</b>${t('th_deaths')}</span><span><b>${n0(f.lung_asr.men)} / ${n0(f.lung_asr.women)}</b>${t('th_inc')}</span></div></div>`}).join('')+`</div>`;
   }else{const c=D.counties[sel],f=c.facts;
     h+=`<div class="kpis">${kpi(n0(f.pop_50_74),t('th_pop50'),'',"obs")}${kpi('~'+n0(c.model.eligible),t('th_elig'),'','mod')}${kpi(n0(f.lung_deaths_per_year),t('th_deaths'),'2021–25','obs')}${kpi(n2(f.smr.smr),t('th_smr'),`95 %: ${n2(f.smr.lo)}–${n2(f.smr.hi)}`,'obs')}${kpi(n0(f.lung_asr.men)+' / '+n0(f.lung_asr.women),t('th_inc'),'2020–24 / 100 000','obs')}${kpi(n1(f.smoking_20_64)+' %',t('why_smoke_k'),'THL 2024','obs')}</div>`}
   if(sel!==null)h+=`<div style="margin-top:16px"><button class="btn" type="button" data-sel="all">${t('back')}</button></div>`;
@@ -595,7 +674,7 @@ function renderLeft(){
   bindLeft();
 }
 function bindLeft(){
-  $('left').querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.sel==='all'?null:b.dataset.sel)));
+  $('left').querySelectorAll('[data-sel]').forEach(b=>b.addEventListener('click',()=>{select(b.dataset.sel==='all'?null:b.dataset.sel);$('left').scrollTo({top:0,behavior:'smooth'})}));
   $('left').querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{const r=routeOf(sel),s=r.stops.find(x=>x.n===+b.dataset.fly);if(s){map.flyTo([s.lat,s.lon],Math.max(map.getZoom(),9),{duration:.6});setActive(s.n,false)}}));
   $('left').querySelectorAll('.stop').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)setActive(+d.dataset.n,false)}));
   bindTools();
@@ -678,7 +757,8 @@ async function loadAdv(){try{const r=await fetch('/api/map/advanced',{headers:{'
 function chatRender(){
   const log=$('chatLog');log.innerHTML='';
   if(chatOK===false){const d=document.createElement('div');d.className='msg sys';d.textContent=t('chat_off');log.appendChild(d)}
-  chat.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='user'?'u':'a');if(m.role==='user')d.textContent=m.content;else d.innerHTML=esc(m.content).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^#+\s*/gm,'');log.appendChild(d)});
+  if(!chat.length){const d=document.createElement('div');d.className='empty';const E={fi:['Kysy, niin piirrän','Pyydä esimerkiksi reitti Oulun ympärille tai laske sairaalapilotin koko. Vastaus näkyy kartalla.'],sv:['Fråga, så ritar jag','Be till exempel om en rutt runt Uleåborg eller storleken på en sjukhuspilot. Svaret syns på kartan.'],en:['Ask, and I draw it','For example: a route around Oulu, or the size of a hospital pilot. The answer appears on the map.']}[lang]||[];d.innerHTML=`<div class="em-orb"></div><b>${E[0]}</b><span>${E[1]}</span>`;log.appendChild(d)}
+  chat.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='user'?'u':'a')+(m.content===t('chat_wait')?' wait':'');if(m.role==='user')d.textContent=m.content;else d.innerHTML=esc(m.content).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^#+\s*/gm,'');log.appendChild(d)});
   const lastA=log.lastElementChild;   // show the start of the newest message, not its end
   log.scrollTop=lastA&&lastA.classList.contains('a')?Math.max(0,lastA.offsetTop-8):log.scrollHeight;
   $('qchips').innerHTML=[...(token&&ADV?['q4']:[]),'q1','q2','q3'].map(q=>`<button type="button" data-q="${q}">${t(q)}</button>`).join('');
@@ -707,7 +787,7 @@ async function sendChat(e){
 function applyLang(){
   document.documentElement.lang=lang;$('lang').value=lang;try{localStorage.setItem('vayla-lang',lang)}catch(e){}
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));document.title=t('title');
-  $('chatIn').placeholder=t('q2');if(D){drawStatic();renderLeft()}chatRender();
+  $('chatIn').placeholder={fi:'Kysy reiteistä…',sv:'Fråga om rutterna…',en:'Ask about the routes…'}[lang]||'Ask about the routes…';if(D){drawStatic();renderLeft()}chatRender();
 }
 $('lang').addEventListener('change',e=>{lang=e.target.value;applyLang()});
 $('allBtn').addEventListener('click',()=>select(null));
