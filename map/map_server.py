@@ -53,6 +53,13 @@ def facts_text(pub: dict) -> str:
         for s in b["stops"]:
             lines.append(f"  {s['n']}. {s['name']}: {s['days']} days, {s['additional']} extra, catchment eligible {s['catchment_eligible']}, {s['tt_ct_min']} min to CT {s['nearest_ct']} ({s['ct_status']}), "
                          f"role {s['kind']}, other-language {round(s['foreign_share'] * 100, 1)}%, basic-education 55-74 {round(s['basic_share'] * 100, 1)}%, in plan in {round(s.get('stability', {}).get('share', 0) * 100)}% of {c.get('scenarios')} scenarios.")
+    towns = sorted(pub.get("ct_towns", []), key=lambda x: x["town"])
+    if towns:
+        lines.append(f"\nAll {len(towns)} CT towns on the map, whole of Finland (from the researched CT-site list; 'likely' = inferred, not confirmed): "
+                     + ", ".join(f"{x['town']} ({x['status']})" for x in towns) + ".")
+        lines.append("Scope: Lapland, Kymenlaakso and Satakunta are modelled in detail (municipality data, OpenStreetMap road times, recommended routes; the figures above). "
+                     "Anywhere else, for example around Oulu, a pilot can be planned with the tools using ct-sim's national model: same eligibility, uptake and cost "
+                     "assumptions, but travel times are a straight-line estimate (x1.3 at 60 km/h). Such results are rougher what-ifs and not a team recommendation; say so.")
     la = pub["counties"].get("HVA21", {}).get("bus", {}).get("totals", {})
     if la.get("additional"):
         lines.append(f"\nTeam recommendation (Polku Labs, not yours to change): bus pilot in Lapland, where travel time is the barrier ({round(100 * la['additional_far'] / la['additional'])}% of the people the bus would reach live more than an hour from a CT). "
@@ -93,9 +100,15 @@ def register_api(api, pub: dict, advanced_json: bytes):
     county = {"type": "string", "enum": list(E.PRIORITY)}
     TOOLS = [
         {"name": "plan_route", "description": "Build a what-if screening-bus route with the same route engine and modelled assumptions as the recommended routes. "
-         "Returns the ordered stops and modelled totals (extra participants, scans, km, working days, cost). The map draws the result.",
-         "input_schema": {"type": "object", "additionalProperties": False, "required": ["counties"], "properties": {
-             "counties": {"type": "array", "items": county, "minItems": 1, "maxItems": 3, "description": "Regions the bus serves: HVA21 Lapland, HVA10 Kymenlaakso, HVA06 Satakunta."},
+         "Two modes: (a) counties = one or more of the three modelled regions (road travel times from OpenStreetMap); (b) around_town = any Finnish municipality, "
+         "e.g. Oulu, with radius_km: ct-sim's national model, where travel times are a straight-line estimate (x1.3 at 60 km/h), so results are rougher. "
+         "Use (b) for any place outside Lapland, Kymenlaakso and Satakunta. Returns the ordered stops and modelled totals (extra participants, scans, km, "
+         "working days, cost). The map draws the result.",
+         "input_schema": {"type": "object", "additionalProperties": False, "properties": {
+             "counties": {"type": "array", "items": county, "minItems": 1, "maxItems": 3, "description": "Mode (a): regions the bus serves: HVA21 Lapland, HVA10 Kymenlaakso, HVA06 Satakunta."},
+             "around_town": {"type": "string", "description": "Mode (b): centre municipality (exact Finnish name, e.g. Oulu, Kajaani, Joensuu)."},
+             "radius_km": {"type": "number", "description": "Mode (b): include municipalities within this road-estimate distance of around_town. Default 100, range 30-200."},
+             "own_region_only": {"type": "boolean", "description": "Mode (b): keep only municipalities in around_town's own wellbeing services county (default true; a pilot is run by one county). Set false only if the user asks to cross county borders."},
              "start": {"type": "string", "description": "Optional first stop (exact municipality name). Omit to let the engine choose."},
              "exclude": {"type": "array", "items": {"type": "string"}, "description": "Municipalities to leave out (exact names)."},
              "hospital_minutes": {"type": "number", "description": "Drive time (min) under which people are invited to hospital CT instead of the bus. Default 45, range 15-120."},
@@ -106,19 +119,26 @@ def register_api(api, pub: dict, advanced_json: bytes):
         {"name": "hospital_scenario", "description": "Size a hospital or clinic CT pilot around one CT town: municipalities within the drive-time limit whose nearest CT is that town, "
          "estimated risk-group people, invitations and expected scans per year. Capacity is not in the data; slots_per_week is the user's assumption. The map draws the invitation area.",
          "input_schema": {"type": "object", "additionalProperties": False, "required": ["town"], "properties": {
-             "town": {"type": "string", "description": "CT town (exact name from the CT towns in MAP DATA)."},
+             "town": {"type": "string", "description": "CT town (exact name from the list of all CT towns in MAP DATA, any region). Outside the three regions travel times are a straight-line estimate."},
              "hospital_minutes": {"type": "number", "description": "Invitation area as drive time in minutes. Default 45, range 15-120."},
              "slots_per_week": {"type": "number", "description": "Optional reserved screening slots per week (an assumption)."}}}},
     ]
 
     def route_brief(r):    # what the model reads back: no geometry
         return {"spec": r["spec"], "start": r["start"], "end": r["end"], "totals": r["totals"], "counties": r.get("counties"),
+                "area": {k: v for k, v in (r.get("area") or {}).items() if k != "names"} or None,
                 "stops": [{k: s.get(k) for k in ("n", "name", "days", "additional", "kind", "tt_ct_min", "nearest_ct")} for s in r["stops"]]}
 
     def run_tool(name, args, out):
         try:
             if name == "plan_route":
-                r = E.plan(args, geometry=True, fetch=True, max_fetch=25); out["route"] = r; return json.dumps(route_brief(r), ensure_ascii=False), False
+                if args.get("around_town"):
+                    a = {k: v for k, v in args.items() if k not in ("around_town", "counties")}
+                    r = E.plan_area(dict(a, town=args["around_town"]), geometry=True, fetch=True, max_fetch=25)
+                else:
+                    if not args.get("counties"): return "Error: give counties (the three regions) or around_town (any municipality).", True
+                    r = E.plan(args, geometry=True, fetch=True, max_fetch=25)
+                out["route"] = r; return json.dumps(route_brief(r), ensure_ascii=False), False
             if name == "hospital_scenario":
                 h = E.hospital_scenario(args); out["hospital"] = h; return json.dumps(h, ensure_ascii=False), False
             return f"Unknown tool {name}", True
@@ -150,6 +170,9 @@ def register_api(api, pub: dict, advanced_json: bytes):
             system.append({"type": "text", "text": "The tools plan_route and hospital_scenario are not available in this session: the map's advanced tools are locked. "
                            "If the user asks you to build or change a route or size a hospital pilot, say in one sentence that this needs the password-protected "
                            "Advanced tools (the lock button above the map), then answer from MAP DATA what you can."})
+        else:   # the user may have unlocked mid-conversation: earlier answers that said "locked" were right at the time, so don't retract them
+            system.append({"type": "text", "text": "The map's password-protected Advanced tools are unlocked in this session, so plan_route and hospital_scenario are "
+                           "available. If an earlier answer said they were locked, that was before the user unlocked them: do not call it a mistake, just use the tools."})
         import anthropic
         client = anthropic.Anthropic(timeout=90.0)
         out, text = {}, ""
