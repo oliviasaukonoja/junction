@@ -11,6 +11,7 @@ There is deliberately no admin page on the website: sign-ups are only
 readable by someone logged in to the Modal account.
 """
 import json
+import time
 import os
 import re
 import threading
@@ -48,6 +49,7 @@ if modal:
         .add_local_file(MAP / "vendor/leaflet.css", "/root/leaflet.css")
         .add_local_file(HERE / "team.jpg", "/root/team.jpg")
         .add_local_file(HERE / "regions.json", "/root/regions.json")
+        .add_local_file(HERE / "ai_engine.py", "/root/ai_engine.py")
         .add_local_file(HERE / "vendor/chart.umd.js", "/root/chart.umd.js")
         .add_local_dir(HERE / "fonts", "/root/fonts")
         # map API (same layout as the repo, so map/route_engine.py finds ct-sim/ and landing-page/regions.json)
@@ -205,6 +207,50 @@ C) Risk-group low-dose CT screening bus (age 50-74, heavy smokers), started as a
 - Estimated risk group about 120,000 people nationally (7% of 50-74-year-olds): smoking rates times an assumed factor, because Finnish pack-year data does not exist. [Polku Labs estimate from THL Sotkanet; assumption]
 - In Finnish cancer screening (breast, colorectal, cervical 2024), participation is about 20 points lower for people whose native language is not Finnish, Swedish or Sami, and lower with basic education; the lowest regional participation is in the capital region. These are other screening programmes, so whether distance or language is the bigger barrier for lung CT is not known; the pilot measures uptake by both. Lapland, the most remote region, has the highest excess lung cancer mortality. [Finnish Cancer Registry screening statistics 2024; Polku Labs SMR calculation]
 RECOMMENDATIONS ARE MADE BY THE POLKU LABS TEAM, NOT BY YOU. The team's recommendation, shown on the page: bus pilot (C) in Lapland, where travel time is the barrier (47% of the people the bus would reach live more than an hour from a CT) [Polku Labs pilot map; modelled]. In Kymenlaakso and Satakunta start with hospital-CT invitations; a bus would mainly add capacity, which is an assumption. For other regions the team makes no recommendation; follow the metrics. Your job is to explain the gap and the evidence. Do not propose actions of your own; if asked what to do, restate this recommendation and say it is the team's recommendation."""
+
+    # ---- AI analyst: an agent over the data with tools; numbers checked; rule-based fallback for the presets ----
+    sys.path.insert(0, str(src("ai_engine.py").parent))
+    import ai_engine
+    ai_data = ai_engine.Data(data_page, json.loads(map_data))
+    agent_cache = {}
+
+    @api.post("/api/ai")
+    def ai(body: dict = Body(...)):
+        import httpx
+        lang = body.get("lang") if body.get("lang") in ("fi", "sv", "en") else "en"
+        preset = body.get("preset") if body.get("preset") in ai_engine.PRESETS else None
+        question = str(body.get("question") or "").strip()[:400]
+        region = body.get("region") if body.get("region") in ai_data.regions else None
+        if not question and not preset:
+            raise HTTPException(status_code=400, detail="ask a question")
+        key = (preset, question, lang, region)
+        if key in agent_cache:
+            return {**agent_cache[key], "cached": True}
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        now = time.time()
+        ai_calls[:] = [t for t in ai_calls if now - t < 3600]
+        out = None
+        if api_key and len(ai_calls) < 120:
+            q = question or {"first_pilot": "Where should Finland's first lung cancer screening pilot go, and why?",
+                             "distance": "In which regions is distance to a CT scanner the main barrier?",
+                             "smoking_mortality": "Where are smoking and lung cancer mortality both high?",
+                             "screening_reach": "Where does screening reach people worst?"}[preset]
+            for model in (os.environ.get("POLKU_MODEL", "claude-sonnet-5-5"), "claude-haiku-5-5"):
+                try:
+                    out = ai_engine.run_agent(ai_data, q, lang, api_key, httpx.post, model, region)
+                    ai_calls.append(now)
+                    break
+                except Exception as e:
+                    print("ai agent error:", model, repr(e)[:300])
+        if out is None and preset:
+            out = ai_engine.run_rules(ai_data, preset, lang)
+            out["offline"] = not api_key
+        if out is None:
+            raise HTTPException(status_code=503, detail="ai not configured" if not api_key else "ai unavailable")
+        if len(agent_cache) > 300:
+            agent_cache.clear()
+        agent_cache[key] = out
+        return out
 
     @api.get("/api/regions")
     def api_regions():

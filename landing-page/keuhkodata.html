@@ -157,6 +157,52 @@ main{padding-bottom:var(--s10)}
 }
 @media (prefers-reduced-motion:reduce){.brief.swap{animation:none}.dots i{animation:none}}
 
+/* ---- AI analyst ---- */
+.ai2{margin-top:var(--s4);border:1px solid var(--line-2);border-radius:var(--r-lg);background:#fff;padding:var(--s3);box-shadow:0 1px 0 rgba(15,26,36,.03),0 8px 28px -18px rgba(15,26,36,.25)}
+.ai2h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.ai2h b{font-size:16px}
+.ai2h span:last-child{font-size:13px;color:var(--sec)}
+.pulse{width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 0 rgba(43,163,154,.5);animation:aipulse 2s infinite}
+@keyframes aipulse{0%{box-shadow:0 0 0 0 rgba(43,163,154,.45)}70%{box-shadow:0 0 0 9px rgba(43,163,154,0)}100%{box-shadow:0 0 0 0 rgba(43,163,154,0)}}
+#aiF{display:flex;gap:var(--s1);margin-top:var(--s2)}
+#aiF input{flex:1;min-width:0}
+.ai2qs{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s1)}
+.ai2qs button{font:inherit;font-size:14px;text-align:start;min-height:36px;padding:6px 12px;border:1px solid var(--line-2);background:#fff;border-radius:999px;cursor:pointer;color:var(--ink)}
+.ai2qs button:hover{border-color:var(--ink)}
+.ai2qs button[aria-pressed=true]{background:var(--accent-t);border-color:var(--teal)}
+.ai2out{margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s2)}
+.trail{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:12.5px;color:var(--sec)}
+.trail li{display:flex;gap:8px;align-items:center;padding:3px 0;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
+.trail li.in{opacity:1;transform:none}
+.trail li::before{content:"";width:14px;height:14px;flex:none;border-radius:50%;background:var(--accent-t) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M4 7.2l2 2 4-4.4' fill='none' stroke='%231D7C75' stroke-width='1.6'/%3E%3C/svg%3E") center no-repeat}
+.trail li.run::before{background:none;border:2px solid var(--teal);border-right-color:transparent;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.aimeta{display:flex;flex-wrap:wrap;gap:6px 14px;margin:var(--s1) 0 0;font-family:var(--mono);font-size:12px;color:var(--ink)}
+.aimeta span{background:var(--surf-2);border-radius:3px;padding:3px 7px}
+.aians{font-family:var(--serif);font-size:20px;line-height:1.4;margin:var(--s2) 0 0}
+.finds{list-style:none;margin:var(--s2) 0 0;padding:0;display:grid;gap:var(--s1)}
+.finds li{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font-size:14.5px;line-height:1.45;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.finds li.in{opacity:1;transform:none}
+.finds .ck{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 6px;border-radius:2px;margin-inline-end:6px;vertical-align:1px}
+.finds .ck.ok{background:var(--accent-t);color:var(--accent-d)}
+.finds .ck.no{background:#FBF0DF;color:#8A5A12}
+.finds .src{display:block;font-family:var(--mono);font-size:11px;color:var(--sec);margin-top:4px}
+.finds .rk{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:700;margin-inline-end:6px}
+.aiunk{margin-top:var(--s2);font-size:13.5px;color:var(--sec)}
+.aiunk b{color:var(--ink);font-weight:600}
+.aimode{margin-top:var(--s1);font-size:12px;color:var(--sec)}
+.globe .lbl b .rkn{display:inline-grid;vertical-align:-3px;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;margin-inline-end:4px;font-family:var(--sans)}
+.globe .lbl.mk{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+@media (max-width:1100px){
+  .ovhead{grid-template-columns:1fr;min-height:0;gap:0}
+  .ovtext{display:contents}
+  .ovtext h1{padding-top:var(--s6)}
+  .ai2{order:2}.regpick{order:3;margin-bottom:var(--s2)}.globe{order:4;position:relative;top:auto;height:auto;min-height:0;margin-inline:calc(-1 * var(--s2))}.brief{order:5;margin-bottom:var(--s4)}
+  .globe .stage{flex:none;min-height:0;height:min(110vw,620px)}
+  .mapcap{margin:0 var(--s2) var(--s4);max-width:none}
+}
+@media (prefers-reduced-motion:reduce){.pulse,.trail li.run::before{animation:none}.trail li,.finds li{transition:none}}
+
 .stephead{padding:var(--s8) 0 var(--s6);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:var(--s4);align-items:start}
 .stephead .no{font-family:var(--serif);font-size:clamp(56px,7vw,96px);line-height:.85;color:var(--accent-l);font-variant-numeric:lining-nums}
 .stephead .no small{font-family:var(--mono);font-size:12px;color:var(--on-ink-2);display:block;margin-top:var(--s1);letter-spacing:0}
@@ -280,6 +326,12 @@ th{color:var(--sec);font-weight:500;font-size:13px}
         <div class="ovtext">
           <h1 data-t="h1">Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin</h1>
           <p class="lead" data-t="lead"></p>
+          <section class="ai2" id="ai2" aria-labelledby="aiTitle">
+            <div class="ai2h"><span class="pulse" aria-hidden="true"></span><b id="aiTitle"></b><span id="aiSub"></span></div>
+            <form id="aiF"><input type="text" id="aiI" maxlength="400" autocomplete="off"><button class="btn sm" type="submit" id="aiGo"></button></form>
+            <div class="ai2qs" id="aiQs"></div>
+            <div class="ai2out hidden" id="aiOut" aria-live="polite"></div>
+          </section>
           <div class="regpick"><label for="region" id="regionLbl"></label><select id="region"></select><div class="chips" id="chips"></div></div>
           <article class="brief" id="brief" aria-live="polite"></article>
         </div>
@@ -311,9 +363,9 @@ const nmN = c => (NOM[lang]&&NOM[lang][c])||nm(c);
 const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
 
 const T = {
- fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin',lead:'Valitse alue kartalta. Näet yhdellä silmäyksellä, mikä ero on, missä kohtaa hoitopolkua se syntyy, ketä se koskee ja mitä tehdään. Jokaisella luvulla on lähde.',tab_dash:'Tilannekuva',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',ai_btn:'Selitä alueen tilanne tekoälyllä',ai_hint:'Tekoäly (Claude) käyttää vain tämän sivun lähdetietoja ja voi erehtyä. Suositukset ovat tiimin, ei tekoälyn.',ai_err:'Analyysi ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.',ai_wait:'Tekoäly kirjoittaa…',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
- sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer upptäcks för sent i Finland, och mest hos dem som vården når sämst',lead:'Välj ett område på kartan. Du ser direkt vad skillnaden är, var i vårdkedjan den uppstår, vem den gäller och vad man gör. Varje siffra har en källa.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
- en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer is found too late in Finland, most of all among people care reaches worst',lead:'Pick a region on the map. In one view: what the gap is, where on the care pathway it forms, who it affects and what to do. Every number has a source.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
+ fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin',lead:'Kysy tekoälyanalyytikolta tai valitse alue kartalta: mikä ero on, missä kohtaa hoitopolkua se syntyy, ketä se koskee ja mitä tehdään. Jokainen luku tarkistetaan lähdedataa vasten.',tab_dash:'Tilannekuva',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',ai_btn:'Selitä alueen tilanne tekoälyllä',ai_hint:'Tekoäly (Claude) käyttää vain tämän sivun lähdetietoja ja voi erehtyä. Suositukset ovat tiimin, ei tekoälyn.',ai_err:'Analyysi ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.',ai_wait:'Tekoäly kirjoittaa…',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
+ sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer upptäcks för sent i Finland, och mest hos dem som vården når sämst',lead:'Fråga AI-analytikern eller välj ett område på kartan: vad skillnaden är, var i vårdkedjan den uppstår, vem den gäller och vad man gör. Varje siffra kontrolleras mot källdatan.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
+ en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer is found too late in Finland, most of all among people care reaches worst',lead:'Ask the AI analyst or pick a region on the map: what the gap is, where on the care pathway it forms, who it affects and what to do. Every number is checked against the source data.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
 };
 const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
 const t = k => T[lang][k];
@@ -784,7 +836,7 @@ function setRegion(c){
   const sel=document.getElementById('region');if(sel)sel.value=c;
   document.querySelectorAll('#chips button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===c));
   if(HERO.view&&HERO.view.select)HERO.view.select(c);
-  heroCaption();syncHash();brief(true);
+  heroCaption();syncHash();brief(true);aiPanel();
   const h=document.getElementById('globeHint');if(h)h.style.opacity=0;
 }
 function ciBar(S){
@@ -837,15 +889,9 @@ function brief(anim){
     <div class="go"><a class="mapbtn" href="/kartta?county=${c}">${glue(b.open(nmR))}</a></div>`:''}
     <div class="s">${b.team} ${piloted?src(['pilot','team']):src(['team'])}</div></div></div>`;
   // AI
-  const nmA=nmR;
-  const ask=REGNAME(c)?`<div class="ask"><h3><i></i>${b.askH(nmA)}</h3>
-    <div class="qs">${b.q.map((f,i)=>`<button type="button" data-q="${i}">${f(nmA)}</button>`).join('')}<button type="button" data-q="b">${b.brief}</button></div>
-    <form id="askF"><input type="text" id="askI" placeholder="${b.ph}" maxlength="300" aria-label="${b.ph}"><button class="btn sm" type="submit">${b.send}</button></form>
-    <div id="askO"></div><p class="note2">${b.aiNote}</p></div>`:'';
+  const ask='';
   el.innerHTML=`<div class="bhead"><h2>${nmR}</h2><span class="verdict ${vd}"><i></i>${b.v[vd]}</span></div>${r1}${r2}${r3}${r4}${ask}`;
   if(anim){el.classList.remove('swap');void el.offsetWidth;el.classList.add('swap');}
-  el.querySelectorAll('[data-q]').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.q;askAI(k==='b'?'':b.q[+k](nmA),btn.textContent);});
-  const fm=document.getElementById('askF');if(fm)fm.onsubmit=e=>{e.preventDefault();const v=document.getElementById('askI').value.trim();if(v)askAI(v,v);};
 }
 async function askAI(question,label){
   const out=document.getElementById('askO');if(!out)return;const my=++aiSeq;
@@ -863,7 +909,73 @@ async function askAI(question,label){
 function typeOut(node,text,my){let i=0;const step=()=>{if(my!==aiSeq)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/90)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(step);};
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;return;}step();}
 const esc2=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function snapHTML(){regionSelect();brief(false);const b=B();
+
+/* ================= AI analyst (agent over the data; numbers checked) ================= */
+const AT={
+ fi:{t:'Tekoälyanalyytikko',sub:'analysoi kaikki 22 aluetta avoimesta datasta',ph:'Kysy keuhkosyövän eroista Suomessa…',go:'Analysoi',
+   p:{first_pilot:'Minne ensimmäinen pilotti?',distance:'Missä etäisyys on este?',smoking_mortality:'Missä tupakointi ja kuolleisuus ovat molemmat korkeita?',screening_reach:'Missä seulonta tavoittaa huonoiten?'},
+   reg:r=>`Mikä alueella ${r} on vialla?`,run:'Analysoidaan…',regions:n=>`${n} aluetta analysoitu`,calls:n=>`${n} työkalukutsua`,sec:x=>`${x} s`,nums:n=>`${n} lukua tarkistettu`,
+   ok:'✓ tarkistettu',no:'⚠ tarkistamaton',unk:'Ei tiedetä:',ai:'Tekoäly (Claude) analysoi datan työkaluilla. Jokainen luku tarkistetaan lähdedataa vasten.',rules:'Sääntöpohjainen analyysi (tekoäly ei ole juuri nyt käytössä). Samat työkalut ja tarkistukset.',
+   off:'Tekoäly ei ole päällä tällä palvelimella. Kokeile valmiita kysymyksiä: ne toimivat aina.',err:'Analyysi ei onnistunut juuri nyt. Valmiit kysymykset toimivat aina.',src:'Lähde'},
+ sv:{t:'AI-analytiker',sub:'analyserar alla 22 områden ur öppna data',ph:'Fråga om lungcancerskillnader i Finland…',go:'Analysera',
+   p:{first_pilot:'Var ska första piloten vara?',distance:'Var är avståndet hindret?',smoking_mortality:'Var är både rökning och dödlighet höga?',screening_reach:'Var når screeningen sämst?'},
+   reg:r=>`Vad är problemet i ${r}?`,run:'Analyserar…',regions:n=>`${n} områden analyserade`,calls:n=>`${n} verktygsanrop`,sec:x=>`${x} s`,nums:n=>`${n} siffror kontrollerade`,
+   ok:'✓ kontrollerad',no:'⚠ ej kontrollerad',unk:'Okänt:',ai:'AI (Claude) analyserar datan med verktyg. Varje siffra kontrolleras mot källdatan.',rules:'Regelbaserad analys (AI är inte tillgänglig just nu). Samma verktyg och kontroller.',
+   off:'AI är inte påslagen på den här servern. Prova de färdiga frågorna: de fungerar alltid.',err:'Analysen lyckades inte just nu. De färdiga frågorna fungerar alltid.',src:'Källa'},
+ en:{t:'AI analyst',sub:'analyses all 22 regions from the open data',ph:'Ask about lung cancer gaps in Finland…',go:'Analyse',
+   p:{first_pilot:'Where should the first pilot go?',distance:'Where is distance the barrier?',smoking_mortality:'Where are smoking and mortality both high?',screening_reach:'Where does screening reach people worst?'},
+   reg:r=>`What is wrong in ${r}?`,run:'Analysing…',regions:n=>`${n} regions analysed`,calls:n=>`${n} tool calls`,sec:x=>`${x} s`,nums:n=>`${n} numbers checked`,
+   ok:'✓ verified',no:'⚠ unverified',unk:'Not known:',ai:'AI (Claude) analysed the data with tools. Every number is checked against the source data.',rules:'Rule-based analysis (the AI is not available right now). Same tools, same checks.',
+   off:'The AI is not switched on on this server. Try the ready questions: they always work.',err:'The analysis did not work just now. The ready questions always work.',src:'Source'}
+};
+const A=()=>AT[lang]||AT.en;
+const IND={fi:{smr:'keuhkosyöpäkuolleisuus (SMR)',excess_deaths:'ylimääräiset kuolemat',daily_smokers:'päivittäinen tupakointi',risk_group_share:'riskiryhmän osuus',risk_group_people:'riskiryhmän koko',screening_breast:'rintasyöpäseulontaan osallistuminen',screening_colorectal:'suolistosyöpäseulontaan osallistuminen'},
+ sv:{smr:'lungcancerdödlighet (SMR)',excess_deaths:'överdödlighet',daily_smokers:'daglig rökning',risk_group_share:'riskgruppens andel',risk_group_people:'riskgruppens storlek',screening_breast:'deltagande i bröstcancerscreening',screening_colorectal:'deltagande i tarmcancerscreening'},
+ en:{smr:'lung cancer mortality (SMR)',excess_deaths:'excess deaths',daily_smokers:'daily smoking',risk_group_share:'risk group share',risk_group_people:'risk group size',screening_breast:'breast screening participation',screening_colorectal:'colorectal screening participation'}};
+function stepLabel(st){const I=IND[lang]||IND.en,n=st.n,cs=(st.codes||[]).map(c=>nmN(c)).join(', ');
+  const T_={fi:{rank_regions:`Järjesti ${n} aluetta: ${I[st.ind]||st.ind}`,region_profile:`Avasi alueen tiedot: ${cs}`,compare_regions:`Vertasi: ${cs}`,national_facts:'Luki koko maan taustaluvut'},
+    sv:{rank_regions:`Rangordnade ${n} områden: ${I[st.ind]||st.ind}`,region_profile:`Öppnade områdesprofil: ${cs}`,compare_regions:`Jämförde: ${cs}`,national_facts:'Läste nationella bakgrundssiffror'},
+    en:{rank_regions:`Ranked ${n} regions by ${I[st.ind]||st.ind}`,region_profile:`Opened region profile: ${cs}`,compare_regions:`Compared ${cs}`,national_facts:'Read the national context'}}[lang]||{};
+  return T_[st.tool]||st.label;}
+let aiRun=0,aiPreset='first_pilot',HL=[];
+function aiPanel(){
+  const a=A();if(!document.getElementById('ai2'))return;
+  document.getElementById('aiTitle').textContent=a.t;document.getElementById('aiSub').textContent=a.sub;
+  const inp=document.getElementById('aiI');inp.placeholder=a.ph;inp.setAttribute('aria-label',a.ph);document.getElementById('aiGo').textContent=a.go;
+  document.getElementById('aiQs').innerHTML=Object.entries(a.p).map(([k,v])=>`<button type="button" data-p="${k}" aria-pressed="${k===aiPreset}">${v}</button>`).join('')+`<button type="button" data-r="1">${a.reg(nmN(REG))}</button>`;
+  document.querySelectorAll('#aiQs [data-p]').forEach(b=>b.onclick=()=>runAnalyst({preset:b.dataset.p}));
+  const rb=document.querySelector('#aiQs [data-r]');if(rb)rb.onclick=()=>runAnalyst({question:rb.textContent,region:REG});
+  document.getElementById('aiF').onsubmit=e=>{e.preventDefault();const v=inp.value.trim();if(v)runAnalyst({question:v,region:REG});};
+}
+async function runAnalyst(req){
+  const a=A(),my=++aiRun,out=document.getElementById('aiOut');
+  aiPreset=req.preset||null;document.querySelectorAll('#aiQs [data-p]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===aiPreset));
+  out.classList.remove('hidden');out.innerHTML=`<ol class="trail"><li class="run in">${a.run}</li></ol>`;
+  let j=null;
+  try{const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...req,lang})});
+    if(my!==aiRun)return;
+    if(!r.ok){out.innerHTML=`<p class="aimode">${r.status===503?a.off:a.err}</p>`;return;}
+    j=await r.json();}catch(e){if(my===aiRun)out.innerHTML=`<p class="aimode">${a.err}</p>`;return;}
+  if(my!==aiRun)return;
+  const regionsN=Math.max(0,...j.steps.map(s=>s.n||0),j.highlight.length);
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,D_=reduce?0:260;
+  out.innerHTML=`<ol class="trail">${j.steps.map(s=>`<li>${esc2(stepLabel(s))}</li>`).join('')}</ol>
+    <div class="aimeta"><span>${a.regions(regionsN)}</span><span>${a.calls(j.steps.length)}</span><span>${j.seconds<0.1?'< 0'+(lang==='en'?'.':',')+'1 s':a.sec(String(j.seconds).replace('.',lang==='en'?'.':','))}</span><span>${a.nums(j.numbers_checked)}</span></div>
+    <p class="aians"></p>
+    <ul class="finds">${j.findings.map((f,i)=>{const rk=j.highlight.findIndex(c=>f.text.includes(nmN(c))||f.text.includes((D.names[c]||{}).en||'§'));
+      return `<li>${rk>=0?`<span class="rk">${rk+1}</span>`:''}<span class="ck ${f.verified?'ok':'no'}" title="${f.verified?'':esc2((f.unverified||[]).join(', '))}">${f.verified?a.ok:a.no}</span>${esc2(f.text)}${f.source?`<span class="src">${a.src}: ${esc2(f.source)}</span>`:''}</li>`}).join('')}</ul>
+    ${j.unknowns&&j.unknowns.length?`<div class="aiunk"><b>${a.unk}</b> ${j.unknowns.map(esc2).join(' ')}</div>`:''}
+    <p class="aimode">${j.mode==='ai'?a.ai:a.rules}</p>`;
+  const lis=[...out.querySelectorAll('.trail li')];
+  lis.forEach((li,i)=>setTimeout(()=>li.classList.add('in'),i*D_));
+  const t0=lis.length*D_;
+  setTimeout(()=>{if(my!==aiRun)return;const p=out.querySelector('.aians');typeOut2(p,j.answer,my);
+    setHighlight(j.highlight);if(j.select)setRegion(j.select);},t0);
+  out.querySelectorAll('.finds li').forEach((li,i)=>setTimeout(()=>li.classList.add('in'),t0+400+i*(D_*0.8)));
+}
+function typeOut2(node,text,my){if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;return;}let i=0;const st=()=>{if(my!==aiRun)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/70)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(st);};st();}
+function setHighlight(codes){HL=(codes||[]).slice(0,4);if(HERO.view&&HERO.view.mark)HERO.view.mark(HL);heroCaption();}
+function snapHTML(){aiPanel();regionSelect();brief(false);const b=B();
   const n=document.getElementById('natH');if(n)n.textContent=b.natH;
   const ls=document.getElementById('libSum');if(ls)ls.textContent=b.libSum;
   const lp=document.getElementById('libP');if(lp)lp.textContent=b.libP;
@@ -894,10 +1006,10 @@ function heroCaption(){
   document.getElementById('mapcap').innerHTML=`<span class="key"><span><i style="background:var(--worse)"></i>${W.w}</span><span><i style="background:var(--better)"></i>${W.b}</span><span><i style="background:#DFE3E3;outline:1px solid #CDD2D3"></i>${W.n}</span></span>${W.h} ${tagHTML('S')}<span class="src">${src(['smr'])}</span>`;
   const box=document.getElementById('globeLabels');
   D.smr.forEach(r=>{
-    const show=r[2]>1||r[0]===REG;let el=HERO.labels[r[0]];
+    const hk=HL.indexOf(r[0]);const show=r[2]>1||r[0]===REG||hk>=0;let el=HERO.labels[r[0]];
     if(!el&&!show)return;
     if(!el){el=document.createElement('div');el.className='lbl';el.dataset.h=r[0];box.append(el);HERO.labels[r[0]]=el;}
-    el.innerHTML=`<b>${nmN(r[0])}</b><span>SMR ${fmt(r[1])}</span>`;
+    el.innerHTML=`<b>${hk>=0?`<span class="rkn">${hk+1}</span>`:''}${nmN(r[0])}</b><span>SMR ${fmt(r[1])}</span>`;el.classList.toggle('mk',hk>=0);
     el.classList.toggle('sel',r[0]===REG);if(HERO.on)el.classList.add('on');
     const still=document.getElementById('globe').classList.contains('is-still');el.style.display=show&&(!still||STILL_POS[r[0]])?'':'none';
   });
@@ -981,7 +1093,8 @@ if(!start) start=(navigator.language||'fi').slice(0,2);
 if(!T[start]) start='en';
 sel.value=start; Chart.defaults.font.family='"Golos Text", sans-serif'; apply(start);
 if(document.fonts&&document.fonts.status!=='loaded') document.fonts.ready.then(()=>render());   // charts measure labels after the web font loads
-sel.addEventListener('change',()=>apply(sel.value));
+sel.addEventListener('change',()=>{apply(sel.value);if(aiPreset)runAnalyst({preset:aiPreset});});
+setTimeout(()=>{if(cur.t==='ov')runAnalyst({preset:'first_pilot'});},900);
 </script>
 </body>
 </html>

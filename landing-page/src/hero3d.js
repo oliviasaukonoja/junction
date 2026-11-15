@@ -9,7 +9,7 @@ import {
 } from "three";
 
 const C = { bg: 0xffffff, base: 0xdfe3e3, baseHover: 0xc9cfd1, baseLine: 0xffffff, worse: 0xd92d20, worseHover: 0xe8574b, worseLine: 0xf6c9c4,
-            better: 0x2f6fb5, betterHover: 0x5287c6, betterLine: 0xd3e2f3, sel: 0xe39a2d };
+            better: 0x2f6fb5, betterHover: 0x5287c6, betterLine: 0xd3e2f3, sel: 0xe39a2d, mark: 0x1d7c75 };
 const RISE_MS = 1500, DRIFT_MS = 5200, K = 320, BASE = 5, LIFT = 46;
 const ease = (t) => {           // cubic-bezier(.2,.8,.2,1), solved numerically
   const cx = 0.6, bx = -0.3, ax = 0.7, cy = 2.4, by = -3, ay = 1.6;   // from P1(.2,.8) P2(.2,1)
@@ -77,11 +77,11 @@ export function mount(el, { data, areas, onLabels, onPick, onHover, selected = n
   };
 
   // ---- state: hover + selection
-  let hover = null, sel = selected;
+  let hover = null, sel = selected, marked = [];
   const paint = () => {
     for (const [hva, r] of Object.entries(R)) {
       r.mat.color.setHex(hva === hover ? C[r.kind + "Hover"] : C[r.kind]);
-      r.line.color.setHex(hva === sel ? C.sel : C[r.kind + "Line"]);
+      r.line.color.setHex(hva === sel ? C.sel : marked.includes(hva) ? C.mark : C[r.kind + "Line"]);
     }
   };
   paint();
@@ -93,7 +93,7 @@ export function mount(el, { data, areas, onLabels, onPick, onHover, selected = n
     const k = ease(Math.min(1, Math.max(0, (t - 250) / RISE_MS)));
     let moving = false;
     for (const [hva, r] of Object.entries(R)) {
-      const goal = BASE + (r.top - BASE) * k + (hva === sel ? LIFT * k : 0);
+      const goal = BASE + (r.top - BASE) * k + (hva === sel ? LIFT * k : marked.includes(hva) ? LIFT * 0.45 * k : 0);
       const nxt = r.cur + (goal - r.cur) * Math.min(1, dt / 90);
       if (Math.abs(goal - nxt) > 0.05) moving = true;
       r.cur = Math.abs(goal - nxt) > 0.05 ? nxt : goal;
@@ -134,6 +134,7 @@ export function mount(el, { data, areas, onLabels, onPick, onHover, selected = n
   raf = requestAnimationFrame(frame);
   return {
     select(hva) { sel = hva; paint(); kick(); },
+    mark(list) { marked = (list || []).slice(); paint(); kick(); },
     renderer,
   };
 }
