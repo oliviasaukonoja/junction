@@ -203,6 +203,22 @@ main{padding-bottom:var(--s10)}
 }
 @media (prefers-reduced-motion:reduce){.pulse,.trail li.run::before{animation:none}.trail li,.finds li{transition:none}}
 
+/* ---- evidence ---- */
+.evid{padding:var(--s10) 0 var(--s4);border-top:1px solid var(--line);margin-top:var(--s4)}
+.evh{max-width:62ch;margin-bottom:var(--s4)}
+.evh p{color:var(--sec);margin:var(--s1) 0 0}
+.evid .headline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 var(--s4);max-width:none;margin:0 0 var(--s5)}
+.evid .hl{grid-template-columns:1fr;border-bottom:1px solid var(--line)}
+.evid .hl .v{grid-row:auto;margin-bottom:6px}
+.evid .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card .eb{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+.srcd{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:var(--s5) 0 0}
+.srcd summary{min-height:56px;display:flex;align-items:center;gap:10px;font-weight:600}
+.srcd summary::before{content:"+";font-family:var(--mono);color:var(--teal);font-size:18px}
+.srcd[open] summary::before{content:"–"}
+.srcd .sources{padding-bottom:var(--s3)}
+@media (max-width:900px){.evid .grid,.evid .headline{grid-template-columns:1fr}}
+
 .stephead{padding:var(--s8) 0 var(--s6);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:var(--s4);align-items:start}
 .stephead .no{font-family:var(--serif);font-size:clamp(56px,7vw,96px);line-height:.85;color:var(--accent-l);font-variant-numeric:lining-nums}
 .stephead .no small{font-family:var(--mono);font-size:12px;color:var(--on-ink-2);display:block;margin-top:var(--s1);letter-spacing:0}
@@ -342,11 +358,10 @@ th{color:var(--sec);font-weight:500;font-size:13px}
   </section>
   <div class="wrap">
     <section id="pg-ov">
-      <section class="natl reveal"><h2 id="natH"></h2><ul class="headline" id="headline"></ul></section>
-      <details class="lib" id="lib"><summary id="libSum"></summary><p class="libp" id="libP"></p><div class="libbtns" id="libbtns"></div></details>
+      <section class="evid" id="evid"><div class="evh"><h2 id="evH"></h2><p id="evP"></p></div><ul class="headline" id="headline"></ul><div class="grid" id="grid2"></div></section>
+      <details class="srcd"><summary id="srcSum"></summary><div class="sources" id="sources"></div></details>
     </section>
-    <section id="pg-v" class="hidden"><div class="grid" id="grid"></div><div class="empty hidden" id="empty" data-t="empty"></div></section>
-    <section id="tab-src" class="hidden"><div class="sources" id="sources"></div></section>
+
   </div>
 </main>
 <div id="site-footer"></div>
@@ -976,10 +991,6 @@ async function runAnalyst(req){
 function typeOut2(node,text,my){if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;return;}let i=0;const st=()=>{if(my!==aiRun)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/70)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(st);};st();}
 function setHighlight(codes){HL=(codes||[]).slice(0,4);if(HERO.view&&HERO.view.mark)HERO.view.mark(HL);heroCaption();}
 function snapHTML(){aiPanel();regionSelect();brief(false);const b=B();
-  const n=document.getElementById('natH');if(n)n.textContent=b.natH;
-  const ls=document.getElementById('libSum');if(ls)ls.textContent=b.libSum;
-  const lp=document.getElementById('libP');if(lp)lp.textContent=b.libP;
-  const lb=document.getElementById('libbtns');if(lb){lb.innerHTML=['gap','where','who','do','src'].map(k=>`<button type="button" data-go="${k}">${b.lib[k]}</button>`).join('');lb.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>go(x.dataset.go));}
   const h=document.getElementById('globeHint');if(h)h.textContent=b.hint;
 }
 function headline(){
@@ -1049,30 +1060,21 @@ function stepcards(){
   document.querySelectorAll('#stepcards [data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 function render(){
-  const pg=NAV.find(n=>n.id===cur.t)||NAV[0]; cur.t=pg.id;
-  if(pg.subs){const sb=pg.subs.find(x=>x.id===cur.s)||pg.subs[0];cur.s=sb.id;selected=sb.v.slice();}else{cur.s=null;selected=[];}
-  buildNav(pg); snapHTML(); syncHash(); headline();
-  document.getElementById('ovhead').classList.toggle('hidden',pg.id!=='ov');
-  document.getElementById('pghead').classList.toggle('hidden',pg.id==='ov');
-  if(pg.id==='ov') hero3d();
+  cur={t:'ov',s:null}; snapHTML(); syncHash(); headline(); hero3d();
   Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
-  document.getElementById('pg-ov').classList.toggle('hidden',pg.id!=='ov');
-  document.getElementById('pg-v').classList.toggle('hidden',!pg.subs);
-  document.getElementById('tab-src').classList.toggle('hidden',pg.id!=='src');
-  if(pg.id==='ov'){return;}
-  if(pg.id==='src'){stephead(pg);return;}
-  if(!pg.subs) return;
-  stephead(pg);
-  const grid=document.getElementById('grid');
-  const RANK={kpi:-3,smr:-2,pathway:-1,reco:999};
-  const vs=selected.map(id=>VIEWS.find(v=>v.id===id)).filter(Boolean);
-  const EB={smr:{fi:'1 · Mikä on ero',sv:'1 · Vad är skillnaden',en:'1 · What is the gap'},pathway:{fi:'2 · Missä kohtaa polkua',sv:'2 · Var i vårdkedjan',en:'2 · Where on the pathway'},risk:{fi:'3 · Ketä se koskee',sv:'3 · Vem det gäller',en:'3 · Who it affects'},reco:{fi:'4 · Mitä tehdään',sv:'4 · Vad gör vi',en:'4 · What to do'}};
-  document.getElementById('empty').classList.toggle('hidden',vs.length>0);
-  grid.innerHTML=vs.map(v=>{
-    const charty=!v.kind||v.kind==='smr';
-    return `<div class="card${(v.wide||v.tall)?' wide':''}${v.id==='reco'?' reco-card':''}"><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.note?`<div class="note">${L(v.note)}</div>`:''}${v.src||charty?`<div class="foot"><span>${v.src?t('source')+': '+src(v.src):''}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;
-  }).join('');
-  vs.filter(v=>!v.kind||v.kind==='smr').forEach(v=>{const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);});
+  evidence();
+}
+const EVI=[['delay',{fi:'Missä kohtaa polkua',sv:'Var i vårdkedjan',en:'Where on the pathway'}],['edu',{fi:'Ketä se koskee: koulutus',sv:'Vem det gäller: utbildning',en:'Who it affects: education'}],['scrlang',{fi:'Ketä se koskee: kieli',sv:'Vem det gäller: språk',en:'Who it affects: language'}],['nordsurv',{fi:'Lopputulos',sv:'Utfall',en:'Outcome'}]];
+function evidence(){
+  const E={fi:['Näyttö analyysin takana','Neljä kansallista havaintoa, joihin tekoäly ja aluekooste nojaavat. Jokaisella on lähde.','Lähteet ja menetelmä'],
+           sv:['Underlaget bakom analysen','Fyra nationella fynd som AI:n och områdessammanfattningen bygger på. Alla har en källa.','Källor och metod'],
+           en:['The evidence behind the analysis','Four national findings the AI and the region brief build on. Each has its source.','Sources and method']}[lang]||[];
+  document.getElementById('evH').textContent=E[0];document.getElementById('evP').textContent=E[1];document.getElementById('srcSum').textContent=E[2];
+  const grid=document.getElementById('grid2');
+  const vs=EVI.map(([id,eb])=>[VIEWS.find(v=>v.id===id),eb]).filter(x=>x[0]);
+  grid.innerHTML=vs.map(([v,eb])=>{const charty=!v.kind||v.kind==='smr';
+    return `<div class="card"><div class="eb">${L(eb)}</div><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.src?`<div class="foot"><span>${t('source')+': '+src(v.src)}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;}).join('');
+  vs.forEach(([v])=>{if(!v.kind||v.kind==='smr'){const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);}});
   grid.querySelectorAll('button[data-t2]').forEach(b=>b.onclick=()=>{const v=VIEWS.find(x=>x.id===b.dataset.t2);const tb=document.getElementById('tb-'+v.id);const show=tb.classList.contains('hidden');tb.innerHTML=show?tableHTML(v,v._spec):'';tb.classList.toggle('hidden',!show);b.textContent=show?t('hide'):t('show');});
 }
 function apply(l){
