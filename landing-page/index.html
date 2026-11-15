@@ -14,24 +14,29 @@ html{scroll-behavior:smooth}
 
 /* hero: the bus (3D, or the 2D drawing without WebGL / with reduced motion) arrives centred; the text appears when it has stopped.
    The text column is exactly as wide as the bus stage. */
-.hero{--bw:min(860px,calc(100vw - 2 * var(--s3)));min-height:calc(100svh - 72px);display:flex;flex-direction:column;justify-content:center;padding:var(--s6) 0 var(--s8)}
-@media (max-width:560px){.hero{--bw:calc(100vw - 2 * var(--s2));padding:var(--s4) 0 var(--s6)}}
+.hero{--bh:clamp(170px,calc(100svh - 72px - 340px),430px);--bw:min(860px,calc(100vw - 2 * var(--s3)),calc(var(--bh) * 2));
+  min-height:calc(100svh - 72px);display:flex;flex-direction:column;justify-content:center;padding:var(--s3) 0 var(--s4)}
+@media (max-width:560px){.hero{--bw:calc(100vw - 2 * var(--s2));--bh:calc(var(--bw) * 11 / 16);padding:var(--s2) 0 var(--s4)}}
 .busstage{position:relative;width:var(--bw);margin:0 auto}
-.bus3d{position:relative;width:100%;aspect-ratio:2/1;cursor:pointer;display:none;-webkit-tap-highlight-color:transparent}
-@media (max-width:560px){.bus3d{aspect-ratio:16/11}}
+.bus3d{position:relative;width:100%;height:var(--bh);cursor:pointer;display:none;-webkit-tap-highlight-color:transparent}
 .bus3d canvas{display:block;width:100%!important;height:100%!important}
 .busstage.is3d .bus3d{display:block}
 .busstage.is3d svg.bus,.busstage.wait3d svg.bus{display:none}
-.busstage.wait3d{min-height:calc(var(--bw) / 2)}
-svg.bus{display:block;width:78%;height:auto;margin:0 auto}
+.busstage.wait3d{min-height:var(--bh)}
+svg.bus{display:block;width:auto;max-width:78%;height:calc(var(--bh) * .9);margin:0 auto}
 [dir=rtl] svg.bus{transform:scaleX(-1)}
 .bus3d-tag{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--mono);font-size:12px;line-height:1;padding:6px 8px;background:#fff;color:var(--ink);border:1px solid var(--line-2);border-radius:2px;white-space:nowrap;opacity:0;transition:opacity .2s}
 .bus3d-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:18px;background:var(--line-2)}
-.busfoot{width:var(--bw);margin:var(--s1) auto 0;display:flex;justify-content:flex-end;min-height:40px}
-.hero .copy{width:var(--bw);max-width:100%;margin:var(--s3) auto 0}
-.hero .copy h1{max-width:18ch}
-.hero .copy .lead{margin-top:var(--s2);max-width:34em}
-@media (max-width:560px){.hero .copy{width:auto}}
+/* the look-inside button sits on the stage's lower corner: no extra row */
+.busfoot{width:var(--bw);margin:-40px auto 0;position:relative;z-index:2;display:flex;justify-content:flex-end;min-height:40px;pointer-events:none}
+.busfoot .peek{pointer-events:auto}
+/* text column: as wide as the bus, but never narrower than a comfortable headline measure */
+.hero .copy{width:max(var(--bw),min(640px,100%));max-width:100%;margin:var(--s3) auto 0}
+.hero .copy h1{max-width:18ch;font-size:clamp(32px,min(4.6vw,6.4svh),60px)}
+:lang(ru) .hero .copy h1,:lang(uk) .hero .copy h1{max-width:24ch}   /* longer words: a wider measure keeps the headline to two or three lines */
+.hero .copy .lead{margin-top:var(--s2);max-width:34em;font-size:clamp(16px,2.4svh,19px)}
+.hero .hero-acts{margin-top:var(--s3)}
+@media (max-width:560px){.hero .copy{width:auto}.hero .copy h1{font-size:clamp(30px,8.5vw,40px)}}
 /* text waits for the bus to stop */
 @media (prefers-reduced-motion:no-preference){
   html.js .hero:not(.parked) .busfoot,html.js .hero:not(.parked) .copy>*{opacity:0;transform:translateY(12px)}
@@ -321,6 +326,21 @@ var BUS3D = {fi:{look:"Katso sisään",close:"Sulje",ct:"Matala-annos-TT"},sv:{l
   function L(){return BUS3D[lang]||BUS3D.en}
   function label(){txt.textContent=on?L().close:L().look;btn.setAttribute("aria-pressed",on?"true":"false");if(api)api.setLabel(L().ct)}
   function park(){hero.classList.add("parked")}
+  // fit the whole hero on screen at load: if this language's text runs long, shrink the bus until the buttons are visible
+  function fit(){
+    hero.style.removeProperty("--bh");
+    var acts=hero.querySelector(".hero-acts"),stg=document.getElementById("busStage");
+    for(var i=0;i<3;i++){
+      var over=acts.getBoundingClientRect().bottom+window.scrollY-window.innerHeight+8;
+      if(over<=0)break;
+      var bh=parseFloat(getComputedStyle(hero).getPropertyValue("--bh"))||stg.offsetHeight;
+      hero.style.setProperty("--bh",Math.max(140,Math.floor(bh-over))+"px");
+    }
+  }
+  fit();
+  var _apply0=apply;apply=function(l){_apply0(l);fit()};
+  window.addEventListener("resize",function(){clearTimeout(fit.t);fit.t=setTimeout(fit,150)});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
   var reduce=false;try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
   var gl=false;try{var c=document.createElement("canvas");gl=!!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){}
   if(!gl||reduce){park();return}
