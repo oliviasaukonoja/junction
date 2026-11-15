@@ -4,1099 +4,330 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Polku hoitoon – Keuhkodata</title>
-<meta name="description" content="Keuhkosyöpä Suomessa julkisen datan valossa: kuolleisuus, alue-erot, viiveet ja seulonnan osallistuminen hyvinvointialueittain. Polku hoitoon, Junction 2026.">
+<meta name="description" content="Keuhkosyöpä Suomessa: missä ero on, ketä se koskee ja mitä tehdään. Tekoälyanalyytikko ja 3D-kartta hyvinvointialueittain.">
 <meta property="og:title" content="Polku hoitoon – Keuhkodata">
-<meta property="og:description" content="Missä keuhkosyövän hoitopolku eriarvoistuu? Avoin data hyvinvointialueittain, suositukset ja lähteet.">
 <meta property="og:type" content="website">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<script src="/vendor/chart.umd.js"></script>
 <link href="/site.css" rel="stylesheet">
 <style>
-/* Keuhkodata. System: /site.css. Chart colours: validated with the dataviz checker (men/women vs #FFFFFF). */
-:root{--grid:#E3E6E6;--men:#2BA39A;--women:#E39A2D;--total:#0F1A24;--edu-low:#1D7C75;--edu-mid:#2BA39A;--edu-high:#A6DAD4;
-  --bar:#B5BCBF;--hi:var(--worse);--lo:var(--better);--mid:#B5BCBF;--neutral:#B5BCBF;--neutral2:#8A9195;--neutral3:#5B6670}
-main{padding-bottom:var(--s10)}
-.navbar{display:none}
+main.dash{padding-bottom:var(--s8)}
+.hidden{display:none!important}
 
-/* band: overview hero with the 3D map, or a step header */
-.kband{padding:0}
-.kband .wrap{position:relative}
-.ovhead{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s4);align-items:stretch;min-height:min(760px,calc(100vh - 64px))}
-.ovtext{padding:var(--s10) 0 var(--s8);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
-.ovtext h1{font-size:clamp(32px,3.2vw,46px);max-width:17ch}
-.headline{margin:var(--s5) 0 0;padding:0;list-style:none;display:grid;gap:0;max-width:30em}
-.hl{display:grid;grid-template-columns:128px 1fr;column-gap:var(--s3);padding:var(--s2) 0;border-top:1px solid var(--on-ink-line)}
-.hl:last-child{border-bottom:1px solid var(--on-ink-line)}
-@media (max-width:640px){.hl{grid-template-columns:1fr}.hl .v{grid-row:auto;margin-bottom:4px}}
-.hl .v{grid-row:span 2;font-size:28px;font-weight:600;line-height:1.1;color:var(--on-ink);letter-spacing:-.01em;white-space:nowrap}
-.hl.worse .v{color:var(--worse)}
-.hl .l{font-size:15px;line-height:1.45;color:var(--on-ink)}
-.hl .s{font-family:var(--mono);font-size:11.5px;color:var(--on-ink-2);margin-top:4px}
-.globe{position:relative;display:flex;flex-direction:column;margin-inline-end:calc(-1 * max(var(--s4), (100vw - var(--wrap)) / 2 + var(--s4)))}
-.globe .stage{position:relative;flex:1;min-height:560px}
-.globe canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
-.globe .still{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
-.globe .stage.is-still{flex:none;aspect-ratio:6/7;height:auto;min-height:0;max-height:none;width:min(100%,600px);margin-inline:auto}
-.globe .lbl{position:absolute;transform:translate(-50%,calc(-100% - 10px));pointer-events:none;white-space:nowrap;text-align:center;opacity:0;transition:opacity .4s var(--ease)}
-.globe .lbl.on{opacity:1}
-.globe .lbl{background:rgba(255,255,255,.94);border:1px solid var(--on-ink-line);border-radius:2px;padding:4px 8px}
-.globe .lbl b{display:block;font-size:13px;font-weight:600;color:var(--on-ink);line-height:1.3}
-.globe .lbl span{display:block;font-family:var(--mono);font-size:11.5px;color:var(--on-ink-2)}
-.globe .lbl[data-h=HVA01]{transform:translate(-100%,8px)}
-.globe .lbl[data-h=HVA10]{transform:translate(4px,calc(-100% - 6px))}
-.globe .lbl[data-h=HVA06]{transform:translate(-100%,calc(-100% - 6px))}
-.mapcap{position:relative;z-index:2;max-width:52ch;margin:0 var(--s4) var(--s5) 0;font-size:13px;line-height:1.5;color:var(--on-ink-2)}
-.mapcap .key{display:flex;flex-wrap:wrap;gap:4px var(--s2);margin-bottom:6px;color:var(--on-ink)}
-.mapcap .key i{display:inline-block;width:10px;height:10px;margin-inline-end:6px;vertical-align:-1px}
-.mapcap .src{color:var(--on-ink-2);display:block;margin-top:6px}
-@media (max-width:900px){
-  .ovhead{grid-template-columns:1fr;min-height:0;gap:0}
-  .ovtext{display:contents}
-  .ovtext h1{padding-top:var(--s6)}
-  .ovtext .lead{margin-bottom:var(--s2)}
-  .globe{order:2}
-  .headline{order:3;margin:0 0 var(--s6)}
-  .globe{margin-inline:calc(-1 * var(--s2))}
-  .globe .stage{flex:none;min-height:0;height:min(118vw,560px)}
-  .mapcap{margin:0 var(--s2) var(--s5);max-width:none}
-}
-/* ---- one dashboard: region brief + 3D map ---- */
-.ovhead{align-items:start}
-.ovtext{justify-content:flex-start;padding:var(--s8) 0 var(--s8)}
-.ovtext h1{font-size:clamp(28px,2.6vw,40px);max-width:20ch}
-.ovtext .lead{font-size:17px;max-width:34em}
-.globe{position:sticky;top:64px;height:calc(100vh - 64px);min-height:560px}
-.globe .stage{min-height:0}
-.globe .hint{position:absolute;left:50%;top:var(--s3);transform:translateX(-50%);font-size:13px;color:var(--sec);background:rgba(255,255,255,.9);padding:6px 10px;border:1px solid var(--line);border-radius:999px;pointer-events:none;white-space:nowrap;transition:opacity .4s}
-.globe .lbl.sel{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
-.regpick{margin:var(--s4) 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1)}
-.regpick label{font-size:13px;color:var(--sec);font-weight:500;width:100%}
-.regpick select{min-height:44px;font-size:16px;min-width:240px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{font:inherit;font-size:14px;min-height:36px;padding:0 12px;border:1px solid var(--line-2);background:#fff;border-radius:999px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
-.chips button i{width:8px;height:8px;border-radius:50%;background:var(--worse)}
-.chips button[aria-pressed=true]{border-color:var(--ink);background:var(--surf-2)}
-.brief{margin-top:var(--s3);border:1px solid var(--line);border-radius:var(--r-lg);background:#fff;overflow:hidden}
-.brief.swap{animation:briefin .45s var(--ease)}
-@keyframes briefin{from{opacity:.0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.bhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s1) var(--s2);padding:var(--s3) var(--s3) var(--s2);border-bottom:1px solid var(--line)}
-.bhead h2{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:-.01em}
-.verdict{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid}
-.verdict i{width:9px;height:9px;border-radius:50%;background:currentColor}
-.verdict.bus{color:#8A5A12;background:#FBF0DF;border-color:#F0D2A2}
-.verdict.hosp{color:var(--accent-d);background:var(--accent-t);border-color:#A9DBD5}
-.verdict.watch{color:#9B2318;background:var(--worse-t);border-color:#F2BDB7}
-.verdict.none{color:var(--sec);background:var(--surf-2);border-color:var(--line)}
-.verdict.low{color:#1F4E86;background:var(--better-t);border-color:#C3D6EE}
-.brow{display:grid;grid-template-columns:34px minmax(0,1fr);gap:0 var(--s2);padding:var(--s3);border-bottom:1px solid var(--line)}
-.brow:last-of-type{border-bottom:0}
-.brow .n{font-family:var(--serif);font-size:28px;line-height:1;color:var(--teal)}
-.brow h3{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sec);margin:4px 0 var(--s1)}
-.brow .big{font-size:34px;font-weight:600;line-height:1.05;letter-spacing:-.02em}
-.brow .big.w{color:var(--worse)}.brow .big.b{color:var(--better)}
-.brow p{margin:6px 0 0;font-size:15px;line-height:1.5}
-.brow .s{font-family:var(--mono);font-size:11.5px;color:var(--sec);margin-top:6px}
-.brow .s a{color:inherit}
-.ci{position:relative;height:28px;margin:var(--s2) 0 4px}
-.ci .ax{position:absolute;left:0;right:0;top:13px;height:2px;background:var(--line)}
-.ci .one{position:absolute;top:2px;bottom:2px;width:1px;background:var(--ink)}
-.ci .one span{position:absolute;top:-16px;left:4px;font-family:var(--mono);font-size:11px;color:var(--sec);white-space:nowrap}
-.ci .rng{position:absolute;top:9px;height:10px;border-radius:5px;opacity:.28}
-.ci .pt{position:absolute;top:6px;width:16px;height:16px;border-radius:50%;margin-left:-8px;border:3px solid #fff;box-shadow:0 0 0 1px rgba(15,26,36,.2)}
-.path3{display:flex;height:30px;border-radius:4px;overflow:hidden;margin:var(--s2) 0 4px;font-size:12px;font-weight:600;color:#fff}
-.path3 div{display:flex;align-items:center;padding:0 8px;white-space:nowrap;overflow:hidden}
-.path3 .p1{background:var(--worse)}.path3 .p2{background:#E8574B}.path3 .p3{background:#B5BCBF;color:var(--ink)}
-.pathlbl{display:flex;font-size:12px;color:var(--sec)}
-.pathlbl div{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-inline-end:6px}
-.dk{height:10px;border-radius:3px;background:var(--teal);margin-top:10px}
-.dkl{font-size:12px;color:var(--sec);margin-top:3px}
-.cmp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px var(--s2);margin-top:var(--s2);font-size:14px;align-items:center}
-.cmp .bar{grid-column:1/-1;height:6px;background:var(--surf-3);border-radius:3px;position:relative;margin-bottom:6px}
-.cmp .bar b{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ink)}
-.cmp .bar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--amber)}
-.cmp .v{font-variant-numeric:tabular-nums;font-weight:600}
-.cmp .v small{font-weight:400;color:var(--sec)}
-.act{background:var(--surf-2)}
-.act .who{display:grid;grid-template-columns:auto 1fr;gap:6px var(--s2);margin:var(--s2) 0 0;font-size:14.5px}
-.act .who dt{color:var(--sec)}.act .who dd{margin:0}
-.act .go{display:flex;flex-wrap:wrap;gap:var(--s1);margin-top:var(--s2)}
-.ask{padding:var(--s3);border-top:1px solid var(--line);background:#fff}
-.ask h3{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
-.ask h3 i{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px var(--accent-t)}
-.ask .qs{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s1)}
-.ask .qs button{font:inherit;font-size:14px;text-align:start;min-height:36px;padding:6px 12px;border:1px solid var(--line-2);background:#fff;border-radius:var(--r);cursor:pointer;color:var(--ink)}
-.ask .qs button:hover{border-color:var(--ink)}
-.ask form{display:flex;gap:var(--s1);margin-top:var(--s1)}
-.ask form input{flex:1;min-width:0}
-.ask .out{margin-top:var(--s2);font-size:15px;line-height:1.6;white-space:pre-wrap;border-inline-start:3px solid var(--teal);padding:2px 0 2px var(--s2)}
-.ask .out.err{border-color:var(--line-2);color:var(--sec)}
-.ask .out .q{display:block;font-size:13px;color:var(--sec);margin-bottom:4px}
-.ask .note2{font-size:12.5px;color:var(--sec);margin-top:var(--s1)}
-.dots{display:inline-flex;gap:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:dot 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
-@keyframes dot{0%,100%{opacity:.25}50%{opacity:1}}
-.natl{padding:var(--s8) 0 var(--s4)}
-.natl h2{margin-bottom:var(--s3)}
-.natl .headline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 var(--s4);max-width:none;margin:0}
-.natl .hl{grid-template-columns:1fr;border-bottom:1px solid var(--line)}
-.natl .hl .v{grid-row:auto;margin-bottom:6px}
-.lib{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:var(--s4) 0 0}
-.lib summary{min-height:56px;display:flex;align-items:center;font-weight:600;font-size:16px;gap:10px}
-.lib summary::before{content:"+";font-family:var(--mono);color:var(--teal);font-size:18px}
-.lib[open] summary::before{content:"–"}
-.libp{color:var(--sec);font-size:15px;max-width:60ch}
-.libbtns{display:flex;flex-wrap:wrap;gap:var(--s1);padding-bottom:var(--s3)}
-.libbtns button{font:inherit;font-size:15px;min-height:44px;padding:0 16px;border:1px solid var(--line-2);background:#fff;border-radius:var(--r);cursor:pointer}
-.libbtns button:hover{border-color:var(--ink)}
-@media (max-width:900px){
-  .globe{position:relative;top:auto;height:auto;min-height:0}
-  .regpick{order:2;margin-bottom:var(--s2)}
-  .globe{order:3}
-  .brief{order:4;margin-bottom:var(--s4)}
-  .natl .headline{grid-template-columns:1fr}
-  .bhead h2{font-size:26px}
-}
-@media (prefers-reduced-motion:reduce){.brief.swap{animation:none}.dots i{animation:none}}
+/* ---- top: title + AI prompt ---- */
+.top{padding:var(--s5) var(--s4) var(--s3);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:var(--s2) var(--s5);align-items:end;max-width:none}
+.top h1{font-size:clamp(28px,2.6vw,40px);max-width:22ch}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:0 0 var(--s1)}
+.ask{display:flex;align-items:center;gap:10px;border:1px solid var(--line-2);border-radius:999px;padding:6px 6px 6px 18px;background:#fff;box-shadow:0 10px 30px -20px rgba(15,26,36,.35);transition:border-color .2s,box-shadow .2s}
+.ask:focus-within{border-color:var(--teal);box-shadow:0 0 0 4px var(--accent-t),0 10px 30px -20px rgba(15,26,36,.35)}
+.ask input{flex:1;min-width:0;border:0!important;box-shadow:none!important;outline:none;min-height:44px;padding:0;font-size:17px;background:none}
+.ask .btn{border-radius:999px;min-height:44px}
+.brain{width:22px;height:22px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 35%,#7FD1C9,var(--teal) 55%,var(--accent-d));box-shadow:0 0 0 0 rgba(43,163,154,.45);animation:breathe 2.6s ease-in-out infinite}
+.brain.think{animation:think .9s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(43,163,154,.35)}50%{box-shadow:0 0 0 8px rgba(43,163,154,0)}}
+@keyframes think{0%,100%{transform:scale(1)}50%{transform:scale(.82)}}
+.chips{grid-column:2;display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:inherit;font-size:14px;min-height:34px;padding:0 13px;border:1px solid var(--line-2);background:#fff;border-radius:999px;cursor:pointer;color:var(--ink)}
+.chips button:hover{border-color:var(--ink)}
+.chips button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
 
-/* ---- AI analyst ---- */
-.ai2{margin-top:var(--s4);border:1px solid var(--line-2);border-radius:var(--r-lg);background:#fff;padding:var(--s3);box-shadow:0 1px 0 rgba(15,26,36,.03),0 8px 28px -18px rgba(15,26,36,.25)}
-.ai2h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
-.ai2h b{font-size:16px}
-.ai2h span:last-child{font-size:13px;color:var(--sec)}
-.pulse{width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 0 rgba(43,163,154,.5);animation:aipulse 2s infinite}
-@keyframes aipulse{0%{box-shadow:0 0 0 0 rgba(43,163,154,.45)}70%{box-shadow:0 0 0 9px rgba(43,163,154,0)}100%{box-shadow:0 0 0 0 rgba(43,163,154,0)}}
-#aiF{display:flex;gap:var(--s1);margin-top:var(--s2)}
-#aiF input{flex:1;min-width:0}
-.ai2qs{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s1)}
-.ai2qs button{font:inherit;font-size:14px;text-align:start;min-height:36px;padding:6px 12px;border:1px solid var(--line-2);background:#fff;border-radius:999px;cursor:pointer;color:var(--ink)}
-.ai2qs button:hover{border-color:var(--ink)}
-.ai2qs button[aria-pressed=true]{background:var(--accent-t);border-color:var(--teal)}
-.ai2out{margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s2)}
-.trail{list-style:none;margin:0;padding:0;font-family:var(--mono);font-size:12.5px;color:var(--sec)}
-.trail li{display:flex;gap:8px;align-items:center;padding:3px 0;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
-.trail li.in{opacity:1;transform:none}
-.trail li::before{content:"";width:14px;height:14px;flex:none;border-radius:50%;background:var(--accent-t) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M4 7.2l2 2 4-4.4' fill='none' stroke='%231D7C75' stroke-width='1.6'/%3E%3C/svg%3E") center no-repeat}
-.trail li.run::before{background:none;border:2px solid var(--teal);border-right-color:transparent;animation:spin .8s linear infinite}
+/* ---- stage: AI answer | 3D map | region card ---- */
+.stage{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr) minmax(320px,380px);gap:var(--s2);padding:0 var(--s4);height:calc(100vh - 64px - 40px);min-height:640px;max-height:900px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:var(--s3);overflow:auto;box-shadow:0 1px 0 rgba(15,26,36,.03)}
+.mapbox{position:relative;border-radius:14px;overflow:hidden;background:#fff}
+.mapbox canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.mapbox .still{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.lbl{position:absolute;transform:translate(-50%,calc(-100% - 8px));pointer-events:none;white-space:nowrap;background:rgba(255,255,255,.95);border:1px solid var(--line-2);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .4s}
+.lbl.on{opacity:1}
+.lbl small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--sec)}
+.lbl .rk{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;margin-inline-end:5px;vertical-align:-3px}
+.lbl.sel{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+.lbl.mk{border-color:var(--teal)}
+.legend{position:absolute;left:var(--s2);bottom:var(--s2);display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--sec);background:rgba(255,255,255,.9);padding:6px 10px;border-radius:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:6px;vertical-align:-1px}
+.maphint{position:absolute;left:50%;top:var(--s2);transform:translateX(-50%);font-size:13px;color:var(--sec);background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:999px;padding:6px 12px;pointer-events:none;transition:opacity .5s}
+
+/* AI answer */
+.ai h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sec);display:flex;align-items:center;gap:8px}
+.ticker{margin-top:var(--s2);font-family:var(--mono);font-size:12.5px;color:var(--sec);min-height:22px;display:flex;align-items:center;gap:8px}
+.ticker .sp{width:12px;height:12px;border-radius:50%;border:2px solid var(--teal);border-right-color:transparent;animation:spin .8s linear infinite;flex:none}
+.ticker .ok{width:14px;height:14px;border-radius:50%;background:var(--teal);flex:none;display:grid;place-items:center;color:#fff;font-size:9px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.aimeta{display:flex;flex-wrap:wrap;gap:6px 14px;margin:var(--s1) 0 0;font-family:var(--mono);font-size:12px;color:var(--ink)}
-.aimeta span{background:var(--surf-2);border-radius:3px;padding:3px 7px}
-.aians{font-family:var(--serif);font-size:20px;line-height:1.4;margin:var(--s2) 0 0}
-.finds{list-style:none;margin:var(--s2) 0 0;padding:0;display:grid;gap:var(--s1)}
-.finds li{border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font-size:14.5px;line-height:1.45;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
-.finds li.in{opacity:1;transform:none}
-.finds .ck{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 6px;border-radius:2px;margin-inline-end:6px;vertical-align:1px}
-.finds .ck.ok{background:var(--accent-t);color:var(--accent-d)}
-.finds .ck.no{background:#FBF0DF;color:#8A5A12}
-.finds .src{display:block;font-family:var(--mono);font-size:11px;color:var(--sec);margin-top:4px}
-.finds .rk{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:700;margin-inline-end:6px}
-.aiunk{margin-top:var(--s2);font-size:13.5px;color:var(--sec)}
-.aiunk b{color:var(--ink);font-weight:600}
-.aimode{margin-top:var(--s1);font-size:12px;color:var(--sec)}
-.globe .lbl b .rkn{display:inline-grid;vertical-align:-3px;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;margin-inline-end:4px;font-family:var(--sans)}
-.globe .lbl.mk{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
-@media (max-width:1100px){
-  .ovhead{grid-template-columns:1fr;min-height:0;gap:0}
-  .ovtext{display:contents}
-  .ovtext h1{padding-top:var(--s6)}
-  .ai2{order:2}.regpick{order:3;margin-bottom:var(--s2)}.globe{order:4;position:relative;top:auto;height:auto;min-height:0;margin-inline:calc(-1 * var(--s2))}.brief{order:5;margin-bottom:var(--s4)}
-  .globe .stage{flex:none;min-height:0;height:min(110vw,620px)}
-  .mapcap{margin:0 var(--s2) var(--s4);max-width:none}
+.answer{font-family:var(--serif);font-size:21px;line-height:1.38;margin:var(--s2) 0 0;min-height:3em}
+.ranked{list-style:none;margin:var(--s3) 0 0;padding:0;display:grid;gap:8px}
+.ranked button{width:100%;display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;text-align:start;font:inherit;background:var(--surf-2);border:1px solid transparent;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink);opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s,border-color .2s}
+.ranked button.in{opacity:1;transform:none}
+.ranked button:hover,.ranked button[aria-current=true]{border-color:var(--ink)}
+.ranked .n{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px;font-weight:700}
+.ranked b{font-weight:600}
+.ranked span.v{font-size:12.5px;color:var(--sec)}
+.ranked em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:600}
+.unk{margin-top:var(--s3);font-size:13.5px;color:var(--sec);line-height:1.5}
+
+/* region card */
+.card h2{font-family:var(--serif);font-weight:400;font-size:32px;letter-spacing:-.01em;line-height:1.1}
+.chead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.verdict{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;padding:5px 11px;border-radius:999px}
+.verdict i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.verdict.bus{color:#8A5A12;background:#FBF0DF}.verdict.hosp{color:var(--accent-d);background:var(--accent-t)}
+.verdict.watch{color:#9B2318;background:var(--worse-t)}.verdict.none{color:var(--sec);background:var(--surf-2)}.verdict.low{color:#1F4E86;background:var(--better-t)}
+.cpick{margin-top:6px}
+.cpick select{min-height:36px;font-size:14px;padding-block:0;border-color:var(--line-2)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:var(--s3)}
+.kpi{background:#fff;padding:14px 14px 12px}
+.kpi b{display:block;font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi b.w{color:var(--worse)}.kpi b.b{color:var(--better)}
+.kpi span{display:block;font-size:13px;color:var(--sec);margin-top:4px;line-height:1.35}
+.cov{margin-top:var(--s3)}
+.cov .row{display:grid;grid-template-columns:96px 1fr 42px;align-items:center;gap:10px;font-size:13px;margin:6px 0}
+.cov .tr{height:10px;border-radius:5px;background:var(--surf-3);overflow:hidden}
+.cov .tr i{display:block;height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.cov .row b{text-align:end;font-variant-numeric:tabular-nums}
+.act{margin-top:var(--s3);font-size:15.5px;line-height:1.5}
+.cbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s2)}
+.cbtns .btn{min-height:44px}
+.cbtns .btn.line{background:#fff}
+
+/* ---- insight tiles with 3D bars ---- */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s2);padding:var(--s5) var(--s4) 0;max-width:none}
+.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:var(--s3) var(--s3) var(--s2);display:flex;flex-direction:column}
+.tile .eyebrow{margin-bottom:6px}
+.tile .big{font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.tile .big.w{color:var(--worse)}
+.tile p{font-size:14.5px;line-height:1.45;margin:8px 0 0;color:var(--ink)}
+.b3{position:relative;height:230px;margin-top:auto}
+.b3 canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.b3v,.b3n,.b3g{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap}
+.b3v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;transition:opacity .3s}
+.b3n{font-size:11.5px;color:var(--sec)}
+.b3g{font-size:11.5px;color:var(--ink);font-weight:600;margin-top:16px}
+.key{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--sec);margin-top:8px}
+.key i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:5px}
+.flat{display:flex;align-items:flex-end;gap:10px;height:180px;margin-top:auto;padding-top:24px}
+.flat div{flex:1;border-radius:4px 4px 0 0;position:relative}
+.flat div span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700}
+.srcline{padding:var(--s4) var(--s4) 0;font-size:12.5px;color:var(--sec);max-width:none}
+
+@media (max-width:1180px){
+  .top{grid-template-columns:1fr;padding:var(--s4) var(--s2) var(--s2)}
+  .chips{grid-column:auto}
+  .stage{grid-template-columns:1fr;height:auto;max-height:none;padding:0 var(--s2)}
+  .mapbox{order:1;height:min(120vw,620px)}
+  .ai{order:2}.card{order:3}
+  .tiles{grid-template-columns:1fr 1fr;padding:var(--s4) var(--s2) 0}
+  .srcline{padding:var(--s3) var(--s2) 0}
 }
-@media (prefers-reduced-motion:reduce){.pulse,.trail li.run::before{animation:none}.trail li,.finds li{transition:none}}
-
-/* ---- evidence ---- */
-.evid{padding:var(--s10) 0 var(--s4);border-top:1px solid var(--line);margin-top:var(--s4)}
-.evh{max-width:62ch;margin-bottom:var(--s4)}
-.evh p{color:var(--sec);margin:var(--s1) 0 0}
-.evid .headline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 var(--s4);max-width:none;margin:0 0 var(--s5)}
-.evid .hl{grid-template-columns:1fr;border-bottom:1px solid var(--line)}
-.evid .hl .v{grid-row:auto;margin-bottom:6px}
-.evid .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card .eb{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
-.srcd{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:var(--s5) 0 0}
-.srcd summary{min-height:56px;display:flex;align-items:center;gap:10px;font-weight:600}
-.srcd summary::before{content:"+";font-family:var(--mono);color:var(--teal);font-size:18px}
-.srcd[open] summary::before{content:"–"}
-.srcd .sources{padding-bottom:var(--s3)}
-@media (max-width:900px){.evid .grid,.evid .headline{grid-template-columns:1fr}}
-
-.stephead{padding:var(--s8) 0 var(--s6);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:var(--s4);align-items:start}
-.stephead .no{font-family:var(--serif);font-size:clamp(56px,7vw,96px);line-height:.85;color:var(--accent-l);font-variant-numeric:lining-nums}
-.stephead .no small{font-family:var(--mono);font-size:12px;color:var(--on-ink-2);display:block;margin-top:var(--s1);letter-spacing:0}
-.stephead h1{font-size:clamp(32px,3.6vw,48px)}
-.stephead .lead{margin-top:var(--s2)}
-.stephead .back{grid-column:1/-1;margin:0 0 var(--s4);font-size:15px}
-.stephead .mapbtn{margin-top:var(--s3)}
-@media (max-width:640px){.stephead{padding:var(--s5) 0 var(--s4);column-gap:var(--s2)}}
-
-/* overview: the four steps */
-.stepcards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 var(--s6);border-top:1px solid var(--ink)}
-.stc{font:inherit;text-align:start;color:var(--ink);background:none;border:0;border-inline-end:1px solid var(--line);padding:var(--s3) var(--s3) var(--s4);cursor:pointer;display:flex;flex-direction:column;gap:var(--s1);position:relative;transition:background-color .3s var(--ease)}
-.stc:last-child{border-inline-end:0}
-.stc::before{content:"";position:absolute;inset-inline:0;top:-1px;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
-[dir=rtl] .stc::before{transform-origin:right}
-.stc:hover{background:var(--sheet)}.stc:hover::before,.stc:focus-visible::before{transform:scaleX(1)}
-.stc .num{font-family:var(--serif);font-size:44px;line-height:1;color:var(--accent);margin-bottom:var(--s1)}
-.stc h3{font-size:19px}
-.stc p{margin:0;font-size:15px;line-height:1.5;color:var(--sec);flex:1}
-.stc .open{margin-top:var(--s2);font-weight:600;font-size:15px;color:var(--accent)}
-.stc.dark .num{color:var(--ink)}
-.stc.dark{background:var(--accent-t)}
-.stc.dark:hover{background:#D6E5E5}
-@media (max-width:900px){.stepcards{grid-template-columns:1fr 1fr}.stc:nth-child(2){border-inline-end:0}.stc:nth-child(-n+2){border-bottom:1px solid var(--line)}}
-@media (max-width:560px){.stepcards{grid-template-columns:1fr}.stc{border-inline-end:0;border-bottom:1px solid var(--line);padding:var(--s3) 0}.stc.dark{padding-inline:var(--s2)}}
-#pg-ov{padding-top:var(--s8)}
-.ovintro{font-family:var(--serif);font-size:clamp(22px,2.2vw,28px);line-height:1.35;max-width:36ch;margin:0 0 var(--s5)}
-
-/* area snapshot + AI analyst */
-.areapanel{display:grid;grid-template-columns:1.1fr 1fr;gap:var(--s3);margin:0 0 var(--s5)}
-@media(max-width:780px){.areapanel{grid-template-columns:1fr}}
-.snap{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s3);font-size:15px}
-.snap>b{font-size:19px;font-weight:600}
-.snap ul{margin:var(--s1) 0 0;padding-inline-start:18px}.snap li{margin:4px 0}
-.ai{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s3)}
-.ai button{font:inherit;font-size:15px;font-weight:600;min-height:44px;padding:0 18px;border:1px solid var(--accent);background:none;color:var(--accent);border-radius:var(--r);cursor:pointer}
-.ai button:hover{background:var(--accent);color:#fff}.ai button[disabled]{opacity:.5;cursor:wait}
-.aihint{display:block;margin-top:var(--s1);font-size:13px;color:var(--sec)}
-#aiout{display:none;margin-top:var(--s2);white-space:pre-wrap;font-size:15px;line-height:1.6;border-top:1px solid var(--line);padding-top:var(--s2)}
-#aiout.on{display:block}
-
-/* step pages: views */
-#pg-v{padding-top:var(--s6)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,540px),1fr));gap:var(--s3)}
-.card{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s3) var(--s3) var(--s2);display:flex;flex-direction:column;min-width:0}
-.card.wide{grid-column:1/-1}
-.card h2{font-size:20px;line-height:1.3;display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1)}
-.card .sub{color:var(--sec);font-size:14px;margin:6px 0 var(--s2)}
-.keymsg{font-family:var(--serif);font-size:20px;line-height:1.4;margin:0 0 var(--s2);max-width:46ch;color:var(--ink)}
-.chartbox{position:relative;height:300px}
-.chartbox.tall{height:540px}
-.foot{display:flex;justify-content:space-between;gap:var(--s2);align-items:flex-end;margin-top:var(--s2);padding-top:var(--s1);border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--sec)}
-.foot a{color:var(--sec)}
-.foot button{font:inherit;font-family:var(--sans);font-size:13px;font-weight:500;min-height:36px;border:1px solid var(--line-2);background:none;color:var(--ink);border-radius:var(--r);padding:0 12px;cursor:pointer;white-space:nowrap}
-.foot button:hover{border-color:var(--ink)}
-.note{font-size:14.5px;color:var(--ink);margin-top:var(--s2);max-width:72ch}
-.tbl{margin-top:var(--s2)}
-table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
-th,td{text-align:end;padding:8px 10px;border-bottom:1px solid var(--line)}
-th:first-child,td:first-child{text-align:start}
-th{color:var(--sec);font-weight:500;font-size:13px}
-.tablewrap{max-height:320px;overflow:auto}
-.dot{display:inline-block;width:10px;height:10px;margin-inline-end:6px}
-.empty{text-align:center;color:var(--sec);padding:var(--s8) 0}
-
-/* key figures */
-.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 var(--s3)}
-@media(max-width:780px){.tiles{grid-template-columns:1fr 1fr}}
-.tile{border-top:1px solid var(--line);padding:var(--s2) 0 var(--s3)}
-.tile .v{font-size:30px;font-weight:600;line-height:1.1;color:var(--ink)}
-.tile .l{font-size:14.5px;margin-top:6px}
-.tile .s{font-family:var(--mono);font-size:11.5px;color:var(--sec);margin-top:var(--s1)}
-
-/* care pathway */
-.steps{list-style:none;margin:var(--s1) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s3)}
-@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}@media(max-width:560px){.steps{grid-template-columns:1fr}}
-.step{border-top:1px solid var(--line-2);padding-top:var(--s2)}
-.step.gap{border-top:3px solid var(--ink)}
-.step.na{border-top:1px dashed var(--line-2)}
-.sh{display:flex;align-items:center;gap:var(--s1);font-size:13px;font-weight:500;color:var(--sec)}
-.step.gap .stl{color:var(--ink);font-weight:600}
-.sn{font-family:var(--serif);font-size:22px;line-height:1;color:var(--accent);min-width:18px}
-.step h3{font-size:17px;margin:var(--s1) 0 var(--s1)}
-.si{padding:var(--s1) 0;border-top:1px solid var(--line)}
-.sv{font-size:22px;font-weight:600;line-height:1.2;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
-.sv small{font-size:13px;font-weight:400;color:var(--sec)}
-.sm{font-size:14px;margin-top:2px}.sc{font-family:var(--mono);font-size:11.5px;color:var(--sec);margin-top:4px}
-
-/* recommendations */
-.reco-card{background:var(--sheet)}
-.reco{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
-@media(max-width:900px){.reco{grid-template-columns:1fr}}
-.rc{padding:var(--s2) var(--s3) var(--s2) 0;border-inline-end:1px solid var(--line);margin-inline-end:var(--s3)}
-.rc:last-child{border-inline-end:0;margin-inline-end:0}
-@media(max-width:900px){.rc{border-inline-end:0;margin:0;padding:var(--s2) 0;border-top:1px solid var(--line)}}
-.rc h3{font-size:18px;margin:0 0 var(--s1)}
-.rc p{margin:0 0 var(--s1);font-size:15px}
-.rc .why{font-size:13.5px;color:var(--sec)}
-.goal{display:flex;flex-direction:column}
-.goal div{border-top:1px solid var(--line);padding:var(--s1) 0}
-.goal b{display:block;font-weight:600}
-.goal span{font-size:14px;color:var(--sec)}
-.mapbtn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:var(--r);background:var(--accent);color:#fff;font-weight:600;font-size:16px;text-decoration:none;transition:background-color .2s var(--ease)}
-.mapbtn:hover{background:var(--accent-d);color:#fff}
-.band a.mapbtn,.band a.mapbtn:hover{color:#fff;text-decoration:none}
-
-/* sources */
-.sources{max-width:72ch;padding-top:var(--s6)}
-.sources h2{font-size:22px;margin:var(--s5) 0 var(--s1)}
-.sources h2:first-child{margin-top:0}
-.sources li{margin:6px 0}
+@media (max-width:640px){.tiles{grid-template-columns:1fr}.top h1{font-size:28px}}
+@media (prefers-reduced-motion:reduce){.brain,.ticker .sp{animation:none}.ranked button{transition:none}.cov .tr i{transition:none}}
 </style>
 </head>
 <body data-languages="fi,sv,en">
 <div id="site-header"></div><script src="/layout.js"></script>
-<main>
-  <div class="navbar hidden"><div class="wrap"><nav class="mainnav" id="mainnav" aria-label="Keuhkodatan vaiheet"></nav></div></div>
-  <section class="band kband" id="kband">
-    <div class="wrap">
-      <div class="ovhead" id="ovhead">
-        <div class="ovtext">
-          <h1 data-t="h1">Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin</h1>
-          <p class="lead" data-t="lead"></p>
-          <section class="ai2" id="ai2" aria-labelledby="aiTitle">
-            <div class="ai2h"><span class="pulse" aria-hidden="true"></span><b id="aiTitle"></b><span id="aiSub"></span></div>
-            <form id="aiF"><input type="text" id="aiI" maxlength="400" autocomplete="off"><button class="btn sm" type="submit" id="aiGo"></button></form>
-            <div class="ai2qs" id="aiQs"></div>
-            <div class="ai2out hidden" id="aiOut" aria-live="polite"></div>
-          </section>
-          <div class="regpick"><label for="region" id="regionLbl"></label><select id="region"></select><div class="chips" id="chips"></div></div>
-          <article class="brief" id="brief" aria-live="polite"></article>
-        </div>
-        <figure class="globe" style="margin-block:0"><div class="stage" id="globe"><img class="still hidden" id="globeStill" data-src="/assets/finland_3d.webp" alt="" width="1200" height="1400"><div id="globeLabels" aria-hidden="true"></div><div class="hint" id="globeHint" aria-hidden="true"></div></div><figcaption class="mapcap" id="mapcap"></figcaption></figure>
-      </div>
-      <div class="stephead hidden" id="pghead"></div>
-    </div>
+<main class="dash">
+  <section class="top wrap">
+    <div><p class="eyebrow" data-k="eyebrow"></p><h1 data-k="h1"></h1></div>
+    <form class="ask" id="askF"><span class="brain" id="brain" aria-hidden="true"></span><input type="text" id="askI" maxlength="400" autocomplete="off"><button class="btn sm" type="submit" data-k="go"></button></form>
+    <div class="chips" id="chips"></div>
   </section>
-  <div class="wrap">
-    <section id="pg-ov">
-      <section class="evid" id="evid"><div class="evh"><h2 id="evH"></h2><p id="evP"></p></div><ul class="headline" id="headline"></ul><div class="grid" id="grid2"></div></section>
-      <details class="srcd"><summary id="srcSum"></summary><div class="sources" id="sources"></div></details>
-    </section>
 
-  </div>
+  <section class="stage">
+    <div class="panel ai" id="ai" aria-live="polite"><h2><span data-k="aiH"></span></h2><div class="ticker" id="ticker"></div><p class="answer" id="answer"></p><ol class="ranked" id="ranked"></ol><p class="unk" id="unk"></p></div>
+    <div class="mapbox" id="globe"><img class="still hidden" id="globeStill" data-src="/assets/finland_3d.webp" alt="" width="1200" height="1400"><div id="labels" aria-hidden="true"></div><div class="maphint" id="hint" data-k="hint"></div><div class="legend" id="legend"></div></div>
+    <aside class="panel card" id="card" aria-live="polite"></aside>
+  </section>
+
+  <section class="tiles wrap" id="tiles"></section>
+  <p class="srcline wrap" data-k="src"></p>
 </main>
 <div id="site-footer"></div>
 <script>
 const D = {"trend": {"years": ["1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [156, 145.7, 151.5, 143.6, 138.6, 158.1, 151.1, 152.4, 156.7, 156.8, 155.3, 139.6, 147.9, 138.6, 141.8, 131.3, 128.3, 124.1, 117.2, 120.4, 109.6, 119.1, 112.3, 102.9, 104.6, 101.9, 98.8, 95.3, 89.2, 87.6, 89, 83.7, 83.1, 78.2, 78.9, 79.8, 76.9, 71, 71, 74.3, 67.1, 64.9, 66.1, 60.9, 62.3, 62.1, 61.2, 57.9, 58.7, 53.7, 55.4, 53.7, 46.7, 49.4, 47.5], "women": [10.6, 11, 8.9, 9.6, 10, 12, 11.9, 11.7, 12.1, 15.2, 13.2, 13.1, 12.1, 14.2, 15.7, 14.7, 14.5, 15, 15.6, 15.8, 15.5, 16.9, 15.7, 16.6, 15.9, 17.1, 16.8, 19.3, 17.3, 18.6, 19.4, 18.6, 20.2, 18.9, 19.9, 20, 20.6, 22, 20.9, 23.2, 23, 24.5, 23.9, 25.1, 24.6, 24.5, 23.7, 24.4, 25, 25.3, 24.7, 25.5, 24.8, 23.3, 23.8], "total": [66.7, 62.9, 63.3, 61.4, 58.8, 66.9, 64.4, 64.6, 66.1, 67.7, 65.8, 60.1, 62, 59.9, 61.8, 57.4, 56.6, 55.2, 53.2, 54.4, 50.3, 54.5, 51.4, 49.1, 49.2, 49.1, 47.5, 48.4, 45.2, 45.1, 45.9, 43.5, 44.7, 42.4, 43, 43.5, 43.1, 41.6, 41.2, 44.3, 41.2, 41.4, 41.6, 39.8, 40.4, 40.1, 39.5, 38.8, 39.3, 37.3, 37.9, 37.9, 34.4, 34.8, 34]}, "share": {"years": ["1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [38.6, 38.3, 38.1, 37.9, 35.9, 38.3, 39.0, 37.8, 39.3, 38.3, 38.6, 36.7, 37.1, 35.1, 35.8, 34.6, 34.3, 33.0, 31.4, 32.5, 30.4, 31.9, 30.5, 29.2, 29.7, 28.3, 28.7, 28.1, 26.9, 27.2, 27.1, 26.3, 26.8, 25.6, 26.1, 26.1, 26.2, 25.0, 25.3, 26.0, 24.1, 23.7, 24.4, 22.4, 23.1, 22.9, 22.8, 22.4, 22.2, 20.8, 21.4, 22.1, 18.7, 20.3, 19.5], "women": [4.6, 4.8, 3.9, 4.4, 4.7, 5.6, 5.6, 5.3, 5.5, 6.8, 6.2, 6.1, 5.6, 6.5, 7.2, 6.6, 6.7, 7.0, 7.1, 7.4, 7.4, 7.9, 7.2, 8.2, 7.7, 8.5, 8.0, 9.5, 8.8, 9.2, 9.9, 9.7, 10.4, 10.0, 10.6, 10.9, 11.2, 11.7, 11.6, 12.3, 12.3, 13.3, 13.0, 13.8, 13.7, 13.4, 13.3, 13.9, 14.2, 14.4, 14.4, 14.9, 14.5, 13.9, 14.4]}, "c34": {"years": ["1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"], "men": [1463, 1389, 1390, 1410, 1381, 1401, 1374, 1410, 1464, 1458, 1383, 1431, 1546, 1435, 1434, 1502, 1381, 1456, 1486, 1493, 1458, 1508, 1412, 1490, 1492, 1313, 1425, 1376], "women": [459, 417, 452, 484, 465, 521, 491, 534, 539, 572, 610, 595, 666, 671, 730, 722, 771, 775, 776, 769, 805, 835, 868, 856, 907, 887, 843, 877]}, "age": {"ages": ["40 – 44", "45 – 49", "50 – 54", "55 – 59", "60 – 64", "65 – 69", "70 – 74", "75 – 79", "80 – 84", "85 – 89", "90 – 94", "95+"], "men": [3, 6, 21, 45, 111, 192, 270, 327, 231, 112, 46, 11], "women": [1, 6, 15, 39, 59, 116, 153, 216, 129, 101, 32, 8]}, "region": [["HVA21", 62.1, 547], ["HVA10", 61.2, 488], ["HVA06", 57.7, 613], ["HVA20", 56.0, 197], ["HVA12", 55.1, 359], ["HVA09", 53.4, 547], ["HVA01", 50.3, 249], ["HVA14", 49.5, 402], ["HVA07", 49.1, 417], ["HVA11", 45.7, 287], ["HVA16", 45.5, 434], ["HVA05", 43.5, 1063], ["HVA19", 39.8, 829], ["HVA13", 39.2, 487], ["HVA17", 38.5, 341], ["HVA18", 38.3, 130], ["HVA02", 38.2, 391], ["HVA15", 36.9, 504], ["HVA08", 35.9, 962], ["HVA03", 35.0, 858], ["HVA90", 33.7, 1131], ["HVA04", 29.5, 417]], "region_fi": 41.9, "smoke_edu": {"years": ["2018", "2019", "2020", "2022", "2024"], "low": [17.6, 15.2, 15.4, 13.8, 14.1], "mid": [10.7, 8.9, 8.5, 8.0, 6.4], "high": [5.9, 7.0, 5.3, 5.8, 4.4]}, "smoke_reg": [["HVA06", 12.5], ["HVA04", 12.5], ["HVA10", 12.0], ["HVA21", 11.4], ["HVA01", 10.7], ["HVA05", 10.2], ["HVA07", 10.2], ["HVA11", 10.1], ["HVA14", 10.0], ["HVA09", 9.9], ["HVA19", 9.5], ["HVA02", 9.3], ["HVA13", 9.0], ["HVA20", 8.9], ["HVA18", 8.7], ["HVA03", 8.0], ["HVA17", 7.7], ["HVA16", 7.6], ["HVA15", 7.6], ["HVA08", 7.4], ["HVA12", 7.2], ["HVA90", 6.8], ["HVA91", 6.8]], "smoke_fi": 9.1, "smr": [["HVA21", 1.29, 1.19, 1.41, 547, 422.8], ["HVA01", 1.18, 1.04, 1.34, 249, 211.0], ["HVA10", 1.15, 1.05, 1.26, 488, 423.5], ["HVA06", 1.14, 1.05, 1.23, 613, 539.9], ["HVA09", 1.06, 0.98, 1.16, 547, 514.1], ["HVA19", 1.05, 0.98, 1.13, 829, 785.9], ["HVA20", 1.05, 0.9, 1.2, 197, 188.4], ["HVA90", 1.04, 0.98, 1.1, 1131, 1092.3], ["HVA02", 1.03, 0.93, 1.14, 391, 378.7], ["HVA03", 1.03, 0.96, 1.1, 858, 836.3], ["HVA07", 1.02, 0.92, 1.12, 417, 409.7], ["HVA05", 1.0, 0.94, 1.07, 1063, 1059.5], ["HVA14", 0.99, 0.89, 1.09, 402, 407.3], ["HVA04", 0.96, 0.87, 1.06, 417, 432.6], ["HVA16", 0.95, 0.87, 1.05, 434, 454.9], ["HVA12", 0.94, 0.85, 1.05, 359, 380.6], ["HVA17", 0.91, 0.81, 1.01, 341, 376.0], ["HVA08", 0.89, 0.83, 0.95, 962, 1080.8], ["HVA11", 0.89, 0.79, 1.0, 287, 323.1], ["HVA18", 0.87, 0.73, 1.04, 130, 149.0], ["HVA15", 0.84, 0.77, 0.92, 504, 597.7], ["HVA13", 0.82, 0.75, 0.9, 487, 591.6]], "names": {"HVA01": {"fi": "Itä-Uudenmaan", "sv": "Östra Nylands", "en": "East Uusimaa"}, "HVA02": {"fi": "Keski-Uudenmaan", "sv": "Mellersta Nylands", "en": "Central Uusimaa"}, "HVA03": {"fi": "Länsi-Uudenmaan", "sv": "Västra Nylands", "en": "West Uusimaa"}, "HVA04": {"fi": "Vantaan ja Keravan", "sv": "Vanda och Kervo", "en": "Vantaa and Kerava"}, "HVA05": {"fi": "Varsinais-Suomen", "sv": "Egentliga Finlands", "en": "Southwest Finland"}, "HVA06": {"fi": "Satakunnan", "sv": "Satakunta", "en": "Satakunta"}, "HVA07": {"fi": "Kanta-Hämeen", "sv": "Egentliga Tavastlands", "en": "Kanta-Häme"}, "HVA08": {"fi": "Pirkanmaan", "sv": "Birkalands", "en": "Pirkanmaa"}, "HVA09": {"fi": "Päijät-Hämeen", "sv": "Päijänne-Tavastlands", "en": "Päijät-Häme"}, "HVA10": {"fi": "Kymenlaakson", "sv": "Kymmenedalens", "en": "Kymenlaakso"}, "HVA11": {"fi": "Etelä-Karjalan", "sv": "Södra Karelens", "en": "South Karelia"}, "HVA12": {"fi": "Etelä-Savon", "sv": "Södra Savolax", "en": "South Savo"}, "HVA13": {"fi": "Pohjois-Savon", "sv": "Norra Savolax", "en": "North Savo"}, "HVA14": {"fi": "Pohjois-Karjalan", "sv": "Norra Karelens", "en": "North Karelia"}, "HVA15": {"fi": "Keski-Suomen", "sv": "Mellersta Finlands", "en": "Central Finland"}, "HVA16": {"fi": "Etelä-Pohjanmaan", "sv": "Södra Österbottens", "en": "South Ostrobothnia"}, "HVA17": {"fi": "Pohjanmaan", "sv": "Österbottens", "en": "Ostrobothnia"}, "HVA18": {"fi": "Keski-Pohjanmaan", "sv": "Mellersta Österbottens", "en": "Central Ostrobothnia"}, "HVA19": {"fi": "Pohjois-Pohjanmaan", "sv": "Norra Österbottens", "en": "North Ostrobothnia"}, "HVA20": {"fi": "Kainuun", "sv": "Kajanalands", "en": "Kainuu"}, "HVA21": {"fi": "Lapin", "sv": "Lapplands", "en": "Lapland"}, "HVA90": {"fi": "Helsingin kaupunki", "sv": "Helsingfors stad", "en": "Helsinki"}, "HVA91": {"fi": "Ahvenanmaa", "sv": "Åland", "en": "Åland"}}, "scr_lang": {"breast": {"file": "breast_11.csv", "Domestic": 83.2, "Other/missing": 60.8}, "colorectal": {"file": "colorectal_10.csv", "Domestic": 74.5, "Other/missing": 53.4}, "cervical": {"file": "cervix_31.csv", "Domestic": 76.2, "Other/missing": 56.3}}, "scr_edu": {"breast": {"file": "breast_21.csv", "Primary education/unknown": 63.5, "Intermediate/secondary": 81.2, "Tertiary/higher education": 85.9}, "colorectal": {"file": "colorectal_13.csv", "Primary education/unknown": 61.5, "Intermediate/secondary": 73.0, "Tertiary/higher education": 79.3}}, "scr_nat": {"breast": 81.6, "colorectal": 73.5}, "scr_county": [["HVA91", null, null, 80.2], ["HVA90", 74.3, 69.6, 72.2], ["HVA03", 76.1, 71.5, 74.6], ["HVA04", 76.7, 71.3, 72.1], ["HVA01", 79.8, 72.0, 76.5], ["HVA02", 80.5, 74.0, 77.0], ["HVA09", 81.8, 75.2, 68.9], ["HVA10", 82.0, 70.0, 77.3], ["HVA12", 82.2, 76.9, 82.3], ["HVA05", 82.7, 73.5, 77.8], ["HVA11", 83.2, 74.0, 77.0], ["HVA07", 83.4, 74.3, 70.4], ["HVA08", 83.5, 74.3, 71.5], ["HVA21", 83.8, 73.7, 79.9], ["HVA20", 84.1, 76.5, 78.5], ["HVA14", 84.2, 73.2, 68.0], ["HVA17", 84.9, 75.9, 72.4], ["HVA06", 84.9, 72.6, 72.1], ["HVA16", 85.0, 74.6, 82.3], ["HVA15", 85.1, 76.5, 70.6], ["HVA13", 85.1, 75.4, 70.0], ["HVA18", 85.4, 73.3, 69.2], ["HVA19", 85.6, 75.6, 73.6]], "risk": [["HVA05", 11588, 148611, 143.1, 12.0, 6.3, ["Turku"]], ["HVA90", 9374, 175327, 129.0, 7.1, 5.9, ["Helsinki"]], ["HVA08", 9168, 154873, 124.2, 7.4, 7.4, ["Sastamala", "Tampere", "Valkeakoski"]], ["HVA03", 8849, 140818, 121.9, 8.7, 6.2, ["Espoo", "Lohja"]], ["HVA19", 8539, 117971, 140.5, 10.5, 6.9, ["Kuusamo", "Oulainen", "Oulu", "Raahe"]], ["HVA04", 7282, 75758, 110.1, 13.6, 8.8, ["Vantaa"]], ["HVA06", 6809, 69574, 176.2, 15.1, 8.3, ["Pori"]], ["HVA13", 5566, 81401, 119.7, 11.0, 5.4, ["Iisalmi", "Kuopio", "Varkaus"]], ["HVA09", 5235, 68271, 160.2, 13.1, 4.7, ["Lahti"]], ["HVA21", 5213, 58881, 185.8, 12.9, 8.8, ["Kemi", "Rovaniemi"]], ["HVA10", 5123, 55654, 175.4, 14.6, 7.3, ["Kotka", "Kouvola"]], ["HVA15", 4887, 82736, 121.8, 8.6, 5.7, ["Jyväskylä"]], ["HVA02", 4561, 64676, 120.9, 11.0, 4.8, ["Hyvinkää"]], ["HVA07", 4526, 56999, 146.3, 12.1, 6.8, ["Hämeenlinna", "Riihimäki"]], ["HVA14", 4091, 53892, 149.2, 11.3, 7.4, ["Joensuu"]], ["HVA16", 3548, 60923, 142.5, 9.3, 4.6, ["Seinäjoki"]], ["HVA11", 3315, 42416, 135.3, 12.3, 6.4, ["Lappeenranta"]], ["HVA17", 3030, 50556, 134.9, 8.6, 5.8, ["Pietarsaari", "Vaasa"]], ["HVA01", 2864, 33414, 149.0, 11.4, 9.5, ["Porvoo"]], ["HVA12", 2745, 47905, 149.9, 8.5, 5.6, ["Mikkeli", "Savonlinna"]], ["HVA20", 1710, 24902, 158.2, 10.5, 6.4, ["Kajaani"]], ["HVA18", 1372, 19906, 130.6, 9.4, 7.5, ["Kokkola"]], ["HVA91", 529, 9927, 139.0, 7.5, 5.3, ["Maarianhamina - Mariehamn"]]], "risk_nat": 119924, "nordsurv": {"title": "Lung cancer five-year relative survival, %", "men": {"Finland": 17, "Denmark": 27, "Sweden": 29, "Norway": 30}, "women": {"Finland": 29, "Denmark": 35, "Sweden": 37, "Norway": 37}, "tag": "N", "source": "IHE Cancer Dashboard Finland 2026 via team notes; not re-verified. NORDCAN is the primary source to check."}};
-const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NOM={fi:{HVA01:'Itä-Uusimaa',HVA02:'Keski-Uusimaa',HVA03:'Länsi-Uusimaa',HVA04:'Vantaa–Kerava',HVA05:'Varsinais-Suomi',HVA06:'Satakunta',HVA07:'Kanta-Häme',HVA08:'Pirkanmaa',HVA09:'Päijät-Häme',HVA10:'Kymenlaakso',HVA11:'Etelä-Karjala',HVA12:'Etelä-Savo',HVA13:'Pohjois-Savo',HVA14:'Pohjois-Karjala',HVA15:'Keski-Suomi',HVA16:'Etelä-Pohjanmaa',HVA17:'Pohjanmaa',HVA18:'Keski-Pohjanmaa',HVA19:'Pohjois-Pohjanmaa',HVA20:'Kainuu',HVA21:'Lappi',HVA90:'Helsinki',HVA91:'Ahvenanmaa'},sv:{HVA01:'Östra Nyland',HVA02:'Mellersta Nyland',HVA03:'Västra Nyland',HVA04:'Vanda och Kervo',HVA05:'Egentliga Finland',HVA06:'Satakunta',HVA07:'Egentliga Tavastland',HVA08:'Birkaland',HVA09:'Päijänne-Tavastland',HVA10:'Kymmenedalen',HVA11:'Södra Karelen',HVA12:'Södra Savolax',HVA13:'Norra Savolax',HVA14:'Norra Karelen',HVA15:'Mellersta Finland',HVA16:'Södra Österbotten',HVA17:'Österbotten',HVA18:'Mellersta Österbotten',HVA19:'Norra Österbotten',HVA20:'Kajanaland',HVA21:'Lappland',HVA90:'Helsingfors',HVA91:'Åland'}};
+const SIGN=D.smr;   // [code, smr, lo, hi, deaths, expected]
 let lang='fi';
 const LOC={fi:'fi-FI',sv:'sv-FI',en:'en-GB'};
-const fmt = v => v==null ? '–' : (typeof v==='number' ? v.toLocaleString(LOC[lang]) : v);
-const L = o => (o && typeof o==='object' && !Array.isArray(o)) ? (o[lang] ?? o.fi) : o;
-const nm = c => D.names[c][lang];
-const NOM={fi:{HVA01:'Itä-Uusimaa',HVA02:'Keski-Uusimaa',HVA03:'Länsi-Uusimaa',HVA04:'Vantaa–Kerava',HVA05:'Varsinais-Suomi',HVA06:'Satakunta',HVA07:'Kanta-Häme',HVA08:'Pirkanmaa',HVA09:'Päijät-Häme',HVA10:'Kymenlaakso',HVA11:'Etelä-Karjala',HVA12:'Etelä-Savo',HVA13:'Pohjois-Savo',HVA14:'Pohjois-Karjala',HVA15:'Keski-Suomi',HVA16:'Etelä-Pohjanmaa',HVA17:'Pohjanmaa',HVA18:'Keski-Pohjanmaa',HVA19:'Pohjois-Pohjanmaa',HVA20:'Kainuu',HVA21:'Lappi',HVA90:'Helsinki',HVA91:'Ahvenanmaa'},sv:{HVA01:'Östra Nyland',HVA02:'Mellersta Nyland',HVA03:'Västra Nyland',HVA04:'Vanda och Kervo',HVA05:'Egentliga Finland',HVA06:'Satakunta',HVA07:'Egentliga Tavastland',HVA08:'Birkaland',HVA09:'Päijänne-Tavastland',HVA10:'Kymmenedalen',HVA11:'Södra Karelen',HVA12:'Södra Savolax',HVA13:'Norra Savolax',HVA14:'Norra Karelen',HVA15:'Mellersta Finland',HVA16:'Södra Österbotten',HVA17:'Österbotten',HVA18:'Mellersta Österbotten',HVA19:'Norra Österbotten',HVA20:'Kajanaland',HVA21:'Lappland',HVA90:'Helsingfors',HVA91:'Åland'}};
-const nmN = c => (NOM[lang]&&NOM[lang][c])||nm(c);
-const pc = s => lang==='en' ? s.replace(/ %/g,'%') : s;
-
-const T = {
- fi:{brand:'Polku hoitoon',nav_bus:'Seulontabussi',nav_app:'Sovellus',badge:'Keuhkodata · avoin data',h1:'Keuhkosyöpä löytyy Suomessa liian myöhään, ja eniten niiltä, joita hoito tavoittaa huonoimmin',lead:'Kysy tekoälyanalyytikolta tai valitse alue kartalta: mikä ero on, missä kohtaa hoitopolkua se syntyy, ketä se koskee ja mitä tehdään. Jokainen luku tarkistetaan lähdedataa vasten.',tab_dash:'Tilannekuva',tab_src:'Lähteet ja rajoitukset',pick_h:'Valitse näkymät itse',pre_l:'Pikavalinta:',ai_btn:'Selitä alueen tilanne tekoälyllä',ai_hint:'Tekoäly (Claude) käyttää vain tämän sivun lähdetietoja ja voi erehtyä. Suositukset ovat tiimin, ei tekoälyn.',ai_err:'Analyysi ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.',ai_wait:'Tekoäly kirjoittaa…',area_l:'Oma alue',area_none:'Ei valittu',pre_sum:'2 minuutin yhteenveto',pre_reg:'Alue-erot',pre_all:'Kaikki näkymät',all:'Valitse kaikki',none:'Tyhjennä',empty:'Valitse yllä vähintään yksi näkymä.',show:'Näytä taulukko',hide:'Piilota taulukko',source:'Lähde',tagS:'S = julkinen lähde',tagN:'N = tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen',tagA:'A = oletus tai välillinen arvio',footer:'Polku hoitoon on Junction 2026 -hackathonissa AstraZenecan haasteeseen tehty konsepti, ei vielä oikea palvelu. Data haettu 14.11.2026.',men:'Miehet',women:'Naiset',total:'Yhteensä',days:'pv',national:'Koko maa',area:'Alue',deaths:'Kuolemat',expected:'Odotetut',ci:'95 %:n luottamusväli',natlevel:'Maan taso',target:'Tavoite 80 %'},
- sv:{brand:'Polku hoitoon',nav_bus:'Screeningbussen',nav_app:'Appen',badge:'Lungdata · öppna data',h1:'Lungcancer upptäcks för sent i Finland, och mest hos dem som vården når sämst',lead:'Fråga AI-analytikern eller välj ett område på kartan: vad skillnaden är, var i vårdkedjan den uppstår, vem den gäller och vad man gör. Varje siffra kontrolleras mot källdatan.',tab_dash:'Lägesbild',tab_src:'Källor och begränsningar',pick_h:'Välj vyer själv',pre_l:'Snabbval:',ai_btn:'Förklara områdets läge med AI',ai_hint:'AI (Claude) använder bara källdata på sidan och kan ha fel. Rekommendationerna kommer från teamet, inte AI.',ai_err:'Analysen lyckades inte just nu. Försök igen om en stund.',ai_wait:'AI skriver…',area_l:'Mitt område',area_none:'Inget valt',pre_sum:'Sammanfattning på 2 min',pre_reg:'Regionala skillnader',pre_all:'Alla vyer',all:'Välj alla',none:'Rensa',empty:'Välj minst en vy ovan.',show:'Visa tabell',hide:'Dölj tabell',source:'Källa',tagS:'S = offentlig källa',tagN:'N = teamets anteckningar eller expertintervju, inte omkontrollerat',tagA:'A = antagande eller indirekt uppskattning',footer:'Polku hoitoon är ett koncept gjort för AstraZenecas utmaning på hackathonet Junction 2026, ännu ingen riktig tjänst. Data hämtade 14.11.2026.',men:'Män',women:'Kvinnor',total:'Totalt',days:'dagar',national:'Hela landet',area:'Område',deaths:'Dödsfall',expected:'Förväntade',ci:'95 % konfidensintervall',natlevel:'Riksnivå',target:'Mål 80 %'},
- en:{brand:'Polku hoitoon',nav_bus:'Screening bus',nav_app:'App',badge:'Lung data · open data',h1:'Lung cancer is found too late in Finland, most of all among people care reaches worst',lead:'Ask the AI analyst or pick a region on the map: what the gap is, where on the care pathway it forms, who it affects and what to do. Every number is checked against the source data.',tab_dash:'Overview',tab_src:'Sources and limitations',pick_h:'Pick views yourself',pre_l:'Quick view:',ai_btn:'Explain this area with AI',ai_hint:'The AI (Claude) uses only the source data on this page and can be wrong. Recommendations come from the team, not from the AI.',ai_err:'The analysis failed just now. Please try again shortly.',ai_wait:'The AI is writing…',area_l:'Your area',area_none:'None selected',pre_sum:'2-minute summary',pre_reg:'Regional gaps',pre_all:'All views',all:'Select all',none:'Clear',empty:'Select at least one view above.',show:'Show table',hide:'Hide table',source:'Source',tagS:'S = public source',tagN:'N = team notes or expert interview, not re-verified',tagA:'A = assumption or indirect estimate',footer:'Polku hoitoon is a concept made for AstraZeneca\'s challenge at the Junction 2026 hackathon, not a real service yet. Data retrieved 14 Nov 2026.',men:'Men',women:'Women',total:'Total',days:'days',national:'Whole country',area:'Area',deaths:'Deaths',expected:'Expected',ci:'95% confidence interval',natlevel:'National level',target:'Target 80%'}
-};
-const MT = {fi:{pro:'Ammattilaisille',dm:'Päättäjille',about:'Tietoa meistä',fb:'Anna palautetta',priv:'Tietosuojaseloste',menu:'Valikko',faq:'Usein kysyttyä'},sv:{pro:'För vårdpersonal',dm:'För beslutsfattare',about:'Om oss',fb:'Ge respons',priv:'Dataskyddsbeskrivning',menu:'Meny',faq:'Vanliga frågor'},en:{pro:'For professionals',dm:'For decision-makers',about:'About us',fb:'Give feedback',priv:'Privacy notice',menu:'Menu',faq:'FAQ'}};
-const t = k => T[lang][k];
-
-const GROUPS = {
- sum:{fi:'Yhteenveto',sv:'Sammanfattning',en:'Summary'},
- mort:{fi:'Kuolleisuus (Tilastokeskus)',sv:'Dödlighet (Statistikcentralen)',en:'Mortality (Statistics Finland)'},
- delay:{fi:'Viiveet hoitopolulla',sv:'Fördröjningar i vårdkedjan',en:'Delays on the care pathway'},
- risk:{fi:'Riskiryhmä ja tupakointi',sv:'Riskgrupp och rökning',en:'Risk group and smoking'},
- eq:{fi:'Eriarvoisuus (Syöpärekisteri)',sv:'Ojämlikhet (Cancerregistret)',en:'Inequality (Cancer Registry)'},
- scr:{fi:'Syöpäseulonnat: kuka jää pois',sv:'Cancerscreening: vem faller bort',en:'Cancer screening: who is missed'},
- intl:{fi:'Kansainvälinen vertailu',sv:'Internationell jämförelse',en:'International comparison'}
-};
-const SRC = {
- st11ay:[{fi:'Tilastokeskus, kuolemansyyt (11ay)',sv:'Statistikcentralen, dödsorsaker (11ay)',en:'Statistics Finland, causes of death (11ay)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_11ay.px/'],
- st11be:[{fi:'Tilastokeskus, kuolemansyyt (11be)',sv:'Statistikcentralen, dödsorsaker (11be)',en:'Statistics Finland, causes of death (11be)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_11be.px/'],
- st13u5:[{fi:'Tilastokeskus, kuolemansyyt (13u5)',sv:'Statistikcentralen, dödsorsaker (13u5)',en:'Statistics Finland, causes of death (13u5)'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/statfin_ksyyt_pxt_13u5.px/'],
- smr:[{fi:'Polku Labs -laskelma Tilastokeskuksen taulukoista 13u5, 11az, 11s1',sv:'Polku Labs beräkning från Statistikcentralens tabeller 13u5, 11az, 11s1',en:'Polku Labs calculation from Statistics Finland tables 13u5, 11az, 11s1'},'https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__ksyyt/'],
- mot:[{fi:'Yle MOT 2026 (Kuittinen ym., julkaisematon)',sv:'Yle MOT 2026 (Kuittinen m.fl., opublicerad)',en:'Yle MOT 2026 (Kuittinen et al., unpublished)'},'https://yle.fi/a/74-20251023'],
- sotk:[{fi:'THL Sotkanet (ind. 4408–4410)',sv:'THL Sotkanet (ind. 4408–4410)',en:'THL Sotkanet (ind. 4408–4410)'},'https://sotkanet.fi'],
- sotk4404:[{fi:'THL Sotkanet (ind. 4404)',sv:'THL Sotkanet (ind. 4404)',en:'THL Sotkanet (ind. 4404)'},'https://sotkanet.fi'],
- risk:[{fi:'Polku Labs -arvio: THL Sotkanet 4405/4406 (2024) × oletettu kerroin',sv:'Polku Labs uppskattning: THL Sotkanet 4405/4406 (2024) × antagen faktor',en:'Polku Labs estimate: THL Sotkanet 4405/4406 (2024) × assumed factor'},'https://sotkanet.fi'],
- ohj:[{fi:'Syöpärekisteri, Syöpä 2022 – Valtakunnallinen keuhkosyöpäohjelma 2026–2035',sv:'Cancerregistret, Cancer 2022 – Nationella lungcancerprogrammet 2026–2035',en:'Finnish Cancer Registry, Cancer 2022 – National Lung Cancer Programme 2026–2035'},'https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf'],
- oecd:[{fi:'ECIS 2022 -arvio – OECD/EU Syöpäprofiilit 2025',sv:'ECIS-uppskattning 2022 – OECD/EU cancerprofiler 2025',en:'ECIS 2022 estimate – OECD/EU Country Cancer Profiles 2025'},'https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf'],
- ihe:[{fi:'IHE Cancer Dashboard for Finland 2026 (Malmberg & Hofmarcher; lukuja myös tiimin muistiinpanoista)',sv:'IHE Cancer Dashboard for Finland 2026 (Malmberg & Hofmarcher; uppgifter även ur teamets anteckningar)',en:'IHE Cancer Dashboard for Finland 2026 (Malmberg & Hofmarcher; figures also from team notes)'},'https://ihe.se/app/uploads/2026/04/IHE-Cancer-Dashboard-Finland_.pdf'],
- scr:[{fi:'Syöpärekisterin seulontatilastot 2024',sv:'Cancerregistrets screeningstatistik 2024',en:'Finnish Cancer Registry screening statistics 2024'},'https://stats.cancerregistry.fi/'],
- team:[{fi:'Polku Labs, ct-sim-analyysi (dokumentit GitHubissa; tiimin muistiinpanot ja kansallinen syöpästrategia)',sv:'Polku Labs, ct-sim-analys (teamets anteckningar och nationella cancerstrategin)',en:'Polku Labs, ct-sim analysis (team notes and the national cancer strategy)'},'https://github.com/oliviasaukonoja/junction/tree/main/ct-sim/docs']
-};
-const src = keys => keys.map(k=>`<a href="${SRC[k][1]}">${L(SRC[k][0])}</a>`).join(' · ');
-
-const line = (labels, sets, unit, extra={}) => ({type:'line', unit, data:{labels, datasets:sets.map(s=>({label:s.label,data:s.data,borderColor:css(s.c),backgroundColor:css(s.c),borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2}))}, ...extra});
-const bar = (labels, sets, unit, extra={}) => ({type:'bar', unit, data:{labels, datasets:sets.map(s=>({label:s.label,data:s.data,backgroundColor:s.colors||css(s.c),borderRadius:4,borderSkipped:'start',maxBarThickness:34}))}, ...extra});
-const SCRN = {breast:{fi:'Rintasyöpä',sv:'Bröstcancer',en:'Breast'},colorectal:{fi:'Suolistosyöpä',sv:'Tarmcancer',en:'Colorectal'},cervical:{fi:'Kohdunkaulansyöpä',sv:'Livmoderhalscancer',en:'Cervical'}};
-
-const VIEWS = [
- {id:'kpi', g:'sum', wide:true, kind:'tiles', title:{fi:'Avainluvut',sv:'Nyckeltal',en:'Key figures'}},
- {id:'pathway', g:'sum', wide:true, kind:'pathway', tag:'N', src:['team','mot'],
-  title:{fi:'Missä kohtaa hoitopolkua ero syntyy',sv:'Var i vårdkedjan uppstår skillnaden',en:'Where on the care pathway the gap emerges'},
-  sub:{fi:'Polku Labsin kooste vaiheittain: Suomen luku isolla, vertailu alla',sv:'Polku Labs sammanställning per steg: Finlands siffra stort, jämförelse under',en:'Polku Labs summary by stage: Finland in large type, comparison below'},
-  note:{fi:'Ero syntyy pääosin ennen diagnoosia, perusterveydenhuollossa. Diagnoosista hoitoon päästään useimmiten ajallaan.',sv:'Skillnaden uppstår främst före diagnos, i primärvården. Från diagnos till behandling går det oftast i tid.',en:'The gap forms mostly before diagnosis, in primary care. Diagnosis to treatment is mostly on time.'}},
- {id:'reco', g:'sum', wide:true, kind:'reco', tag:'N', src:['team'],
-  title:{fi:'Mitä tehdään: suositukset',sv:'Vad gör vi: rekommendationer',en:'What to do: recommendations'},
-  sub:{fi:'Polku Labsin ehdotukset yllä olevan datan pohjalta',sv:'Polku Labs förslag utifrån datan ovan',en:'Polku Labs proposals based on the data above'},
-  note:{fi:'Nämä ovat tiimin ehdotuksia, eivät todistettu vaikutus. Siksi ehdotamme satunnaistettua pilottia ennen laajennusta.',sv:'Detta är teamets förslag, inte bevisad effekt. Därför föreslår vi en randomiserad pilot före utvidgning.',en:'These are team proposals, not proven effects. Hence we propose a randomised pilot before any rollout.'}},
- {id:'goal3', g:'sum', kind:'goal3', tag:'S', src:['team'],
-  title:{fi:'Syöpästrategian tavoite 3: mittarit',sv:'Cancerstrategins mål 3: indikatorer',en:'Cancer strategy Goal 3: indicators'},
-  sub:{fi:'Kansallinen syöpästrategia 2026–2035',sv:'Nationella cancerstrategin 2026–2035',en:'National Cancer Strategy 2026–2035'}},
- {id:'trend', g:'mort', tag:'S', src:['st11ay'],
-  title:{fi:'Keuhkosyöpäkuolleisuus 1971–2025',sv:'Lungcancerdödlighet 1971–2025',en:'Lung cancer mortality 1971–2025'},
-  sub:{fi:'Ikävakioitu kuolleisuus / 100 000 asukasta (C32–C34)',sv:'Åldersstandardiserad dödlighet / 100 000 invånare (C32–C34)',en:'Age-standardised mortality / 100,000 population (C32–C34)'},
-  chart:()=>line(D.trend.years,[{label:t('men'),data:D.trend.men,c:'--men'},{label:t('women'),data:D.trend.women,c:'--women'},{label:t('total'),data:D.trend.total,c:'--total'}],'/100 000'),
-  note:{fi:'Miesten kuolleisuus on pudonnut 1970-luvun tasosta (156) alle kolmannekseen (47,5 vuonna 2025). Naisten kuolleisuus yli kaksinkertaistui vuosina 1971–2020 (10,6 → 25,3) ja on sen jälkeen tasaantunut.',sv:'Männens dödlighet har sjunkit från 1970-talets nivå (156) till under en tredjedel (47,5 år 2025). Kvinnornas dödlighet mer än fördubblades 1971–2020 (10,6 → 25,3) och har sedan planat ut.',en:'Mortality in men has fallen from the 1970s level (156) to under a third (47.5 in 2025). Mortality in women more than doubled in 1971–2020 (10.6 → 25.3) and has since levelled off.'}},
- {id:'count', g:'mort', tag:'S', src:['st11be'],
-  title:{fi:'Keuhkosyöpäkuolemat vuosittain',sv:'Lungcancerdödsfall per år',en:'Lung cancer deaths per year'},
-  sub:{fi:'Kuolleiden lukumäärä, keuhkosyöpä (C34), 1998–2025',sv:'Antal döda, lungcancer (C34), 1998–2025',en:'Number of deaths, lung cancer (C34), 1998–2025'},
-  chart:()=>line(D.c34.years,[{label:t('men'),data:D.c34.men,c:'--men'},{label:t('women'),data:D.c34.women,c:'--women'}],'')},
- {id:'share', g:'mort', tag:'S', src:['st11ay'],
-  title:{fi:'Keuhkosyövän osuus syöpäkuolemista',sv:'Lungcancerns andel av cancerdödsfallen',en:'Lung cancer share of cancer deaths'},
-  sub:{fi:'% syöpäkuolemista (C32–C34 / C00–C97), 1971–2025',sv:'% av cancerdödsfallen (C32–C34 / C00–C97), 1971–2025',en:'% of cancer deaths (C32–C34 / C00–C97), 1971–2025'},
-  chart:()=>line(D.share.years,[{label:t('men'),data:D.share.men,c:'--men'},{label:t('women'),data:D.share.women,c:'--women'}],'%')},
- {id:'age', g:'mort', tag:'S', src:['st11be'],
-  title:{fi:'Keuhkosyöpäkuolemat ikäryhmittäin 2025',sv:'Lungcancerdödsfall per åldersgrupp 2025',en:'Lung cancer deaths by age group, 2025'},
-  sub:{fi:'Kuolleiden lukumäärä, keuhkosyöpä (C34)',sv:'Antal döda, lungcancer (C34)',en:'Number of deaths, lung cancer (C34)'},
-  chart:()=>bar(D.age.ages,[{label:t('men'),data:D.age.men,c:'--men'},{label:t('women'),data:D.age.women,c:'--women'}],'')},
- {id:'smr', g:'mort', tag:'S', src:['smr'], tall:true, kind:'smr',
-  title:{fi:'Ikävakioitu kuolleisuussuhde (SMR) hyvinvointialueittain',sv:'Åldersstandardiserad dödlighetskvot (SMR) per välfärdsområde',en:'Age-standardised mortality ratio (SMR) by wellbeing services county'},
-  sub:{fi:'Havaitut / odotetut keuhkosyöpäkuolemat 2021–2025 (C32–C34), 95 %:n luottamusväli. 1,0 = maan taso',sv:'Observerade / förväntade lungcancerdödsfall 2021–2025 (C32–C34), 95 % konfidensintervall. 1,0 = riksnivå',en:'Observed / expected lung cancer deaths 2021–2025 (C32–C34), 95% confidence interval. 1.0 = national level'},
-  note:{fi:'SMR huomioi alueen ikärakenteen, joten se on karkeaa kuolleisuutta reilumpi vertailu. Punainen = merkitsevästi yli maan tason, sininen = merkitsevästi alle, harmaa = ei merkitsevää eroa.',sv:'SMR tar hänsyn till områdets åldersstruktur och är därför en rättvisare jämförelse än rå dödlighet. Rött = signifikant över riksnivån, blått = signifikant under, grått = ingen signifikant skillnad.',en:'SMR accounts for each area\'s age structure, so it is a fairer comparison than crude mortality. Red = significantly above the national level, blue = significantly below, grey = no significant difference.'}},
- {id:'region', g:'mort', tag:'S', src:['st13u5'], tall:true,
-  title:{fi:'Karkea kuolleisuus hyvinvointialueittain',sv:'Rå dödlighet per välfärdsområde',en:'Crude mortality by wellbeing services county'},
-  sub:{fi:'Ikävakioimaton kuolleisuus / 100 000 asukasta, keskiarvo 2021–2025 (C32–C34)',sv:'Ej åldersstandardiserad dödlighet / 100 000 invånare, medeltal 2021–2025 (C32–C34)',en:'Crude mortality / 100,000 population, mean 2021–2025 (C32–C34)'},
-  chart:()=>bar(D.region.map(r=>nmN(r[0])),[{label:'/100 000',data:D.region.map(r=>r[1]),c:'--bar'}],'/100 000',{horizontal:true,codes:D.region.map(r=>r[0]),ref:D.region_fi,refLabel:t('national')}),
-  note:{fi:'Luku ei ole ikävakioitu. Reiluun vertailuun käytä SMR-näkymää.',sv:'Talet är inte åldersstandardiserat. Använd SMR-vyn för en rättvis jämförelse.',en:'Not age-standardised. Use the SMR view for a fair comparison.'}},
- {id:'delay', g:'delay', tag:'N', src:['mot'],
-  title:{fi:'Viive oireista hoidon alkuun',sv:'Fördröjning från symtom till behandlingsstart',en:'Delay from symptoms to start of treatment'},
-  sub:{fi:'Keskimääräiset päivät, keuhkosyöpä',sv:'Genomsnittligt antal dagar, lungcancer',en:'Average days, lung cancer'},
-  chart:()=>bar([{fi:'Suomi',sv:'Finland',en:'Finland'}[lang],{fi:'Ruotsi',sv:'Sverige',en:'Sweden'}[lang],{fi:'Tanska',sv:'Danmark',en:'Denmark'}[lang]],[{label:t('days'),colors:[css('--men'),css('--neutral'),css('--neutral')],data:[155,107,67]}],t('days')),
-  note:{fi:'Suomen luku perustuu julkaisemattomaan tutkimukseen neljästä sairaalasta (Kuopio, Tampere, Turku, Rovaniemi).',sv:'Finlands siffra bygger på en opublicerad studie från fyra sjukhus (Kuopio, Tammerfors, Åbo, Rovaniemi).',en:'Finland\'s figure is from an unpublished study in four hospitals (Kuopio, Tampere, Turku, Rovaniemi).'}},
- {id:'delayphase', g:'delay', tag:'N', src:['mot'],
-  title:{fi:'Suomen viive vaiheittain',sv:'Finlands fördröjning per fas',en:'Finland\'s delay by phase'},
-  sub:{fi:'Päivää, keuhkosyöpä',sv:'Dagar, lungcancer',en:'Days, lung cancer'},
-  chart:()=>bar([{fi:'Potilas (oireista ensikäyntiin)',sv:'Patient (symtom till första besök)',en:'Patient (symptoms to first visit)'}[lang],{fi:'Perusterveydenhuolto',sv:'Primärvård',en:'Primary care'}[lang],{fi:'Erikoissairaanhoito',sv:'Specialiserad sjukvård',en:'Specialist care'}[lang]],[{label:t('days'),data:[50,41,58],c:'--bar'}],t('days'),{horizontal:true}),
-  note:{fi:'Potilasviive on "yli 50 pv", joten pylväs näyttää alarajan. Osien summa on alle 155 pv, koska kaikkea aikaa ei ole jaettu vaiheisiin. Satakunnassa suurin viive oli erikoissairaanhoidossa (Mattila 2025), eli pullonkaula vaihtelee alueittain.',sv:'Patientfördröjningen är "över 50 dagar", så stapeln visar nedre gränsen. Delarna summerar till under 155 dagar eftersom all tid inte är fördelad på faser. I Satakunta var den största fördröjningen i specialiserad sjukvård (Mattila 2025), så flaskhalsen varierar regionalt.',en:'Patient delay is "over 50 days", so the bar shows the lower bound. The parts sum to less than 155 days because not all time is assigned to a phase. In Satakunta the largest delay was in specialist care (Mattila 2025), so the bottleneck varies by region.'}},
- {id:'risk', g:'risk', tag:'A', src:['risk'], tall:true,
-  title:{fi:'Arvioitu riskiryhmä hyvinvointialueittain',sv:'Uppskattad riskgrupp per välfärdsområde',en:'Estimated high-risk group by wellbeing services county'},
-  sub:{fi:'% 50–74-vuotiaista: ≥20 askivuotta, tupakoi tai lopetti alle 15 v sitten. Henkilömäärät taulukossa',sv:'% av 50–74-åringar: ≥20 paketår, röker eller slutade för under 15 år sedan. Antal personer i tabellen',en:'% of 50–74-year-olds: ≥20 pack-years, current smoker or quit within 15 years. Headcounts in the table'},
-  chart:()=>{const rs=D.risk.slice().sort((a,b)=>b[1]/b[2]-a[1]/a[2]);return bar(rs.map(r=>nmN(r[0])),[{label:{fi:'Riskiryhmän osuus 50–74-vuotiaista',sv:'Riskgruppens andel av 50–74-åringar',en:'Risk group share of 50–74-year-olds'}[lang],data:rs.map(r=>Math.round(r[1]/r[2]*1000)/10),c:'--bar'}],'%',{horizontal:true,codes:rs.map(r=>r[0]),riskTable:true});},
-  note:{fi:`Koko maassa noin ${fmt(D.risk_nat)} henkilöä (7 % 50–74-vuotiaista). Arvio = alueen tupakointiosuus × oletettu kerroin 0,8 (vaihteluväli 0,55–1,1), koska suomalaista askivuosidataa ei löytynyt. Taulukossa myös CT-paikkakunnat (tiimin selvittämä lista, ei virallinen rekisteri).`,sv:`I hela landet cirka ${fmt(D.risk_nat)} personer (7 % av 50–74-åringarna). Uppskattning = områdets rökningsandel × antagen faktor 0,8 (intervall 0,55–1,1), eftersom finländska paketårsdata inte hittades. Tabellen visar också orter med CT (teamets egen lista, inget officiellt register).`,en:`About ${fmt(D.risk_nat)} people nationally (7% of those aged 50–74). Estimate = the area's smoking rate × an assumed factor of 0.8 (range 0.55–1.1), because no Finnish pack-year data was found. The table also lists CT towns (the team's researched list, not an official register).`}},
- {id:'smokeedu', g:'risk', tag:'S', src:['sotk'],
-  title:{fi:'Päivittäin tupakoivat koulutusasteittain',sv:'Dagligrökare per utbildningsnivå',en:'Daily smokers by education'},
-  sub:{fi:'% 20 vuotta täyttäneistä, koko maa',sv:'% av personer 20 år och äldre, hela landet',en:'% of people aged 20+, whole country'},
-  chart:()=>line(D.smoke_edu.years,[{label:{fi:'Matala koulutus',sv:'Låg utbildning',en:'Low education'}[lang],data:D.smoke_edu.low,c:'--edu-low'},{label:{fi:'Keskitaso',sv:'Mellannivå',en:'Intermediate'}[lang],data:D.smoke_edu.mid,c:'--edu-mid'},{label:{fi:'Korkea koulutus',sv:'Hög utbildning',en:'High education'}[lang],data:D.smoke_edu.high,c:'--edu-high'}],'%',{points:true}),
-  note:{fi:'Tupakointi on keuhkosyövän tärkein riskitekijä: arviolta 80–90 % keuhkosyövistä liittyy siihen (keuhkosyöpäohjelma).',sv:'Rökning är den viktigaste riskfaktorn för lungcancer: uppskattningsvis 80–90 % av lungcancerfallen är kopplade till den (lungcancerprogrammet).',en:'Smoking is the main risk factor for lung cancer: an estimated 80–90% of lung cancers are linked to it (lung cancer programme).'}},
- {id:'smokereg', g:'risk', tag:'S', src:['sotk4404'], tall:true,
-  title:{fi:'Päivittäin tupakoivat hyvinvointialueittain 2024',sv:'Dagligrökare per välfärdsområde 2024',en:'Daily smokers by wellbeing services county, 2024'},
-  sub:{fi:'% väestöstä',sv:'% av befolkningen',en:'% of population'},
-  chart:()=>bar(D.smoke_reg.map(r=>nmN(r[0])),[{label:'%',data:D.smoke_reg.map(r=>r[1]),c:'--bar'}],'%',{horizontal:true,codes:D.smoke_reg.map(r=>r[0]),ref:D.smoke_fi,refLabel:t('national')})},
- {id:'edu', g:'eq', tag:'S', src:['ohj'],
-  title:{fi:'Koulutus, ilmaantuvuus ja kuolleisuus',sv:'Utbildning, incidens och dödlighet',en:'Education, incidence and mortality'},
-  sub:{fi:'Tapauksia / 100 000, 2018–2022, perusaste vs. korkea-aste',sv:'Fall / 100 000, 2018–2022, grundnivå vs. högre nivå',en:'Cases / 100,000, 2018–2022, basic vs. higher education'},
-  chart:()=>{const a={fi:['Ilmaantuvuus, miehet','Ilmaantuvuus, naiset','Kuolleisuus, miehet','Kuolleisuus, naiset'],sv:['Incidens, män','Incidens, kvinnor','Dödlighet, män','Dödlighet, kvinnor'],en:['Incidence, men','Incidence, women','Mortality, men','Mortality, women']}[lang];return bar(a,[{label:{fi:'Perusaste',sv:'Grundnivå',en:'Basic'}[lang],data:[128.7,76.4,108.1,55.5],c:'--edu-low'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Higher'}[lang],data:[48.5,32.0,39.2,20.4],c:'--edu-high'}],'/100 000');},
-  note:{fi:'Perusasteen koulutuksen saaneilla keuhkosyöpään sairastutaan ja kuollaan noin 2,5–2,8 kertaa yleisemmin kuin korkeasti koulutetuilla.',sv:'Personer med grundutbildning insjuknar och dör i lungcancer cirka 2,5–2,8 gånger oftare än högutbildade.',en:'People with basic education get and die of lung cancer about 2.5–2.8 times as often as the highly educated.'}},
- {id:'survedu', g:'eq', tag:'S', src:['ohj'],
-  title:{fi:'Elossaolo koulutuksen mukaan',sv:'Överlevnad efter utbildning',en:'Survival by education'},
-  sub:{fi:'5 vuoden elossaolo %, 2020–2022 (pyöristetyt arvot)',sv:'5-årsöverlevnad %, 2020–2022 (avrundade värden)',en:'5-year survival %, 2020–2022 (rounded values)'},
-  chart:()=>bar([t('men'),t('women')],[{label:{fi:'Perusaste',sv:'Grundnivå',en:'Basic'}[lang],data:[13,20],c:'--edu-low'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Higher'}[lang],data:[18,30],c:'--edu-high'}],'%')},
- {id:'survage', g:'eq', tag:'S', src:['ohj'],
-  title:{fi:'Naisten elossaolo iän mukaan',sv:'Kvinnors överlevnad efter ålder',en:'Survival in women by age'},
-  sub:{fi:'5 vuoden elossaolo %, keuhkosyöpä',sv:'5-årsöverlevnad %, lungcancer',en:'5-year survival %, lung cancer'},
-  chart:()=>bar({fi:['alle 55 v','55–74 v','yli 75 v'],sv:['under 55 år','55–74 år','över 75 år'],en:['under 55','55–74','over 75']}[lang],[{label:'%',data:[48,25,17],c:'--women'}],'%')},
- {id:'scrlang', g:'scr', tag:'S', src:['scr'],
-  title:{fi:'Seulontaan osallistuminen äidinkielen mukaan',sv:'Deltagande i screening efter modersmål',en:'Screening participation by native language'},
-  sub:{fi:'% kutsutuista, 2024',sv:'% av de inbjudna, 2024',en:'% of those invited, 2024'},
-  chart:()=>{const k=['breast','colorectal','cervical'];return bar(k.map(x=>L(SCRN[x])),[{label:{fi:'Suomi, ruotsi tai saame',sv:'Finska, svenska eller samiska',en:'Finnish, Swedish or Sámi'}[lang],data:k.map(x=>D.scr_lang[x]['Domestic']),c:'--men'},{label:{fi:'Muu tai puuttuu',sv:'Annat eller saknas',en:'Other or missing'}[lang],data:k.map(x=>D.scr_lang[x]['Other/missing']),c:'--women'}],'%');},
-  note:{fi:'Keuhkosyövälle ei ole Suomessa seulontaohjelmaa. Nämä kolme ohjelmaa näyttävät, kenet seulonta nykyään tavoittaa huonoiten: vieraskieliset ja vähän koulutetut. Keuhkojen TT-seulonnasta tätä ei vielä tiedetä.',sv:'Finland har inget screeningprogram för lungcancer. De tre programmen visar vem screening når sämst i dag: personer med annat modersmål och lågutbildade. För DT-screening av lungorna är detta ännu inte känt.',en:'Finland has no lung cancer screening programme. These three programmes show who screening reaches worst today: people with another native language and people with less education. This is not yet known for lung CT.'}},
- {id:'scredu', g:'scr', tag:'S', src:['scr'],
-  title:{fi:'Seulontaan osallistuminen koulutuksen mukaan',sv:'Deltagande i screening efter utbildning',en:'Screening participation by education'},
-  sub:{fi:'% kutsutuista, 2024',sv:'% av de inbjudna, 2024',en:'% of those invited, 2024'},
-  chart:()=>{const k=['breast','colorectal'];return bar(k.map(x=>L(SCRN[x])),[{label:{fi:'Perusaste tai tuntematon',sv:'Grundnivå eller okänd',en:'Primary or unknown'}[lang],data:k.map(x=>D.scr_edu[x]['Primary education/unknown']),c:'--edu-low'},{label:{fi:'Keskiaste',sv:'Mellannivå',en:'Intermediate'}[lang],data:k.map(x=>D.scr_edu[x]['Intermediate/secondary']),c:'--edu-mid'},{label:{fi:'Korkea-aste',sv:'Högre nivå',en:'Tertiary'}[lang],data:k.map(x=>D.scr_edu[x]['Tertiary/higher education']),c:'--edu-high'}],'%');}},
- {id:'scrcounty', g:'scr', tag:'S', src:['scr'], tall:true,
-  title:{fi:'Seulontaan osallistuminen hyvinvointialueittain',sv:'Deltagande i screening per välfärdsområde',en:'Screening participation by wellbeing services county'},
-  sub:{fi:'% kutsutuista, 2024. Katkoviiva = tavoite 80 %',sv:'% av de inbjudna, 2024. Streckad linje = mål 80 %',en:'% of those invited, 2024. Dashed line = 80% target'},
-  chart:()=>bar(D.scr_county.map(r=>nmN(r[0])),[{label:L(SCRN.breast),data:D.scr_county.map(r=>r[1]),c:'--men'},{label:L(SCRN.colorectal),data:D.scr_county.map(r=>r[2]),c:'--women'},{label:L(SCRN.cervical),data:D.scr_county.map(r=>r[3]),c:'--total'}],'%',{horizontal:true,codes:D.scr_county.map(r=>r[0]),ref:80,refLabel:t('target'),xmin:50}),
-  note:{fi:'Matalimmat osallistumisasteet ovat pääkaupunkiseudulla (Helsinki, Vantaa–Kerava, Länsi-Uusimaa). Kieleen ja koulutukseen liittyvä ero näkyy rinta-, suolisto- ja kohdunkaulansyövän seulonnoissa; keuhkojen TT-seulonnasta sitä ei vielä tiedetä.',sv:'Det lägsta deltagandet finns i huvudstadsregionen (Helsingfors, Vanda–Kervo, Västra Nyland). Skillnaden efter språk och utbildning kommer från screening för bröst-, tarm- och livmoderhalscancer; för DT-screening av lungorna är den ännu inte känd.',en:'Participation is lowest in the capital region (Helsinki, Vantaa–Kerava, West Uusimaa). The language and education pattern comes from breast, colorectal and cervical screening; it is not yet known for lung CT.'}},
- {id:'nordsurv', g:'intl', tag:'N', src:['ihe'],
-  title:{fi:'Keuhkosyövän elossaolo Pohjoismaissa',sv:'Lungcanceröverlevnad i Norden',en:'Lung cancer survival in the Nordics'},
-  sub:{fi:'5 vuoden suhteellinen elossaolo, %',sv:'Relativ 5-årsöverlevnad, %',en:'5-year relative survival, %'},
-  chart:()=>{const c=['Finland','Denmark','Sweden','Norway'],n={fi:['Suomi','Tanska','Ruotsi','Norja'],sv:['Finland','Danmark','Sverige','Norge'],en:c}[lang],cols=['--men','--neutral','--neutral2','--neutral3'];return bar([t('men'),t('women')],c.map((x,i)=>({label:n[i],data:[D.nordsurv.men[x],D.nordsurv.women[x]],c:cols[i]})),'%');},
-  note:{fi:'Lähteet eroavat: keuhkosyöpäohjelma (NORDCAN) antaa Suomen naisille noin 26 % ja Norjan miehille noin 27 %. NORDCAN on ensisijainen lähde tarkistettavaksi.',sv:'Källorna skiljer sig: lungcancerprogrammet (NORDCAN) anger cirka 26 % för finländska kvinnor och cirka 27 % för norska män. NORDCAN är primärkällan att kontrollera.',en:'Sources differ: the lung cancer programme (NORDCAN) gives about 26% for Finnish women and about 27% for Norwegian men. NORDCAN is the primary source to check.'}},
- {id:'eu', g:'intl', tag:'S', src:['oecd'],
-  title:{fi:'Suomi vs. EU: ilmaantuvuus',sv:'Finland vs. EU: incidens',en:'Finland vs. EU: incidence'},
-  sub:{fi:'Ikävakioitu ilmaantuvuus / 100 000, ECIS:n arvio 2022',sv:'Åldersstandardiserad incidens / 100 000, ECIS-uppskattning 2022',en:'Age-standardised incidence / 100,000, ECIS estimate 2022'},
-  chart:()=>bar([t('men'),t('women')],[{label:{fi:'Suomi',sv:'Finland',en:'Finland'}[lang],data:[65,35],c:'--men'},{label:'EU27',data:[95,44],c:'--neutral'}],'/100 000'),
-  note:{fi:'Suomessa keuhkosyövän ilmaantuvuus on molemmilla sukupuolilla EU:n keskiarvoa matalampi.',sv:'I Finland är lungcancerincidensen lägre än EU-genomsnittet för båda könen.',en:'Lung cancer incidence in Finland is below the EU average for both sexes.'}}
-];
-
-const TILES = () => [
- {v:'155 '+t('days'), l:{fi:'oireista hoidon alkuun (Ruotsi 107, Tanska 67)',sv:'från symtom till behandling (Sverige 107, Danmark 67)',en:'from symptoms to treatment (Sweden 107, Denmark 67)'}, s:'Yle MOT 2026'},
- {v:'~'+fmt(3000), l:{fi:'uutta keuhkosyöpää vuodessa',sv:'nya lungcancerfall per år',en:'new lung cancers a year'}, s:{fi:'Syöpärekisteri, 2022',sv:'Cancerregistret, 2022',en:'Cancer Registry, 2022'}},
- {v:fmt(D.c34.men.at(-1)+D.c34.women.at(-1)), l:{fi:'keuhkosyöpäkuolemaa 2025',sv:'lungcancerdödsfall 2025',en:'lung cancer deaths in 2025'}, s:{fi:'Tilastokeskus',sv:'Statistikcentralen',en:'Statistics Finland'}},
- {v:'21 %', l:{fi:'5 vuoden suhteellinen elossaolo',sv:'relativ 5-årsöverlevnad',en:'5-year relative survival'}, s:{fi:'2020–2022, Syöpärekisteri',sv:'2020–2022, Cancerregistret',en:'2020–2022, Cancer Registry'}},
- {v:'27 %', l:{fi:'sai parantavaa hoitoa',sv:'fick kurativ behandling',en:'received curative treatment'}, s:{fi:'2019–2023, keuhkosyöpäraportti',sv:'2019–2023, lungcancerrapporten',en:'2019–2023, lung cancer report'}},
- {v:'~'+fmt(Math.round(D.risk_nat/1000)*1000), l:{fi:'arvioitu riskiryhmä (50–74 v)',sv:'uppskattad riskgrupp (50–74 år)',en:'estimated high-risk group (50–74)'}, s:{fi:'Polku Labs -arvio [A]',sv:'Polku Labs uppskattning [A]',en:'Polku Labs estimate [A]'}}
-];
-
-const PATH = [
- {gap:true, st:{fi:'Toteaminen',sv:'Upptäckt',en:'Detection'}, items:[
-   {m:{fi:'Syövistä levinneisyys kirjattu',sv:'Cancerfall med registrerat stadium',en:'Cancers with stage recorded'},f:'42 %',c:{fi:'tavoite 70 % todettuna vaiheessa I–II, ei mitattavissa nyt',sv:'mål 70 % upptäckta i stadium I–II, kan inte mätas i dag',en:'target 70% found at stage I–II, cannot be measured today'},tag:'N'},
-   {m:{fi:'Keuhkosyöpä todettu vaiheessa IV',sv:'Lungcancer upptäckt i stadium IV',en:'Lung cancer found at stage IV'},f:{fi:'59 % (yksi keskus, 2007–2019)',sv:'59 % (ett center, 2007–2019)',en:'59% (one centre, 2007–2019)'},c:{fi:'ei kansallista lukua',sv:'ingen nationell siffra',en:'no national figure'},tag:'N'},
-   {m:{fi:'Seulontaan osallistuminen, muu äidinkieli vs. kotimainen (rinta)',sv:'Screeningdeltagande, annat modersmål vs. inhemskt (bröst)',en:'Screening participation, other native language vs. domestic (breast)'},f:{fi:'60,8 % / 83,2 %',sv:'60,8 % / 83,2 %',en:'60.8% / 83.2%'},c:{fi:'tavoite 80 % joka alueella',sv:'mål 80 % i varje område',en:'target 80% in every county'},tag:'S'}]},
- {gap:true, st:{fi:'Perusterveydenhuolto → erikoissairaanhoito',sv:'Primärvård → specialiserad sjukvård',en:'Primary → specialist care'}, items:[
-   {m:{fi:'Keuhko: aika oirevastaanotolle',sv:'Lunga: tid till symtombesök',en:'Lung: time to symptom appointment'},f:{fi:'14 pv',sv:'14 dagar',en:'14 days'},c:{fi:'2–7 pv muissa Pohjoismaissa',sv:'2–7 dagar i övriga Norden',en:'2–7 days in the other Nordics'},tag:'N'},
-   {m:{fi:'Keuhko: erikoislääkärin konsultaatio',sv:'Lunga: specialistkonsultation',en:'Lung: specialist consultation'},f:{fi:'2–4 vk',sv:'2–4 veckor',en:'2–4 weeks'},c:{fi:'1–2 vk muualla',sv:'1–2 veckor på andra håll',en:'1–2 weeks elsewhere'},tag:'N'}]},
- {gap:null, st:{fi:'Diagnoosi',sv:'Diagnos',en:'Diagnosis'}, items:[
-   {m:{fi:'Aika oireista diagnoosiin alueittain',sv:'Tid från symtom till diagnos per region',en:'Time from symptoms to diagnosis by region'},f:{fi:'ei tiedossa',sv:'okänt',en:'not known'},c:{fi:'suomalaista dataa ei löytynyt',sv:'inga finländska data hittades',en:'no Finnish data found'},tag:'N'}]},
- {gap:false, st:{fi:'Hoidon aloitus',sv:'Behandlingsstart',en:'Treatment start'}, items:[
-   {m:{fi:'Diagnoosista hoitoon, mediaani',sv:'Från diagnos till behandling, median',en:'Diagnosis to treatment, median'},f:{fi:'36–38 pv',sv:'36–38 dagar',en:'36–38 days'},c:{fi:'raja 180 pv; alle 2 % ylitti sen 2024',sv:'gräns 180 dagar; under 2 % överskred den 2024',en:'limit 180 days; under 2% exceeded it in 2024'},tag:'N'}]}
-];
-const GOAL3 = [
- {b:{fi:'Huonoennusteisten syöpien elossaolo pohjoismaiselle tasolle',sv:'Överlevnaden i cancer med dålig prognos når nordisk nivå',en:'Survival in poor-prognosis cancers reaches the Nordic level'},s:{fi:'Keuhkosyöpä +14 %-yksikköä vuoden 2023 NORDCAN-tasosta (Ruotsin ja Norjan keskiarvo).',sv:'Lungcancer +14 procentenheter jämfört med NORDCAN-nivån 2023 (medeltal för Sverige och Norge).',en:'Lung cancer +14 percentage points versus the 2023 NORDCAN level (average of Sweden and Norway).'},tag:'S'},
- {b:{fi:'Syöpäkuolleisuus laskee 10 %',sv:'Cancerdödligheten sjunker med 10 %',en:'Cancer mortality falls 10%'},s:{fi:'Noin 13 300 kuolemasta vuodessa, eli noin 1 330 vähemmän.',sv:'Från cirka 13 300 dödsfall per år, alltså cirka 1 330 färre.',en:'From about 13,300 deaths a year, so about 1,330 fewer.'},tag:'S'},
- {b:{fi:'Potilaat pääsevät hoitoon tavoiteajoissa',sv:'Patienterna får behandling inom målen',en:'Patients reach treatment within target times'},s:{fi:'Diagnoosista hoitoon mediaani 36–38 pv (2018–2022). Viive syntyy pääosin ennen diagnoosia.',sv:'Från diagnos till behandling median 36–38 dagar (2018–2022). Fördröjningen uppstår främst före diagnos.',en:'Median diagnosis to treatment 36–38 days (2018–2022). The delay forms mostly before diagnosis.'},tag:'N'}
-];
-
-const SOURCES = {
- fi:`<h2>Mistä data tulee</h2><ul>
- <li><b>Tilastokeskus, kuolemansyytilasto</b>: taulukot 11ay, 11be ja 13u5, haettu suoraan rajapinnasta.</li>
- <li><b>Ikävakioitu SMR</b>: Polku Labsin laskelma Tilastokeskuksen taulukoista 13u5, 11az ja 11s1 (epäsuora ikävakiointi kansallisilla ikäryhmäkohtaisilla kuolleisuuksilla).</li>
- <li><b>THL Sotkanet</b>: tupakointi-indikaattorit 4404–4410, haettu suoraan rajapinnasta.</li>
- <li><b>Syöpärekisterin seulontatilastot 2024</b>: osallistuminen alueittain, kielen ja koulutuksen mukaan, luettu suoraan tilastotaulukoista (Polku Labs, ct-sim).</li>
- <li><b>Riskiryhmäarvio</b>: Polku Labsin arvio, THL Sotkanet 4405/4406 × oletettu kerroin. CT-paikkakunnat ovat tiimin selvittämä lista (36 paikkakuntaa, 24 vahvistettu), eivät virallinen rekisteri.</li>
- <li><b>Syöpärekisteri</b>: Syöpä 2022 ja keuhkosyöpäraportti, luvut <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">Valtakunnallisesta keuhkosyöpäohjelmasta 2026–2035</a>.</li>
- <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">viive oireista hoitoon</a> (julkaisematon tutkimus neljästä sairaalasta).</li>
- <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Syöpäprofiilit 2025 – Suomi</a>.</li>
- <li><b>IHE Cancer Dashboard Finland 2026</b>: pohjoismainen elossaolo tiimin muistiinpanojen kautta, ei tarkistettu uudelleen.</li></ul>
- <h2>Merkinnät</h2><ul><li><span class="tag S">S</span> julkinen lähde</li><li><span class="tag N">N</span> tiimin muistiinpanot tai asiantuntijahaastattelu, ei tarkistettu uudelleen</li><li><span class="tag A">A</span> oletus tai välillinen arvio</li></ul>
- <h2>Rajoitukset</h2><ul>
- <li>Tilastokeskuksen aikasarja ja alueluvut käyttävät ryhmää C32–C34 (sisältää kurkunpään syövän). Lukumäärät ja ikäryhmät ovat pelkkää keuhkosyöpää (C34).</li>
- <li>Alueellisia tietoja levinneisyydestä, oireista diagnoosiin kuluvasta ajasta tai CT-jonoista ei ole julkisesti saatavilla.</li>
- <li>Riskiryhmäarvio perustuu oletettuun kertoimeen, koska suomalaista askivuosidataa ei löytynyt.</li>
- <li>Syöpärekisterin, ECIS:n ja NORDCANin sovelluksia ei voitu hakea suoraan; luvut on poimittu julkaistuista raporteista.</li></ul>`,
- sv:`<h2>Varifrån data kommer</h2><ul>
- <li><b>Statistikcentralen, dödsorsaksstatistik</b>: tabellerna 11ay, 11be och 13u5, hämtade direkt via API.</li>
- <li><b>Åldersstandardiserad SMR</b>: Polku Labs beräkning från Statistikcentralens tabeller 13u5, 11az och 11s1 (indirekt åldersstandardisering med nationella åldersspecifika dödstal).</li>
- <li><b>THL Sotkanet</b>: rökindikatorerna 4404–4410, hämtade direkt via API.</li>
- <li><b>Cancerregistrets screeningstatistik 2024</b>: deltagande per område, språk och utbildning, läst direkt ur statistiktabellerna (Polku Labs, ct-sim).</li>
- <li><b>Uppskattad riskgrupp</b>: Polku Labs uppskattning, THL Sotkanet 4405/4406 × antagen faktor. Orterna med CT är teamets egen lista (36 orter, 24 bekräftade), inget officiellt register.</li>
- <li><b>Cancerregistret</b>: Cancer 2022 och lungcancerrapporten, siffror ur <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">Nationella lungcancerprogrammet 2026–2035</a>.</li>
- <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">fördröjning från symtom till behandling</a> (opublicerad studie från fyra sjukhus).</li>
- <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Cancerprofiler 2025 – Finland</a>.</li>
- <li><b>IHE Cancer Dashboard Finland 2026</b>: nordisk överlevnad via teamets anteckningar, inte omkontrollerat.</li></ul>
- <h2>Märkningar</h2><ul><li><span class="tag S">S</span> offentlig källa</li><li><span class="tag N">N</span> teamets anteckningar eller expertintervju, inte omkontrollerat</li><li><span class="tag A">A</span> antagande eller indirekt uppskattning</li></ul>
- <h2>Begränsningar</h2><ul>
- <li>Statistikcentralens tidsserie och regionala siffror använder gruppen C32–C34 (inkluderar struphuvudcancer). Antal och åldersgrupper gäller enbart lungcancer (C34).</li>
- <li>Regionala data om stadium, tid från symtom till diagnos eller CT-köer finns inte offentligt.</li>
- <li>Riskgruppsuppskattningen bygger på en antagen faktor, eftersom finländska paketårsdata inte hittades.</li>
- <li>Cancerregistrets, ECIS och NORDCANs applikationer kunde inte läsas direkt; siffrorna kommer ur publicerade rapporter.</li></ul>`,
- en:`<h2>Where the data comes from</h2><ul>
- <li><b>Statistics Finland, causes of death</b>: tables 11ay, 11be and 13u5, read directly from the API.</li>
- <li><b>Age-standardised SMR</b>: Polku Labs calculation from Statistics Finland tables 13u5, 11az and 11s1 (indirect standardisation with national age-specific rates).</li>
- <li><b>THL Sotkanet</b>: smoking indicators 4404–4410, read directly from the API.</li>
- <li><b>Finnish Cancer Registry screening statistics 2024</b>: participation by county, language and education, read directly from the statistics tables (Polku Labs, ct-sim).</li>
- <li><b>High-risk group estimate</b>: Polku Labs estimate, THL Sotkanet 4405/4406 × an assumed factor. CT towns are the team's researched list (36 towns, 24 confirmed), not an official register.</li>
- <li><b>Finnish Cancer Registry</b>: Cancer 2022 and the lung cancer report, figures from the <a href="https://www.filha.fi/wp-content/uploads/2026/05/Valtakunnallinen-keuhkosyopaohjelma-2026-2035_180526_preprint.pdf">National Lung Cancer Programme 2026–2035</a>.</li>
- <li><b>Yle MOT 2026</b>: <a href="https://yle.fi/a/74-20251023">delay from symptoms to treatment</a> (unpublished study in four hospitals).</li>
- <li><b>ECIS/OECD</b>: <a href="https://cancer-inequalities.jrc.ec.europa.eu/sites/default/files/docs/ccp2025/ec-oecd-2024-1666-fi.pdf">Country Cancer Profile 2025 – Finland</a>.</li>
- <li><b>IHE Cancer Dashboard Finland 2026</b>: Nordic survival via team notes, not re-verified.</li></ul>
- <h2>Tags</h2><ul><li><span class="tag S">S</span> public source</li><li><span class="tag N">N</span> team notes or expert interview, not re-verified</li><li><span class="tag A">A</span> assumption or indirect estimate</li></ul>
- <h2>Limitations</h2><ul>
- <li>The Statistics Finland time series and regional figures use group C32–C34 (includes laryngeal cancer). Counts and age groups are lung cancer only (C34).</li>
- <li>Regional data on stage, symptom-to-diagnosis time or CT queues is not publicly available.</li>
- <li>The high-risk group estimate relies on an assumed factor, because no Finnish pack-year data was found.</li>
- <li>The Cancer Registry, ECIS and NORDCAN applications could not be read directly; figures come from published reports.</li></ul>`
-};
-
-const KEY='keuhkodata-views-v4';
-const PRE={sum:['pathway','smr','risk','reco'],reg:['smr','risk','smokereg','scrcounty'],all:null};
-let selected;
-try{selected=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!Array.isArray(selected)) selected=PRE.sum.slice();
-const charts={};
-let myArea='';try{myArea=localStorage.getItem('keuhkodata-area')||''}catch(e){}
-if(!D.names[myArea]) myArea='';
-function save(){try{localStorage.setItem(KEY,JSON.stringify(selected))}catch(e){}}
-const NAV=[
- {id:'ov',t:{fi:'Yleiskuva',sv:'Översikt',en:'Overview'}},
- {id:'gap',n:1,t:{fi:'Mikä on ero',sv:'Vad är skillnaden',en:'What is the gap'},d:{fi:'Missä keuhkosyöpään kuollaan enemmän kuin ikärakenne ennustaa, ja miten Suomi pärjää naapureihin verrattuna.',sv:'Var fler dör i lungcancer än åldersstrukturen förutsäger, och hur Finland står sig mot grannländerna.',en:'Where more people die of lung cancer than age structure predicts, and how Finland compares with its neighbours.'},
-  subs:[{id:'reg',t:{fi:'Alueet',sv:'Områden',en:'Areas'},v:['smr','region']},{id:'trend',t:{fi:'Kehitys',sv:'Utveckling',en:'Trend'},v:['trend','count','share','age']},{id:'intl',t:{fi:'Pohjoismaat ja EU',sv:'Norden och EU',en:'Nordics and EU'},v:['nordsurv','eu']}]},
- {id:'where',n:2,t:{fi:'Missä kohtaa polkua',sv:'Var i vårdkedjan',en:'Where on the pathway'},d:{fi:'Ero syntyy ennen diagnoosia: potilasviive ja perusterveydenhuolto. Diagnoosin jälkeen hoitoon päästään pääosin ajallaan.',sv:'Skillnaden uppstår före diagnos: patientfördröjning och primärvård. Efter diagnos kommer man oftast i tid till behandling.',en:'The gap forms before diagnosis: patient delay and primary care. After diagnosis, treatment mostly starts on time.'},
-  subs:[{id:'path',t:{fi:'Hoitopolku',sv:'Vårdkedjan',en:'Care pathway'},v:['pathway']},{id:'delay',t:{fi:'Viiveet',sv:'Fördröjningar',en:'Delays'},v:['delay','delayphase']},{id:'goal',t:{fi:'Strategian mittarit',sv:'Strategins indikatorer',en:'Strategy indicators'},v:['goal3']}]},
- {id:'who',n:3,t:{fi:'Ketä se koskee',sv:'Vem det gäller',en:'Who it affects'},d:{fi:'Riskiryhmä, koulutus ja kieli: kenet hoito ja seulonta tavoittavat huonoimmin.',sv:'Riskgrupp, utbildning och språk: vem vården och screeningen når sämst.',en:'Risk group, education and language: who care and screening reach worst.'},
-  subs:[{id:'risk',t:{fi:'Riskiryhmä',sv:'Riskgrupp',en:'Risk group'},v:['risk','smokereg']},{id:'edu',t:{fi:'Koulutus ja ikä',sv:'Utbildning och ålder',en:'Education and age'},v:['edu','survedu','smokeedu','survage']},{id:'scr',t:{fi:'Seulonta',sv:'Screening',en:'Screening'},v:['scrlang','scredu','scrcounty']}]},
- {id:'do',n:4,t:{fi:'Mitä tehdään',sv:'Vad gör vi',en:'What to do'},d:{fi:'Polku Labsin suositukset datan perusteella.',sv:'Polku Labs rekommendationer utifrån datan.',en:'Polku Labs recommendations based on the data.'},subs:[{id:'reco',t:{fi:'Suositukset',sv:'Rekommendationer',en:'Recommendations'},v:['reco']}]},
- {id:'src',t:{fi:'Lähteet',sv:'Källor',en:'Sources'}}
-];
-let cur={t:'ov',s:null};
-(function(){try{const h=new URLSearchParams(location.hash.slice(1));const tt=h.get('t');if(NAV.some(n=>n.id===tt))cur={t:tt,s:h.get('s')};const v=h.get('v');if(v){const ids=v.split(',').filter(x=>VIEWS.some(w=>w.id===x));if(ids.length)selected=ids;}const a=h.get('a');if(a&&D.names[a]){myArea=a;}}catch(e){}})();
-function syncHash(){try{const p=new URLSearchParams();p.set('t',cur.t);if(cur.s)p.set('s',cur.s);if(myArea)p.set('a',myArea);history.replaceState(null,'','#'+p.toString());}catch(e){}}
-
-function buildPicker(){return;
-  const groups={};
-  VIEWS.forEach(v=>(groups[v.g]=groups[v.g]||[]).push(v));
-  document.getElementById('groups').innerHTML=Object.entries(groups).map(([g,vs])=>`<div class="group"><h3>${L(GROUPS[g])}</h3>${vs.map(v=>`<label><input type="checkbox" value="${v.id}" ${selected.includes(v.id)?'checked':''}><span>${L(v.title)}</span></label>`).join('')}</div>`).join('');
-  document.querySelectorAll('#groups input').forEach(i=>i.addEventListener('change',()=>{selected=VIEWS.map(v=>v.id).filter(id=>document.querySelector(`#groups input[value="${id}"]`).checked);save();render();}));
-  document.getElementById('legendtags').innerHTML=['S','N','A'].map(k=>`<span><span class="tag ${k}" style="margin:0 4px 0 0">${k}</span>${t('tag'+k).slice(4)}</span>`).join('');
-}
-function markPre(){
-  const cur=JSON.stringify(VIEWS.map(v=>v.id).filter(id=>selected.includes(id)));
-  document.querySelectorAll('.presets button').forEach(b=>{const p=PRE[b.dataset.pre]||VIEWS.map(v=>v.id);b.setAttribute('aria-pressed',JSON.stringify(VIEWS.map(v=>v.id).filter(id=>p.includes(id)))===cur);});
-  const c=document.getElementById('cnt');if(c)c.textContent='('+selected.length+'/'+VIEWS.length+')';
-}
-
-const refLine={id:'refLine',afterDatasetsDraw(c){const cfg=c.config.options.plugins.refLine;if(!cfg||cfg.value==null)return;const x=c.scales.x.getPixelForValue(cfg.value);const {top,bottom}=c.chartArea;const ctx=c.ctx;ctx.save();ctx.strokeStyle=css('--muted');ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=css('--ink');ctx.font='500 12px "Golos Text", sans-serif';ctx.textAlign='left';ctx.fillText(`${cfg.label} ${cfg.value.toLocaleString(LOC[lang])}`,x+5,top-4);ctx.restore();}};
-
-function smrSpec(){
-  const col=r=>r[2]>1?css('--hi'):(r[3]<1?css('--lo'):css('--mid'));
-  return {type:'bar',unit:'',horizontal:true,codes:D.smr.map(r=>r[0]),ref:1,refLabel:t('natlevel'),smrTable:true,xmin:0.6,xmax:1.5,
-    data:{labels:D.smr.map(r=>nmN(r[0])),datasets:[
-      {type:'bar',label:t('ci'),data:D.smr.map(r=>[r[2],r[3]]),backgroundColor:D.smr.map(col),barThickness:3,borderRadius:2,order:2},
-      {type:'line',label:'SMR',data:D.smr.map(r=>r[1]),showLine:false,pointRadius:6,pointHoverRadius:8,pointBackgroundColor:D.smr.map(col),pointBorderColor:'#fff',pointBorderWidth:2,order:1}]}};
-}
-const dimc=c=>(typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c))?c+'3D':c;
-function highlight(spec){
-  const HI=new Set(D.smr.filter(r=>r[2]>1).map(r=>r[0]));
-  if(spec.codes&&spec.data.datasets.length===1&&!spec.smrTable){
-    spec.data.datasets[0].backgroundColor=spec.codes.map(c=>HI.has(c)?css('--hi'):css('--bar'));
-    spec.data.datasets[0].maxBarThickness=16;
-  }
-  if(!myArea||!spec.codes) return;
-  const i=spec.codes.indexOf(myArea); if(i<0) return;
-  spec.data.datasets.forEach(d=>{
-    ['backgroundColor','pointBackgroundColor'].forEach(k=>{
-      if(d[k]==null) return;
-      const arr=Array.isArray(d[k])?d[k]:spec.codes.map(()=>d[k]);
-      d[k]=arr.map((c,j)=>j===i?(spec.data.datasets.length===1&&!spec.smrTable&&!HI.has(myArea)?css('--ink'):c):dimc(c));
-    });
-  });
-}
-function makeChart(canvas,spec){
-  highlight(spec);
-  const h=!!spec.horizontal, many=spec.data.datasets.length>1&&!spec.smrTable, grid=css('--grid'), t2=css('--muted');
-  return new Chart(canvas,{type:spec.type,data:spec.data,plugins:[refLine],options:{
-    maintainAspectRatio:false, indexAxis:h?'y':'x', locale:LOC[lang],
-    layout:{padding:{top:spec.ref!=null?18:0,right:8}},
-    interaction:{mode:'index',intersect:false},
-    elements:{point:{radius:spec.points?4:0}},
-    plugins:{legend:{display:many,position:'top',align:'start',labels:{color:t2,usePointStyle:true,boxWidth:8,font:{family:'Golos Text',size:12}}},
-      tooltip:{callbacks:{label:c=>{const r=c.raw;if(Array.isArray(r))return ` ${c.dataset.label}: ${r[0].toLocaleString(LOC[lang])}–${r[1].toLocaleString(LOC[lang])}`;return ` ${c.dataset.label}: ${c.parsed[h?'x':'y'].toLocaleString(LOC[lang])} ${spec.unit}`;}}},
-      refLine:spec.ref!=null?{value:spec.ref,label:spec.refLabel}:null},
-    scales:{x:{grid:{display:h,color:grid},ticks:{color:t2,maxTicksLimit:h?7:12,font:{family:'Golos Text',size:11}},border:{display:false},beginAtZero:spec.xmin==null,min:spec.xmin,max:spec.xmax},
-            y:{grid:{display:!h,color:grid},ticks:{callback:function(v){const l=String(this.getLabelForValue(v));if(!h||l.length<=22||innerWidth>700)return l;const w=l.split(' ');const out=[];let cur='';w.forEach(x=>{if((cur+' '+x).trim().length>22&&cur){out.push(cur);cur=x}else cur=(cur+' '+x).trim()});out.push(cur);return out},color:c=>spec.codes&&myArea&&spec.codes[c.index]===myArea?css('--ink'):t2,autoSkip:false,font:c=>({family:'Golos Text',size:11,weight:spec.codes&&myArea&&spec.codes[c.index]===myArea?'700':'400'})},border:{display:false},beginAtZero:true}}
-  }});
-}
-function tableHTML(v,spec){
-  if(v.kind==='smr') return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th><th>SMR</th><th>95 %</th><th>${t('deaths')}</th><th>${t('expected')}</th></tr></thead><tbody>${D.smr.map(r=>`<tr><td>${nmN(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}–${fmt(r[3])}</td><td>${fmt(r[4])}</td><td>${fmt(r[5])}</td></tr>`).join('')}</tbody></table></div>`;
-  if(v.id==='risk'){const h={fi:['Riskiryhmä','50–74-v.','Tupakoi 20–64 v %','CT-paikkakunnat'],sv:['Riskgrupp','50–74 år','Röker 20–64 år %','Orter med CT'],en:['Risk group','Aged 50–74','Smoking 20–64 %','CT towns']}[lang];
-    return `<div class="tablewrap"><table><thead><tr><th>${t('area')}</th>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${D.risk.map(r=>`<tr><td>${nmN(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td>${fmt(r[4])}</td><td style="text-align:start">${r[6].join(', ')||'–'}</td></tr>`).join('')}</tbody></table></div>`;}
-  const ds=spec.data.datasets;
-  return `<div class="tablewrap"><table><thead><tr><th></th>${ds.map(d=>`<th>${d.label}</th>`).join('')}</tr></thead><tbody>${spec.data.labels.map((l,i)=>`<tr><td>${l}</td>${ds.map(d=>`<td>${fmt(d.data[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-}
-const tagWord = k => { const x=t('tag'+k)||k, i=x.indexOf(' = '), w=i<0?x:x.slice(i+3); const c=w.search(/ (tai|eller|or) /); return c>0?w.slice(0,c):w; };
-const tagHTML = k => k?`<span class="tag ${k}" title="${t('tag'+k)}">${tagWord(k)}</span>`:'';
-function body(v){
-  if(v.kind==='tiles') return `<div class="tiles">${TILES().map(x=>`<div class="tile"><div class="v">${pc(x.v)}</div><div class="l">${L(x.l)}</div><div class="s">${L(x.s)}</div></div>`).join('')}</div>`;
-  if(v.kind==='pathway'){
-    const ST={true:['gap',{fi:'Ero syntyy tässä',sv:'Skillnaden uppstår här',en:'The gap forms here'}],false:['ok',{fi:'Pääosin ajallaan',sv:'Mestadels i tid',en:'Mostly on time'}],null:['na',{fi:'Ei dataa',sv:'Inga data',en:'No data'}]};
-    return `<ol class="steps">${PATH.map((p,i)=>{const st=ST[p.gap];return `<li class="step ${st[0]}"><div class="sh"><span class="sn">${i+1}</span><span class="stl">${L(st[1])}</span></div><h3>${L(p.st)}</h3>${p.items.map(it=>`<div class="si"><div class="sv">${(()=>{const f=pc(L(it.f)),k=f.indexOf(" (");return k<0?f:f.slice(0,k)+`<small>${f.slice(k)}</small>`})()}${tagHTML(it.tag)}</div><div class="sm">${L(it.m)}</div><div class="sc">${L(it.c)}</div></div>`).join('')}</li>`}).join('')}</ol>`;}
-  if(v.kind==='reco'){
-    const R={
-     fi:[['Seulontabussi','Bussipilotti Lapissa, jossa matka-aika on este (47 % niistä, jotka bussi tavoittaisi, asuu yli tunnin päässä TT-laitteesta). Kymenlaaksossa ja Satakunnassa aloitetaan sairaalan TT-kutsuilla; bussi lisäisi lähinnä kapasiteettia, mikä on oletus. Kohderyhmä: 50–74-vuotiaat tupakoivat ja tupakoineet.','Bussi ei ole halvempi kuin sairaalan TT; se kannattaa vain, jos se tavoittaa ihmisiä, joita sairaalan TT ei tavoita. Pilotti satunnaistaa kutsut ja mittaa osallistumista sekä etäisyyden että kielen mukaan.'],
-         ['Pilottikartta','Sairaalan TT-pilotti alueille, joilta on enintään 45 minuutin ajomatka TT-laitteelle; sen ulkopuolella seulontabussi. Lapissa 15 kunnasta 21:stä on yli 45 minuutin päässä. <a href="/kartta">Avaa pilottikartta&nbsp;→</a>','Matka-ajat OpenStreetMap/OSRM, ei talviolosuhteita; TT-paikat ovat tutkittu lista, eivät virallinen rekisteri.'],
-         ['Mittarit','Aika oireesta TT:hen; I–II-vaiheessa todettujen osuus (nyt 42 %, tavoite 70 %); seulontaan osallistuminen kielen ja koulutuksen mukaan.','Seurataan alueittain, jotta ero näkyy.']],
-     sv:[['Screeningbuss','Busspilot i Lappland, där restiden är hindret (47 % av dem som bussen skulle nå bor mer än en timme från en DT). I Kymmenedalen och Satakunta börjar man med inbjudningar till sjukhusets DT; en buss skulle främst ge mer kapacitet, vilket är ett antagande. Målgrupp: rökare och tidigare rökare, 50–74 år.','Bussen är inte billigare än sjukhusets DT; den lönar sig bara om den når personer som sjukhusets DT inte når. Piloten randomiserar inbjudningarna och mäter deltagandet efter både avstånd och språk.'],
-         ['Pilotkarta','Pilot med sjukhusets DT inom 45 minuters bilresa från en DT-apparat; längre bort en screeningbuss. I Lappland ligger 15 av 21 kommuner mer än 45 minuter bort. <a href="/kartta">Öppna pilotkartan&nbsp;→</a>','Restider från OpenStreetMap/OSRM, utan vinterförhållanden; DT-platserna är en undersökt lista, inte ett officiellt register.'],
-         ['Mått','Tid från symtom till DT; andel upptäckta i stadium I–II (nu 42 %, mål 70 %); screeningdeltagande per språk och utbildning.','Följs upp per område så att skillnaden syns.']],
-     en:[['Screening bus','Bus pilot in Lapland, where travel time is the barrier (47% of the people the bus would reach live more than an hour from a CT). In Kymenlaakso and Satakunta start with hospital-CT invitations; a bus would mainly add capacity, which is an assumption. Target group: current and former smokers aged 50–74.','The bus is not cheaper than a hospital CT; it only pays off if it reaches people a hospital CT does not. The pilot randomises invitations and measures participation by both distance and language.'],
-         ['Pilot map','Hospital CT pilot within 45 minutes\' drive of a CT scanner; screening bus beyond. In Lapland, 15 of 21 municipalities are more than 45 minutes away. <a href="/kartta">Open the pilot map&nbsp;→</a>','Travel times OpenStreetMap/OSRM, no winter; CT sites are a researched list, not an official register.'],
-         ['Measures','Time from symptoms to CT; share found at stage I–II (now 42%, target 70%); screening participation by language and education.','Tracked by area so the gap stays visible.']]}[lang];
-    return `<div class="reco">${R.map((r,i)=>`<div class="rc"><h3>${i+1}. ${r[0]}</h3><p>${r[1]}</p><p class="why">${r[2]}</p></div>`).join('')}</div>`;}
-  if(v.kind==='goal3') return `<div class="goal">${GOAL3.map(x=>`<div><b>${L(x.b)} ${tagHTML(x.tag)}</b><span>${L(x.s)}</span></div>`).join('')}</div>`;
-  return `<div class="chartbox${v.tall?' tall':''}"><canvas id="cv-${v.id}" role="img" aria-label="${L(v.title)}"></canvas></div><div class="tbl hidden" id="tb-${v.id}"></div>`;
-}
-
-function MSG(v){
-  const f1=x=>fmt(Math.round(x*10)/10);
-  let m=null;
-  if(v.id==='smr'){const top=D.smr[0],n=D.smr.filter(r=>r[2]>1).length,pct=Math.round((top[1]-1)*100);
-    m={fi:`${nm(top[0])} alueella keuhkosyöpään kuolee ${pct} % enemmän kuin ikärakenteen perusteella odottaisi. ${n} aluetta on merkitsevästi maan tason yläpuolella.`,
-       sv:`I ${nm(top[0])} välfärdsområde dör ${pct} % fler i lungcancer än åldersstrukturen förutsäger. ${n} områden ligger signifikant över riksnivån.`,
-       en:`In ${nm(top[0])}, ${pct}% more people die of lung cancer than its age structure would predict. ${n} areas are significantly above the national level.`}[lang];}
-  if(v.id==='scrlang'){const b=D.scr_lang.breast,d=Math.round((b.Domestic-b['Other/missing'])*10)/10;
-    m={fi:`Rintasyöpäseulontaan osallistuu ${f1(b.Domestic)} % kotimaisen äidinkielen puhujista mutta ${f1(b['Other/missing'])} % muun kielen puhujista: ero on ${f1(d)} prosenttiyksikköä.`,
-       sv:`${f1(b.Domestic)} % med inhemskt modersmål deltar i bröstcancerscreeningen men ${f1(b['Other/missing'])} % med annat språk: skillnaden är ${f1(d)} procentenheter.`,
-       en:`${f1(b.Domestic)}% of domestic-language speakers attend breast screening versus ${f1(b['Other/missing'])}% of other-language speakers: a gap of ${f1(d)} percentage points.`}[lang];}
-  if(v.id==='smokeedu'){const i=D.smoke_edu.low.length-1,lo=D.smoke_edu.low[i],hi=D.smoke_edu.high[i],y=D.smoke_edu.years[i],r=Math.round(lo/hi*10)/10;
-    m={fi:`Vuonna ${y} matalasti koulutetuista tupakoi päivittäin ${f1(lo)} %, korkeasti koulutetuista ${f1(hi)} %: noin ${f1(r)}-kertainen ero.`,
-       sv:`År ${y} rökte ${f1(lo)} % av de lågutbildade dagligen mot ${f1(hi)} % av högutbildade: ungefär ${f1(r)} gånger fler.`,
-       en:`In ${y}, ${f1(lo)}% of people with low education smoked daily versus ${f1(hi)}% of the highly educated: roughly ${f1(r)} times as many.`}[lang];}
-  if(v.id==='nordsurv'){const a=D.nordsurv.men;
-    m={fi:`Miehistä keuhkosyövästä on viiden vuoden kuluttua elossa ${a.Finland} % Suomessa, ${a.Norway} % Norjassa.`,
-       sv:`Fem år efter diagnos lever ${a.Finland} % av männen i Finland men ${a.Norway} % i Norge.`,
-       en:`Five years after diagnosis, ${a.Finland}% of men with lung cancer are alive in Finland versus ${a.Norway}% in Norway.`}[lang];}
-  if(v.id==='risk'){const rs=D.risk.slice().sort((a,b)=>b[1]/b[2]-a[1]/a[2]),tp=rs[0],sh=f1(tp[1]/tp[2]*100);
-    m={fi:`Riskiryhmän osuus on suurin ${nm(tp[0])} alueella (${sh} % 50–74-vuotiaista). Punaiset alueet ovat samat, joilla kuolleisuus on merkitsevästi koholla.`,
-       sv:`Riskgruppens andel är störst i ${nm(tp[0])} välfärdsområde (${sh} % av 50–74-åringarna). De röda områdena är samma som har signifikant förhöjd dödlighet.`,
-       en:`The risk group is largest in ${nm(tp[0])} (${sh}% of 50–74-year-olds). Red marks the same areas that have significantly raised mortality.`}[lang];}
-  if(v.id==='delay'){m={fi:'Oireista hoidon alkuun kuluu Suomessa keskimäärin 155 päivää, Ruotsissa 107 ja Tanskassa 67.',sv:'Från symtom till behandling går i genomsnitt 155 dagar i Finland, 107 i Sverige och 67 i Danmark.',en:'From symptoms to treatment takes on average 155 days in Finland, 107 in Sweden and 67 in Denmark.'}[lang];}
-  return m?`<p class="keymsg">${m}</p>`:'';
-}
-function buildArea(){
-  const el=document.getElementById('area');
-  if(!el) return;
-  const codes=Object.keys(D.names).sort((a,b)=>nmN(a).localeCompare(nmN(b),LOC[lang]));
-  el.innerHTML=`<option value="">${t('area_none')}</option>`+codes.map(c=>`<option value="${c}"${c===myArea?' selected':''}>${nmN(c)}</option>`).join('');
-  el.onchange=()=>{myArea=el.value;try{localStorage.setItem('keuhkodata-area',myArea)}catch(e){}render();};
-}
-const REGNAME=c=>c==='HVA90'?'Helsingin kaupunki':(D.names[c]&&c!=='HVA91'?D.names[c].fi+' hyvinvointialue':null);
-let aiFor='';
-async function runAI(){
-  const out=document.getElementById('aiout'),btn=document.getElementById('aibtn');
-  out.className='on';out.textContent=t('ai_wait');btn.disabled=true;
-  try{
-    const r=await fetch('/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({region:REGNAME(myArea),lang,question:''})});
-    if(!r.ok) throw new Error(r.status);
-    const j=await r.json(); out.textContent=j.text;
-  }catch(e){out.textContent=t('ai_err')}
-  btn.disabled=false;
-}
-/* ================= ONE DASHBOARD: region brief ================= */
-let REG=(myArea&&D.smr.some(r=>r[0]===myArea))?myArea:'HVA21';
-let PM=null; fetch('/pilot_map.json').then(r=>r.json()).then(j=>{PM=j;brief(false);}).catch(()=>{});
-SRC.thlwait=[{fi:'THL, hoitoonpääsy erikoissairaanhoitoon (syöpätaudit) 2023–2026, Polku Labs -kooste',sv:'THL, tillgång till specialiserad sjukvård (cancersjukdomar) 2023–2026, Polku Labs sammanställning',en:'THL, access to specialist care (oncology) 2023–2026, Polku Labs summary'},'https://github.com/oliviasaukonoja/junction/blob/main/ct-sim/docs/wait_times_syopataudit_2023_2026.md'];
-SRC.pilot=[{fi:'Polku Labs -pilottikartta (mallinnettu, OSRM-matka-ajat)',sv:'Polku Labs pilotkarta (modellerad, OSRM-restider)',en:'Polku Labs pilot map (modelled, OSRM travel times)'},'/kartta'];
-const BT={
- fi:{reg:'Alue',hint:'Klikkaa aluetta kartalla',r1:'Mikä on ero',r2:'Missä kohtaa hoitopolkua',r3:'Ketä se koskee',r4:'Mitä tehdään',
-   more:p=>`enemmän keuhkosyöpäkuolemia kuin ikärakenne ennustaa`,less:p=>`vähemmän keuhkosyöpäkuolemia kuin ikärakenne ennustaa`,
-   gapP:(o,e,x,lo,hi,sm)=>`${o} kuolemaa vuosina 2021–2025, odotettu ${e}: ${x>=0?'noin '+x+' enemmän':'noin '+(-x)+' vähemmän'} viidessä vuodessa. SMR ${sm} (95 %: ${lo}–${hi}).`,
-   sig:{hi:'Merkitsevästi yli maan tason.',lo:'Merkitsevästi alle maan tason.',ns:'Ei merkitsevää eroa maan tasoon.'},rank:(r,n)=>`Sija ${r}/${n}`,nat:'maan taso 1,0',
-   pathP:'Kansallisesti oireista hoitoon kuluu noin 155 päivää. Viive syntyy ennen diagnoosia: potilaan viive ja perusterveydenhuolto.',
-   p1:'Potilas 50+ pv',p2:'Perusterveydenhuolto 41 pv',p3:'Erikoissairaanhoito 58 pv',dk:'Tanska: 67 päivää yhteensä',
-   regWait:(a,b,y)=>`Tällä alueella syöpätautien ensiarviota odotti yli 90 päivää ${a} % lähetteistä, hoitoa ${b} % (${y}). Koskee kaikkia syöpiä, ei vain keuhkoja.`,
-   noReg:r=>`Keuhkosyövän polun aikoja ei julkaista alueittain, joten emme tiedä, missä vaiheessa ${r} jää jälkeen. Juuri tämän tietopankki mittaisi.`,
-   smk:'Päivittäin tupakoivat',risk:'Arvioitu riskiryhmä (50–74 v)',scr:'Rintasyöpäseulontaan osallistuu',natl:'koko maa',
-   edu:'Koko maa: keuhkosyöpä on miehillä 2,7× yleisempi perusasteen kuin korkea-asteen koulutuksella, ja muuta kieltä puhuvat osallistuvat seulontoihin noin 20 prosenttiyksikköä harvemmin.',
-   people:n=>`${n} henkilöä`,
-   v:{bus:'Bussipilotti',hosp:'Sairaalan TT-kutsut ensin',watch:'Koholla – ei vielä pilottia',none:'Ei merkitsevää eroa',low:'Alle maan tason'},
-   act:{
-    bus:(f,ad,h,b)=>`Matka on este: ${f} % niistä, jotka bussi tavoittaisi lisää, asuu yli tunnin päässä TT-laitteesta. Mallissa sairaalan TT tavoittaa ${h} % riskiryhmän vuositarpeesta, bussin kanssa ${b} % – noin ${ad} lisäosallistujaa vuodessa.`,
-    hosp:(f,ad,h,b)=>`Lähes kaikki asuvat TT-laitteen lähellä: vain ${f} % bussin lisäosallistujista asuu kaukana. Aloitetaan kutsuilla sairaalan TT:hen; bussi lisäisi lähinnä kapasiteettia (oletus).`,
-    watch:()=>'Kuolleisuus on merkitsevästi koholla, mutta pilottikartta ei vielä mallinna aluetta. Tiimi ei anna tälle alueelle suositusta: seurataan mittareita.',
-    none:()=>'Ei merkitsevää eroa maan tasoon. Seurataan samoja mittareita kuin muualla, jotta mahdollinen ero näkyy.',
-    low:()=>'Kuolleisuus on merkitsevästi maan tasoa matalampi. Alue on hyvä vertailukohta pilotille.'},
-   who:'Kuka',whoV:{bus:r=>`${r} hyvinvointialue ajaa vuoden pilotin satunnaistetuin kutsuin; kumppanina AstraZeneca (ehdotus).`,hosp:r=>`${r} hyvinvointialue kutsuu riskiryhmän sairaalan TT:hen satunnaistetusti ja mittaa osallistumisen.`},
-   what:'Mittari',whatV:'I–II-vaiheessa todettujen osuus ja aika oireesta TT:hen (syöpästrategian tavoite 3), osallistuminen etäisyyden ja kielen mukaan.',
-   open:r=>`Avaa ${r} pilottikartalla →`,team:'Tiimin suositus datan pohjalta, ei todistettu vaikutus.',
-   askH:r=>`Kysy tekoälyltä: ${r}`,q:[r=>`Miksi ${r} erottuu?`,r=>`Mitä alueesta ${r} ei vielä tiedetä?`,()=>'Mitä pilotin pitäisi mitata ensin?'],brief:'Kirjoita tiivistelmä',
-   ph:'Kysy omin sanoin…',send:'Kysy',aiNote:'Vastaa vain lähteistetyistä faktoista ja kertoo, mitä ei tiedetä. Ei potilaskohtaisia neuvoja.',
-   aiOff:'Tekoäly ei ole päällä tällä palvelimella. Yllä oleva kooste on kokonainen ilman sitä.',aiErr:'Vastausta ei saatu juuri nyt. Yllä oleva kooste on kokonainen ilman sitä.',
-   natH:'Koko Suomi',libSum:'Kaikki todisteet: 20 kaaviota ja lähteet',libP:'Jokainen yllä oleva luku tulee näistä. Avaa, jos haluat nähdä datan.',lib:{gap:'Ero ja kehitys',where:'Hoitopolku ja viiveet',who:'Riskiryhmä, koulutus, seulonta',do:'Suositukset',src:'Lähteet'}},
- sv:{reg:'Område',hint:'Klicka på ett område på kartan',r1:'Vad är skillnaden',r2:'Var i vårdkedjan',r3:'Vem det gäller',r4:'Vad gör vi',
-   more:()=>'fler lungcancerdödsfall än åldersstrukturen förutsäger',less:()=>'färre lungcancerdödsfall än åldersstrukturen förutsäger',
-   gapP:(o,e,x,lo,hi,sm)=>`${o} dödsfall 2021–2025, förväntat ${e}: ${x>=0?'cirka '+x+' fler':'cirka '+(-x)+' färre'} på fem år. SMR ${sm} (95 %: ${lo}–${hi}).`,
-   sig:{hi:'Signifikant över riksnivån.',lo:'Signifikant under riksnivån.',ns:'Ingen signifikant skillnad mot riksnivån.'},rank:(r,n)=>`Plats ${r}/${n}`,nat:'riksnivå 1,0',
-   pathP:'Nationellt tar det cirka 155 dagar från symtom till behandling. Fördröjningen uppstår före diagnos: patientfördröjning och primärvård.',
-   p1:'Patient 50+ d',p2:'Primärvård 41 d',p3:'Specialistvård 58 d',dk:'Danmark: 67 dagar totalt',
-   regWait:(a,b,y)=>`I området väntade ${a} % av remisserna inom cancersjukdomar över 90 dagar på första bedömning och ${b} % på behandling (${y}). Gäller alla cancrar, inte bara lunga.`,
-   noReg:r=>`Tider i lungcancerns vårdkedja publiceras inte per område, så vi vet inte i vilket skede ${r} halkar efter. Det är just detta databanken skulle mäta.`,
-   smk:'Dagligrökare',risk:'Uppskattad riskgrupp (50–74 år)',scr:'Deltar i bröstcancerscreening',natl:'hela landet',
-   edu:'Hela landet: lungcancer är 2,7× vanligare bland män med grundutbildning än med högre utbildning, och personer med annat språk deltar i screening cirka 20 procentenheter mindre.',
-   people:n=>`${n} personer`,
-   v:{bus:'Busspilot',hosp:'Inbjudningar till sjukhusets DT först',watch:'Förhöjd – ingen pilot ännu',none:'Ingen signifikant skillnad',low:'Under riksnivån'},
-   act:{
-    bus:(f,ad,h,b)=>`Avståndet är hindret: ${f} % av dem som bussen skulle nå utöver sjukhuset bor mer än en timme från en DT. I modellen når sjukhusets DT ${h} % av riskgruppens årliga behov, med bussen ${b} % – cirka ${ad} fler deltagare per år.`,
-    hosp:(f,ad,h,b)=>`Nästan alla bor nära en DT: bara ${f} % av bussens extra deltagare bor långt bort. Börja med inbjudningar till sjukhusets DT; en buss skulle främst ge kapacitet (antagande).`,
-    watch:()=>'Dödligheten är signifikant förhöjd, men pilotkartan modellerar inte området ännu. Teamet ger ingen rekommendation här: följ måtten.',
-    none:()=>'Ingen signifikant skillnad mot riksnivån. Följ samma mått som på andra håll så att en eventuell skillnad syns.',
-    low:()=>'Dödligheten är signifikant lägre än riksnivån. Området är en bra jämförelse för piloten.'},
-   who:'Vem',whoV:{bus:r=>`${r} driver en ettårig pilot med randomiserade inbjudningar; AstraZeneca som partner (förslag).`,hosp:r=>`${r} bjuder in riskgruppen till sjukhusets DT randomiserat och mäter deltagandet.`},
-   what:'Mått',whatV:'Andel upptäckta i stadium I–II och tid från symtom till DT (cancerstrategins mål 3), deltagande efter avstånd och språk.',
-   open:r=>`Öppna ${r} på pilotkartan →`,team:'Teamets rekommendation utifrån datan, inte bevisad effekt.',
-   askH:r=>`Fråga AI: ${r}`,q:[r=>`Varför sticker ${r} ut?`,r=>`Vad vet vi inte om ${r}?`,()=>'Vad ska en pilot mäta först?'],brief:'Skriv en sammanfattning',
-   ph:'Fråga med egna ord…',send:'Fråga',aiNote:'Svarar bara utifrån källbelagda fakta och säger vad som inte är känt. Inga råd till enskilda patienter.',
-   aiOff:'AI är inte påslagen på den här servern. Sammanfattningen ovan är komplett utan den.',aiErr:'Inget svar just nu. Sammanfattningen ovan är komplett utan det.',
-   natH:'Hela Finland',libSum:'Alla belägg: 20 diagram och källor',libP:'Varje siffra ovan kommer härifrån. Öppna om du vill se datan.',lib:{gap:'Skillnad och utveckling',where:'Vårdkedja och fördröjningar',who:'Riskgrupp, utbildning, screening',do:'Rekommendationer',src:'Källor'}},
- en:{reg:'Region',hint:'Click a region on the map',r1:'What is the gap',r2:'Where on the care pathway',r3:'Who it affects',r4:'What to do',
-   more:()=>'more lung cancer deaths than the age structure predicts',less:()=>'fewer lung cancer deaths than the age structure predicts',
-   gapP:(o,e,x,lo,hi,sm)=>`${o} deaths in 2021–2025 against ${e} expected: ${x>=0?'about '+x+' more':'about '+(-x)+' fewer'} in five years. SMR ${sm} (95% CI ${lo}–${hi}).`,
-   sig:{hi:'Significantly above the national level.',lo:'Significantly below the national level.',ns:'Not significantly different from the national level.'},rank:(r,n)=>`Rank ${r} of ${n}`,nat:'national level 1.0',
-   pathP:'Nationally, symptoms to treatment takes about 155 days. The delay forms before diagnosis: patient delay and primary care.',
-   p1:'Patient 50+ d',p2:'Primary care 41 d',p3:'Specialist 58 d',dk:'Denmark: 67 days in total',
-   regWait:(a,b,y)=>`Here, ${a}% of oncology referrals waited over 90 days for a first specialist assessment and ${b}% for treatment (${y}). All cancers, not lung only.`,
-   noReg:r=>`Lung cancer pathway times are not published by region, so nobody knows at which step ${r} falls behind. That is exactly what the data bank would measure.`,
-   smk:'Daily smokers',risk:'Estimated risk group (50–74)',scr:'Breast screening participation',natl:'national',
-   edu:'Nationally: lung cancer is 2.7× more common in men with basic than with higher education, and people with another language attend screening about 20 points less often.',
-   people:n=>`${n} people`,
-   v:{bus:'Bus pilot',hosp:'Hospital-CT invitations first',watch:'Raised – no pilot yet',none:'No significant gap',low:'Below national level'},
-   act:{
-    bus:(f,ad,h,b)=>`Distance is the barrier: ${f}% of the extra people a bus would reach live over an hour from a CT. Modelled: a hospital CT reaches ${h}% of the risk group's yearly need, with the bus ${b}% – about ${ad} extra participants a year.`,
-    hosp:(f,ad,h,b)=>`Almost everyone lives near a CT: only ${f}% of the bus's extra participants live far away. Start with hospital-CT invitations; a bus would mainly add capacity (an assumption).`,
-    watch:()=>'Mortality is significantly raised, but the pilot map does not model this region yet. The team makes no recommendation here: track the metrics.',
-    none:()=>'No significant difference from the national level. Track the same metrics as everywhere, so any gap shows up.',
-    low:()=>'Mortality is significantly below the national level. A useful comparison region for the pilot.'},
-   who:'Who',whoV:{bus:r=>`${r} wellbeing services county runs a one-year pilot with randomised invitations; AstraZeneca as partner (proposal).`,hosp:r=>`${r} wellbeing services county invites the risk group to the hospital CT, randomised, and measures uptake.`},
-   what:'Metric',whatV:'Share found at stage I–II and time from symptoms to CT (cancer strategy Goal 3), uptake by distance and language.',
-   open:r=>`Open ${r} in the pilot map →`,team:'Team recommendation from the data, not a proven effect.',
-   askH:r=>`Ask the AI about ${r}`,q:[r=>`Why does ${r} stand out?`,r=>`What is not known about ${r}?`,()=>'What should a pilot measure first?'],brief:'Write a briefing',
-   ph:'Ask in your own words…',send:'Ask',aiNote:'Answers only from cited facts and says what is unknown. No advice about individual patients.',
-   aiOff:'The AI is not switched on on this server. The brief above is complete without it.',aiErr:'No answer right now. The brief above is complete without it.',
-   natH:'All of Finland',libSum:'All evidence: 20 charts and sources',libP:'Every number above comes from here. Open it to see the data.',lib:{gap:'Gap and trend',where:'Pathway and delays',who:'Risk group, education, screening',do:'Recommendations',src:'Sources'}}
-};
-const B=()=>BT[lang]||BT.en;
-const PILOT={HVA21:'bus',HVA10:'hosp',HVA06:'hosp'};
+const fmt=v=>v==null?'–':(typeof v==='number'?v.toLocaleString(LOC[lang]):v);
 const f1=x=>fmt(Math.round(x*10)/10);
-function verdictOf(c){const S=D.smr.find(r=>r[0]===c);if(PILOT[c])return PILOT[c];if(!S)return 'none';return S[2]>1?'watch':S[3]<1?'low':'none';}
-function regionSelect(){
-  const sel=document.getElementById('region');if(!sel)return;
-  document.getElementById('regionLbl').textContent=B().reg;
-  const rows=D.smr.slice().sort((a,b)=>nmN(a[0]).localeCompare(nmN(b[0]),LOC[lang]));
-  sel.innerHTML=rows.map(r=>`<option value="${r[0]}"${r[0]===REG?' selected':''}>${nmN(r[0])}</option>`).join('');
-  sel.onchange=()=>setRegion(sel.value);
-  const quick=D.smr.filter(r=>r[2]>1).map(r=>r[0]);
-  document.getElementById('chips').innerHTML=quick.map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===REG}"><i></i>${nmN(c)}</button>`).join('');
-  document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>setRegion(b.dataset.c));
+const pc=s=>lang==='en'?String(s).replace(/ %/g,'%'):s;
+const nmN=c=>(NOM[lang]&&NOM[lang][c])||(D.names[c]&&D.names[c].en)||c;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PILOT={HVA21:'bus',HVA10:'hosp',HVA06:'hosp'};
+const T={
+ fi:{eyebrow:'Keuhkodata · tekoälyanalyytikko',h1:'Missä Suomen pitäisi toimia ensin keuhkosyövän kanssa?',go:'Analysoi',ph:'Kysy mitä tahansa keuhkosyövän eroista Suomessa…',aiH:'Tekoälyanalyytikko',hint:'Klikkaa aluetta',
+   src:'Data: Tilastokeskus, THL, Syöpärekisteri, Yle MOT 2026, IHE 2026. Pilottiluvut ovat mallinnettuja.',
+   p:{first_pilot:'Minne ensimmäinen pilotti?',distance:'Missä etäisyys on este?',smoking_mortality:'Tupakointi ja kuolleisuus',screening_reach:'Kenet seulonta tavoittaa huonoiten?'},
+   lg:['Merkitsevästi koholla','Merkitsevästi matalampi','Ei eroa'],run:'Analysoidaan…',done:(n,s,t)=>`${n} aluetta · ${s} vaihetta · ${t} s`,
+   off:'Tekoäly ei ole juuri nyt käytössä. Valmiit kysymykset toimivat aina.',
+   v:{bus:'Bussipilotti',hosp:'Sairaalan TT-kutsut ensin',watch:'Koholla, ei pilottia vielä',none:'Ei merkitsevää eroa',low:'Maan tasoa matalampi'},
+   k:{smr:'keuhkosyöpäkuolemia kuin ikärakenne ennustaa',ex:'ylimääräistä kuolemaa 5 vuodessa',sm:n=>`tupakoi päivittäin · koko maa ${n}`,rk:'riskiryhmässä (arvio)'},
+   cov:['Sairaalan TT','+ bussi'],far:(f,a)=>`${f} % lisäosallistujista asuu kaukana TT:stä · ${a} lisäosallistujaa vuodessa (mallinnettu)`,
+   act:{bus:'Etäisyys on este. Seulontabussi tavoittaa ne, joita sairaalan TT ei tavoita.',hosp:'Lähes kaikki asuvat TT:n lähellä. Aloitetaan kutsuilla sairaalan TT:hen.',watch:'Kuolleisuus on koholla, mutta aluetta ei ole vielä mallinnettu. Seurataan mittareita.',none:'Ei merkitsevää eroa maan tasoon.',low:'Hyvä vertailualue pilotille.'},
+   plan:'Suunnittele pilotti →',ask:r=>`Kysy alueesta ${r}`,askQ:r=>`Mikä alueella ${r} on vialla ja mitä pitäisi tehdä?`,chg:'Vaihda aluetta',
+   t1:['Missä kohtaa polkua','155 pv','Oireista hoitoon Suomessa. Viive syntyy ennen diagnoosia.',['Suomi','Ruotsi','Tanska']],
+   t2:['Ketä se koskee','2,7×','Keuhkosyöpä miehillä: perusaste vs. korkea-aste, / 100 000.',['Sairastuneet','Kuolleet'],['Perusaste','Korkea-aste']],
+   t3:['Kenet seulonta tavoittaa','−22','prosenttiyksikköä: muuta kieltä puhuvat osallistuvat seulontoihin harvemmin.',['Rinta','Suolisto','Kohdunkaula'],['Suomi, ruotsi, saame','Muu kieli']],
+   t4:['Lopputulos','17 %','miehistä elossa 5 vuotta keuhkosyövän jälkeen. Norjassa 30 %.',['Suomi','Tanska','Ruotsi','Norja']]},
+ sv:{eyebrow:'Lungdata · AI-analytiker',h1:'Var ska Finland agera först mot lungcancer?',go:'Analysera',ph:'Fråga vad som helst om lungcancerskillnader i Finland…',aiH:'AI-analytiker',hint:'Klicka på ett område',
+   src:'Data: Statistikcentralen, THL, Cancerregistret, Yle MOT 2026, IHE 2026. Pilotsiffrorna är modellerade.',
+   p:{first_pilot:'Var ska första piloten vara?',distance:'Var är avståndet hindret?',smoking_mortality:'Rökning och dödlighet',screening_reach:'Vem når screeningen sämst?'},
+   lg:['Signifikant förhöjd','Signifikant lägre','Ingen skillnad'],run:'Analyserar…',done:(n,s,t)=>`${n} områden · ${s} steg · ${t} s`,
+   off:'AI är inte tillgänglig just nu. De färdiga frågorna fungerar alltid.',
+   v:{bus:'Busspilot',hosp:'Sjukhusets DT först',watch:'Förhöjd, ingen pilot ännu',none:'Ingen signifikant skillnad',low:'Under riksnivån'},
+   k:{smr:'lungcancerdödsfall än åldersstrukturen förutsäger',ex:'fler dödsfall på 5 år',sm:n=>`röker dagligen · hela landet ${n}`,rk:'i riskgruppen (uppskattning)'},
+   cov:['Sjukhusets DT','+ buss'],far:(f,a)=>`${f} % av de extra deltagarna bor långt från en DT · ${a} fler deltagare per år (modellerat)`,
+   act:{bus:'Avståndet är hindret. En screeningbuss når dem som sjukhusets DT inte når.',hosp:'Nästan alla bor nära en DT. Börja med inbjudningar till sjukhusets DT.',watch:'Dödligheten är förhöjd men området är inte modellerat ännu. Följ måtten.',none:'Ingen signifikant skillnad mot riksnivån.',low:'Ett bra jämförelseområde för piloten.'},
+   plan:'Planera piloten →',ask:r=>`Fråga om ${r}`,askQ:r=>`Vad är problemet i ${r} och vad bör göras?`,chg:'Byt område',
+   t1:['Var i vårdkedjan','155 d','Från symtom till behandling i Finland. Fördröjningen uppstår före diagnos.',['Finland','Sverige','Danmark']],
+   t2:['Vem det gäller','2,7×','Lungcancer hos män: grundutbildning vs högre, / 100 000.',['Insjuknade','Döda'],['Grundnivå','Högre nivå']],
+   t3:['Vem screeningen når','−22','procentenheter: personer med annat språk deltar mindre i screening.',['Bröst','Tarm','Livmoderhals'],['Finska, svenska, samiska','Annat språk']],
+   t4:['Utfall','17 %','av männen lever 5 år efter lungcancer. I Norge 30 %.',['Finland','Danmark','Sverige','Norge']]},
+ en:{eyebrow:'Lung data · AI analyst',h1:'Where should Finland act first on lung cancer?',go:'Analyse',ph:'Ask anything about lung cancer gaps in Finland…',aiH:'AI analyst',hint:'Click a region',
+   src:'Data: Statistics Finland, THL, Finnish Cancer Registry, Yle MOT 2026, IHE 2026. Pilot figures are modelled.',
+   p:{first_pilot:'Where should the first pilot go?',distance:'Where is distance the barrier?',smoking_mortality:'Smoking and mortality',screening_reach:'Who does screening miss?'},
+   lg:['Significantly raised','Significantly lower','No difference'],run:'Analysing…',done:(n,s,t)=>`${n} regions · ${s} steps · ${t} s`,
+   off:'The AI is not available right now. The ready questions always work.',
+   v:{bus:'Bus pilot',hosp:'Hospital CT first',watch:'Raised, no pilot yet',none:'No significant gap',low:'Below national level'},
+   k:{smr:'lung cancer deaths vs. what age predicts',ex:'excess deaths in 5 years',sm:n=>`smoke daily · Finland ${n}`,rk:'in the risk group (estimate)'},
+   cov:['Hospital CT','+ bus'],far:(f,a)=>`${f}% of the extra people live far from a CT · ${a} extra participants a year (modelled)`,
+   act:{bus:'Distance is the barrier. A screening bus reaches people the hospital CT does not.',hosp:'Almost everyone lives near a CT. Start with hospital-CT invitations.',watch:'Mortality is raised, but the region is not modelled yet. Track the metrics.',none:'No significant difference from the national level.',low:'A good comparison region for the pilot.'},
+   plan:'Plan the pilot →',ask:r=>`Ask about ${r}`,askQ:r=>`What is wrong in ${r} and what should be done?`,chg:'Change region',
+   t1:['Where on the pathway','155 days','From first symptoms to treatment in Finland. The delay forms before diagnosis.',['Finland','Sweden','Denmark']],
+   t2:['Who it affects','2.7×','Lung cancer in men: basic vs. higher education, per 100,000.',['Cases','Deaths'],['Basic','Higher']],
+   t3:['Who screening misses','−22','points: people with another native language take part in screening less.',['Breast','Colorectal','Cervical'],['Finnish, Swedish, Sámi','Other language']],
+   t4:['Outcome','17%','of men alive five years after lung cancer. Norway: 30%.',['Finland','Denmark','Sweden','Norway']]}
+};
+const t=()=>T[lang]||T.en;
+let REG='HVA21',HL=[],VIEW=null,PM=null,aiRun=0,aiPreset='first_pilot',HERO_ON=false;
+try{const a=localStorage.getItem('keuhkodata-area');if(a&&SIGN.some(r=>r[0]===a))REG=a;}catch(e){}
+fetch('/pilot_map.json').then(r=>r.json()).then(j=>{PM=j;card();}).catch(()=>{});
+const sigOf=c=>{const S=SIGN.find(r=>r[0]===c);return !S?'ns':S[2]>1?'hi':S[3]<1?'lo':'ns';};
+const verdict=c=>PILOT[c]||({hi:'watch',lo:'low',ns:'none'}[sigOf(c)]);
+
+/* ---------- region card ---------- */
+function card(anim){
+  const el=document.getElementById('card'),c=REG,S=SIGN.find(r=>r[0]===c);if(!S)return;
+  const L=t(),vd=verdict(c),sg=sigOf(c),pct=Math.round((S[1]-1)*100);
+  const K=D.smoke_reg.find(r=>r[0]===c),R=D.risk.find(r=>r[0]===c),P=PM&&PM.counties&&PM.counties[c];
+  const opts=SIGN.slice().sort((a,b)=>nmN(a[0]).localeCompare(nmN(b[0]),LOC[lang])).map(r=>`<option value="${r[0]}"${r[0]===c?' selected':''}>${esc(nmN(r[0]))}</option>`).join('');
+  let pilot='';
+  if(P&&(vd==='bus'||vd==='hosp')){const T2=P.bus.totals,h=Math.round(T2.coverage_hospital_only*100),b=Math.round(T2.coverage_with_bus*100),far=Math.round(T2.additional_far/T2.additional*100);
+    pilot=`<div class="cov"><div class="row"><span>${L.cov[0]}</span><div class="tr"><i data-w="${h}" style="background:#9AA3A8"></i></div><b>${pc(h+' %')}</b></div><div class="row"><span>${L.cov[1]}</span><div class="tr"><i data-w="${b}" style="background:var(--amber)"></i></div><b>${pc(b+' %')}</b></div></div><p class="unk" style="margin-top:6px">${pc(L.far(far,fmt(T2.additional)))}</p>`;}
+  el.innerHTML=`<div class="chead"><h2>${esc(nmN(c))}</h2><span class="verdict ${vd}"><i></i>${L.v[vd]}</span></div>
+   <div class="cpick"><label class="sr" for="regSel">${L.chg}</label><select id="regSel">${opts}</select></div>
+   <div class="kpis">
+    <div class="kpi"><b class="${sg==='hi'?'w':sg==='lo'?'b':''}">${pc((pct>=0?'+':'−')+Math.abs(pct)+' %')}</b><span>${L.k.smr}</span></div>
+    <div class="kpi"><b>${fmt(Math.round(S[4]-S[5]))}</b><span>${L.k.ex}</span></div>
+    <div class="kpi"><b>${K?pc(f1(K[1])+' %'):'–'}</b><span>${L.k.sm(pc(f1(D.smoke_fi)+' %'))}</span></div>
+    <div class="kpi"><b>${R?fmt(R[1]):'–'}</b><span>${L.k.rk}</span></div>
+   </div>${pilot}
+   <p class="act">${L.act[vd]}</p>
+   <div class="cbtns">${vd==='bus'||vd==='hosp'?`<a class="btn" href="/kartta?county=${c}">${L.plan}</a>`:''}<button class="btn line" type="button" id="askReg">${esc(L.ask(nmN(c)))}</button></div>`;
+  document.getElementById('regSel').onchange=e=>setRegion(e.target.value);
+  document.getElementById('askReg').onclick=()=>runAI({question:L.askQ(nmN(c)),region:c});
+  requestAnimationFrame(()=>el.querySelectorAll('.tr i').forEach(i=>i.style.width=i.dataset.w+'%'));
+  if(anim){el.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'});}
 }
 function setRegion(c){
-  if(!c||c===REG&&document.getElementById('brief').innerHTML)return;
-  REG=c;myArea=c;try{localStorage.setItem('keuhkodata-area',c)}catch(e){}
-  const sel=document.getElementById('region');if(sel)sel.value=c;
-  document.querySelectorAll('#chips button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===c));
-  if(HERO.view&&HERO.view.select)HERO.view.select(c);
-  heroCaption();syncHash();brief(true);aiPanel();
-  const h=document.getElementById('globeHint');if(h)h.style.opacity=0;
-}
-function ciBar(S){
-  const lo=.7,hi=1.45,X=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));
-  const col=S[2]>1?'var(--worse)':S[3]<1?'var(--better)':'#8A9195';
-  return `<div class="ci" aria-hidden="true"><div class="ax"></div><div class="one" style="left:${X(1)}%"><span>${B().nat}</span></div><div class="rng" style="left:${X(S[2])}%;width:${X(S[3])-X(S[2])}%;background:${col}"></div><div class="pt" style="left:${X(S[1])}%;background:${col}"></div></div>`;
-}
-function cmp(label,v,nat,max,unit){
-  const vv=v==null?'–':f1(v)+unit,nn=f1(nat)+unit;
-  return `<div>${label}</div><div class="v">${pc(vv)} <small>· ${B().natl} ${pc(nn)}</small></div><div class="bar"><b style="width:${v==null?0:Math.min(100,v/max*100)}%"></b><u style="left:${Math.min(100,nat/max*100)}%"></u></div>`;
-}
-let aiSeq=0;
-function brief(anim){
-  const el=document.getElementById('brief');if(!el)return;
-  const c=REG,b=B(),S=D.smr.find(r=>r[0]===c);if(!S){el.innerHTML='';return;}
-  const nmR=nmN(c),vd=verdictOf(c),sig=S[2]>1?'hi':S[3]<1?'lo':'ns';
-  const pct=Math.round((S[1]-1)*100),x=Math.round(S[4]-S[5]);
-  const rank=D.smr.slice().sort((a,b)=>b[1]-a[1]).findIndex(r=>r[0]===c)+1;
-  const K=D.smoke_reg.find(r=>r[0]===c),R=D.risk.find(r=>r[0]===c),Cs=D.scr_county.find(r=>r[0]===c);
-  const pcty=PM&&PM.counties&&PM.counties[c];
-  // 1 gap
-  const r1=`<div class="brow"><div class="n">1</div><div><h3>${b.r1} ${tagHTML('S')}</h3>
-    <div class="big ${sig==='hi'?'w':sig==='lo'?'b':''}">${pc((pct>=0?'+':'−')+Math.abs(pct)+' %')}</div>
-    <p>${pct>=0?b.more():b.less()}. ${b.sig[sig]} ${b.rank(rank,D.smr.length)}.</p>${ciBar(S)}
-    <p>${b.gapP(fmt(S[4]),fmt(Math.round(S[5])),x,fmt(S[2]),fmt(S[3]),fmt(S[1]))}</p><div class="s">${src(['smr'])}</div></div></div>`;
-  // 2 where
-  let regw='';
-  if(pcty&&pcty.facts&&pcty.facts.oncology_waits){const w=pcty.facts.oncology_waits.filter(q=>q.assess_over90!=null&&q.assess_months>=9).slice(-1)[0];
-    if(w)regw=`<p>${pc(b.regWait(f1(w.assess_over90),f1(w.treat_over90||0),w.year))} ${tagHTML('S')}</p><div class="s">${src(['thlwait'])}</div>`;}
-  const r2=`<div class="brow"><div class="n">2</div><div><h3>${b.r2} ${tagHTML('N')}</h3>
-    <p>${b.pathP}</p>
-    <div class="path3" aria-hidden="true"><div class="p1" style="flex:50">${b.p1}</div><div class="p2" style="flex:41">${b.p2}</div><div class="p3" style="flex:58">${b.p3}</div></div>
-    <div class="dk" style="width:${67/155*100}%" aria-hidden="true"></div><div class="dkl">${b.dk}</div>
-    <div class="s">${src(['mot'])}</div>${regw}<p>${b.noReg(nmR)}</p></div></div>`;
-  // 3 who
-  const scrNat=D.scr_nat.breast;
-  const r3=`<div class="brow"><div class="n">3</div><div><h3>${b.r3}</h3>
-    <div class="cmp">${K?cmp(b.smk+' '+tagHTML('S'),K[1],D.smoke_fi,25,' %'):''}${Cs&&Cs[1]!=null?cmp(b.scr+' '+tagHTML('S'),Cs[1],scrNat,100,' %'):''}</div>
-    ${R?`<p>${b.risk}: <b>${b.people(fmt(R[1]))}</b> (${pc(f1(R[1]/R[2]*100)+' %')}) ${tagHTML('A')}</p>`:''}
-    <p>${b.edu} ${tagHTML('S')}</p><div class="s">${src(['sotk','scr','risk','ohj'])}</div></div></div>`;
-  // 4 action
-  let actP='';
-  if((vd==='bus'||vd==='hosp')&&pcty){const T2=pcty.bus.totals;actP=b.act[vd](Math.round(T2.additional_far/T2.additional*100),fmt(T2.additional),Math.round(T2.coverage_hospital_only*100),Math.round(T2.coverage_with_bus*100));}
-  else if(vd==='bus'||vd==='hosp'){actP=b.act[vd]('…','…','…','…');}
-  else actP=b.act[vd]();
-  const piloted=vd==='bus'||vd==='hosp';
-  const r4=`<div class="brow act"><div class="n">4</div><div><h3>${b.r4} ${tagHTML(piloted?'A':'N')}</h3>
-    <p style="font-size:16px">${pc(actP)}</p>
-    ${piloted?`<dl class="who"><dt>${b.who}</dt><dd>${b.whoV[vd](nmR)}</dd><dt>${b.what}</dt><dd>${b.whatV}</dd></dl>
-    <div class="go"><a class="mapbtn" href="/kartta?county=${c}">${glue(b.open(nmR))}</a></div>`:''}
-    <div class="s">${b.team} ${piloted?src(['pilot','team']):src(['team'])}</div></div></div>`;
-  // AI
-  const ask='';
-  el.innerHTML=`<div class="bhead"><h2>${nmR}</h2><span class="verdict ${vd}"><i></i>${b.v[vd]}</span></div>${r1}${r2}${r3}${r4}${ask}`;
-  if(anim){el.classList.remove('swap');void el.offsetWidth;el.classList.add('swap');}
-}
-async function askAI(question,label){
-  const out=document.getElementById('askO');if(!out)return;const my=++aiSeq;
-  out.className='out';out.innerHTML=`<span class="q">${esc2(label)}</span><span class="dots"><i></i><i></i><i></i></span>`;
-  try{
-    const r=await fetch('/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({region:REGNAME(REG),lang,question})});
-    if(my!==aiSeq)return;
-    if(r.status===503){out.className='out err';out.innerHTML=`<span class="q">${esc2(label)}</span>${B().aiOff}`;return;}
-    if(!r.ok)throw new Error(r.status);
-    const j=await r.json();if(my!==aiSeq)return;
-    out.innerHTML=`<span class="q">${esc2(label)}</span>`;const tx=document.createElement('span');out.appendChild(tx);
-    typeOut(tx,j.text,my);
-  }catch(e){if(my!==aiSeq)return;out.className='out err';out.innerHTML=`<span class="q">${esc2(label)}</span>${B().aiErr}`;}
-}
-function typeOut(node,text,my){let i=0;const step=()=>{if(my!==aiSeq)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/90)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(step);};
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;return;}step();}
-const esc2=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-/* ================= AI analyst (agent over the data; numbers checked) ================= */
-const AT={
- fi:{t:'Tekoälyanalyytikko',sub:'analysoi kaikki 22 aluetta avoimesta datasta',ph:'Kysy keuhkosyövän eroista Suomessa…',go:'Analysoi',
-   p:{first_pilot:'Minne ensimmäinen pilotti?',distance:'Missä etäisyys on este?',smoking_mortality:'Missä tupakointi ja kuolleisuus ovat molemmat korkeita?',screening_reach:'Missä seulonta tavoittaa huonoiten?'},
-   reg:r=>`Mikä alueella ${r} on vialla?`,run:'Analysoidaan…',regions:n=>`${n} aluetta analysoitu`,calls:n=>`${n} työkalukutsua`,sec:x=>`${x} s`,nums:n=>`${n} lukua tarkistettu`,
-   ok:'✓ tarkistettu',no:'⚠ tarkistamaton',unk:'Ei tiedetä:',ai:'Tekoäly (Claude) analysoi datan työkaluilla. Jokainen luku tarkistetaan lähdedataa vasten.',rules:'Sääntöpohjainen analyysi (tekoäly ei ole juuri nyt käytössä). Samat työkalut ja tarkistukset.',
-   off:'Tekoäly ei ole päällä tällä palvelimella. Kokeile valmiita kysymyksiä: ne toimivat aina.',err:'Analyysi ei onnistunut juuri nyt. Valmiit kysymykset toimivat aina.',src:'Lähde'},
- sv:{t:'AI-analytiker',sub:'analyserar alla 22 områden ur öppna data',ph:'Fråga om lungcancerskillnader i Finland…',go:'Analysera',
-   p:{first_pilot:'Var ska första piloten vara?',distance:'Var är avståndet hindret?',smoking_mortality:'Var är både rökning och dödlighet höga?',screening_reach:'Var når screeningen sämst?'},
-   reg:r=>`Vad är problemet i ${r}?`,run:'Analyserar…',regions:n=>`${n} områden analyserade`,calls:n=>`${n} verktygsanrop`,sec:x=>`${x} s`,nums:n=>`${n} siffror kontrollerade`,
-   ok:'✓ kontrollerad',no:'⚠ ej kontrollerad',unk:'Okänt:',ai:'AI (Claude) analyserar datan med verktyg. Varje siffra kontrolleras mot källdatan.',rules:'Regelbaserad analys (AI är inte tillgänglig just nu). Samma verktyg och kontroller.',
-   off:'AI är inte påslagen på den här servern. Prova de färdiga frågorna: de fungerar alltid.',err:'Analysen lyckades inte just nu. De färdiga frågorna fungerar alltid.',src:'Källa'},
- en:{t:'AI analyst',sub:'analyses all 22 regions from the open data',ph:'Ask about lung cancer gaps in Finland…',go:'Analyse',
-   p:{first_pilot:'Where should the first pilot go?',distance:'Where is distance the barrier?',smoking_mortality:'Where are smoking and mortality both high?',screening_reach:'Where does screening reach people worst?'},
-   reg:r=>`What is wrong in ${r}?`,run:'Analysing…',regions:n=>`${n} regions analysed`,calls:n=>`${n} tool calls`,sec:x=>`${x} s`,nums:n=>`${n} numbers checked`,
-   ok:'✓ verified',no:'⚠ unverified',unk:'Not known:',ai:'AI (Claude) analysed the data with tools. Every number is checked against the source data.',rules:'Rule-based analysis (the AI is not available right now). Same tools, same checks.',
-   off:'The AI is not switched on on this server. Try the ready questions: they always work.',err:'The analysis did not work just now. The ready questions always work.',src:'Source'}
-};
-const A=()=>AT[lang]||AT.en;
-const IND={fi:{smr:'keuhkosyöpäkuolleisuus (SMR)',excess_deaths:'ylimääräiset kuolemat',daily_smokers:'päivittäinen tupakointi',risk_group_share:'riskiryhmän osuus',risk_group_people:'riskiryhmän koko',screening_breast:'rintasyöpäseulontaan osallistuminen',screening_colorectal:'suolistosyöpäseulontaan osallistuminen'},
- sv:{smr:'lungcancerdödlighet (SMR)',excess_deaths:'överdödlighet',daily_smokers:'daglig rökning',risk_group_share:'riskgruppens andel',risk_group_people:'riskgruppens storlek',screening_breast:'deltagande i bröstcancerscreening',screening_colorectal:'deltagande i tarmcancerscreening'},
- en:{smr:'lung cancer mortality (SMR)',excess_deaths:'excess deaths',daily_smokers:'daily smoking',risk_group_share:'risk group share',risk_group_people:'risk group size',screening_breast:'breast screening participation',screening_colorectal:'colorectal screening participation'}};
-function stepLabel(st){const I=IND[lang]||IND.en,n=st.n,cs=(st.codes||[]).map(c=>nmN(c)).join(', ');
-  const T_={fi:{rank_regions:`Järjesti ${n} aluetta: ${I[st.ind]||st.ind}`,region_profile:`Avasi alueen tiedot: ${cs}`,compare_regions:`Vertasi: ${cs}`,national_facts:'Luki koko maan taustaluvut'},
-    sv:{rank_regions:`Rangordnade ${n} områden: ${I[st.ind]||st.ind}`,region_profile:`Öppnade områdesprofil: ${cs}`,compare_regions:`Jämförde: ${cs}`,national_facts:'Läste nationella bakgrundssiffror'},
-    en:{rank_regions:`Ranked ${n} regions by ${I[st.ind]||st.ind}`,region_profile:`Opened region profile: ${cs}`,compare_regions:`Compared ${cs}`,national_facts:'Read the national context'}}[lang]||{};
-  return T_[st.tool]||st.label;}
-let aiRun=0,aiPreset='first_pilot',HL=[];
-function aiPanel(){
-  const a=A();if(!document.getElementById('ai2'))return;
-  document.getElementById('aiTitle').textContent=a.t;document.getElementById('aiSub').textContent=a.sub;
-  const inp=document.getElementById('aiI');inp.placeholder=a.ph;inp.setAttribute('aria-label',a.ph);document.getElementById('aiGo').textContent=a.go;
-  document.getElementById('aiQs').innerHTML=Object.entries(a.p).map(([k,v])=>`<button type="button" data-p="${k}" aria-pressed="${k===aiPreset}">${v}</button>`).join('')+`<button type="button" data-r="1">${a.reg(nmN(REG))}</button>`;
-  document.querySelectorAll('#aiQs [data-p]').forEach(b=>b.onclick=()=>runAnalyst({preset:b.dataset.p}));
-  const rb=document.querySelector('#aiQs [data-r]');if(rb)rb.onclick=()=>runAnalyst({question:rb.textContent,region:REG});
-  document.getElementById('aiF').onsubmit=e=>{e.preventDefault();const v=inp.value.trim();if(v)runAnalyst({question:v,region:REG});};
-}
-async function runAnalyst(req){
-  const a=A(),my=++aiRun,out=document.getElementById('aiOut');
-  aiPreset=req.preset||null;document.querySelectorAll('#aiQs [data-p]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===aiPreset));
-  out.classList.remove('hidden');out.innerHTML=`<ol class="trail"><li class="run in">${a.run}</li></ol>`;
-  let j=null;
-  try{const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...req,lang})});
-    if(my!==aiRun)return;
-    if(!r.ok){out.innerHTML=`<p class="aimode">${r.status===503?a.off:a.err}</p>`;return;}
-    j=await r.json();}catch(e){if(my===aiRun)out.innerHTML=`<p class="aimode">${a.err}</p>`;return;}
-  if(my!==aiRun)return;
-  const regionsN=Math.max(0,...j.steps.map(s=>s.n||0),j.highlight.length);
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,D_=reduce?0:260;
-  out.innerHTML=`<ol class="trail">${j.steps.map(s=>`<li>${esc2(stepLabel(s))}</li>`).join('')}</ol>
-    <div class="aimeta"><span>${a.regions(regionsN)}</span><span>${a.calls(j.steps.length)}</span><span>${j.seconds<0.1?'< 0'+(lang==='en'?'.':',')+'1 s':a.sec(String(j.seconds).replace('.',lang==='en'?'.':','))}</span><span>${a.nums(j.numbers_checked)}</span></div>
-    <p class="aians"></p>
-    <ul class="finds">${j.findings.map((f,i)=>{const rk=j.highlight.findIndex(c=>f.text.includes(nmN(c))||f.text.includes((D.names[c]||{}).en||'§'));
-      return `<li>${rk>=0?`<span class="rk">${rk+1}</span>`:''}<span class="ck ${f.verified?'ok':'no'}" title="${f.verified?'':esc2((f.unverified||[]).join(', '))}">${f.verified?a.ok:a.no}</span>${esc2(f.text)}${f.source?`<span class="src">${a.src}: ${esc2(f.source)}</span>`:''}</li>`}).join('')}</ul>
-    ${j.unknowns&&j.unknowns.length?`<div class="aiunk"><b>${a.unk}</b> ${j.unknowns.map(esc2).join(' ')}</div>`:''}
-    <p class="aimode">${j.mode==='ai'?a.ai:a.rules}</p>`;
-  const lis=[...out.querySelectorAll('.trail li')];
-  lis.forEach((li,i)=>setTimeout(()=>li.classList.add('in'),i*D_));
-  const t0=lis.length*D_;
-  setTimeout(()=>{if(my!==aiRun)return;const p=out.querySelector('.aians');typeOut2(p,j.answer,my);
-    setHighlight(j.highlight);if(j.select)setRegion(j.select);},t0);
-  out.querySelectorAll('.finds li').forEach((li,i)=>setTimeout(()=>li.classList.add('in'),t0+400+i*(D_*0.8)));
-}
-function typeOut2(node,text,my){if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;return;}let i=0;const st=()=>{if(my!==aiRun)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/70)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(st);};st();}
-function setHighlight(codes){HL=(codes||[]).slice(0,4);if(HERO.view&&HERO.view.mark)HERO.view.mark(HL);heroCaption();}
-function snapHTML(){aiPanel();regionSelect();brief(false);const b=B();
-  const h=document.getElementById('globeHint');if(h)h.textContent=b.hint;
-}
-function headline(){
-  const top=D.smr[0],pct=Math.round((top[1]-1)*100);
-  const X={fi:[['155 pv','oireista hoidon alkuun Suomessa. Tanskassa 67.','Yle MOT 2026'],[`+${pct} %`,`enemmän keuhkosyöpäkuolemia ${nm(top[0])} alueella kuin ikärakenne ennustaa`,'Tilastokeskus, Polku Labs -laskelma'],['2,7×','yleisempi perusasteen kuin korkea-asteen koulutuksen saaneilla miehillä','Syöpärekisteri, Syöpä 2022']],
-           sv:[['155 d','från symtom till behandling i Finland. I Danmark 67.','Yle MOT 2026'],[`+${pct} %`,`fler lungcancerdödsfall i ${nm(top[0])} välfärdsområde än åldersstrukturen förutsäger`,'Statistikcentralen, Polku Labs beräkning'],['2,7×','vanligare bland män med grundutbildning än med högre utbildning','Cancerregistret, Cancer 2022']],
-           en:[['155 days','from symptoms to treatment in Finland. Denmark: 67.','Yle MOT 2026'],[`+${pct}%`,`more lung cancer deaths in ${nm(top[0])} than its age structure predicts`,'Statistics Finland, Polku Labs calculation'],['2.7×','more common in men with basic than with higher education','Finnish Cancer Registry, Cancer 2022']]}[lang];
-  document.getElementById('headline').innerHTML=X.map((x,i)=>`<li class="hl${i===1?' worse':''}"><span class="v">${x[0]}</span><span class="l">${x[1]}</span><span class="s">${x[2]}</span></li>`).join('');
-}
-function go(t,s){try{history.pushState(null,'',location.href)}catch(e){}cur={t,s:s||null};render();window.scrollTo({top:0});}   // own history entry, so Back returns to the previous step
-window.addEventListener('popstate',()=>{try{const h=new URLSearchParams(location.hash.slice(1));const tt=h.get('t');cur=NAV.some(n=>n.id===tt)?{t:tt,s:h.get('s')}:{t:'ov',s:null};}catch(e){cur={t:'ov',s:null}}render();});
-function buildNav(pg){
-  const nav=document.getElementById('mainnav');
-  nav.innerHTML='';nav.closest('.navbar').classList.add('hidden');   // pilot map link lives in the shared top navigation
+  if(!c)return;REG=c;try{localStorage.setItem('keuhkodata-area',c)}catch(e){}
+  if(VIEW)VIEW.select(c);labels();card(true);
+  document.querySelectorAll('#ranked button').forEach(b=>b.setAttribute('aria-current',b.dataset.c===c));
+  const h=document.getElementById('hint');if(h)h.style.opacity=0;
 }
 
-/* ---- 3D hero: Finland from 308 municipalities; significantly high SMR areas rise in red ---- */
-const HERO={started:false,labels:{}};
-const STILL_POS={"HVA21":[49.8,25.3],"HVA01":[62.9,89.6],"HVA10":[70.8,86.8],"HVA06":[34.7,80.7]};   // label positions (%) in /assets/finland_3d.webp (600x700 render of the settled scene)
-function heroCaption(){
-  const W={fi:{h:'Korkeus: keuhkosyöpäkuolemat suhteessa siihen, mitä alueen ikärakenne ennustaa (SMR 2021–2025, 1,0 = maan taso).',w:'Merkitsevästi yli maan tason',b:'Merkitsevästi alle',n:'Ei merkitsevää eroa'},
-           sv:{h:'Höjd: lungcancerdödsfall i förhållande till vad områdets åldersstruktur förutsäger (SMR 2021–2025, 1,0 = riksnivå).',w:'Signifikant över riksnivån',b:'Signifikant under',n:'Ingen signifikant skillnad'},
-           en:{h:'Height: lung cancer deaths relative to what each area\'s age structure predicts (SMR 2021–2025, 1.0 = national level).',w:'Significantly above the national level',b:'Significantly below',n:'No significant difference'}}[lang];
-  document.getElementById('mapcap').innerHTML=`<span class="key"><span><i style="background:var(--worse)"></i>${W.w}</span><span><i style="background:var(--better)"></i>${W.b}</span><span><i style="background:#DFE3E3;outline:1px solid #CDD2D3"></i>${W.n}</span></span>${W.h} ${tagHTML('S')}<span class="src">${src(['smr'])}</span>`;
-  const box=document.getElementById('globeLabels');
-  D.smr.forEach(r=>{
-    const hk=HL.indexOf(r[0]);const show=r[2]>1||r[0]===REG||hk>=0;let el=HERO.labels[r[0]];
+/* ---------- 3D map ---------- */
+const LBL={};let POS={};
+const STILL_POS={"HVA21":[49.8,25.3],"HVA01":[62.9,89.6],"HVA10":[70.8,86.8],"HVA06":[34.7,80.7]};
+function labels(){
+  const box=document.getElementById('labels');
+  SIGN.forEach(r=>{const c=r[0],hk=HL.indexOf(c),show=r[2]>1||c===REG||hk>=0;let el=LBL[c];
     if(!el&&!show)return;
-    if(!el){el=document.createElement('div');el.className='lbl';el.dataset.h=r[0];box.append(el);HERO.labels[r[0]]=el;}
-    el.innerHTML=`<b>${hk>=0?`<span class="rkn">${hk+1}</span>`:''}${nmN(r[0])}</b><span>SMR ${fmt(r[1])}</span>`;el.classList.toggle('mk',hk>=0);
-    el.classList.toggle('sel',r[0]===REG);if(HERO.on)el.classList.add('on');
-    const still=document.getElementById('globe').classList.contains('is-still');el.style.display=show&&(!still||STILL_POS[r[0]])?'':'none';
+    if(!el){el=document.createElement('div');el.className='lbl';box.append(el);LBL[c]=el;}
+    el.innerHTML=`${hk>=0?`<span class="rk">${hk+1}</span>`:''}${esc(nmN(c))}<small>SMR ${fmt(r[1])}</small>`;
+    el.classList.toggle('sel',c===REG);el.classList.toggle('mk',hk>=0);if(HERO_ON)el.classList.add('on');
+    const p=POS[c];el.style.display=show&&p?'':'none';if(p){el.style.left=p[0]+'%';el.style.top=p[1]+'%';}
   });
 }
-function placeLabels(list){list.forEach(p=>{const el=HERO.labels[p.hva];if(el){el.style.left=p.x+'%';el.style.top=p.y+'%';}});}
-function hero3d(){
-  heroCaption();
-  if(HERO.started) return; HERO.started=true;
-  const box=document.getElementById('globe'), still=document.getElementById('globeStill');
-  const showStill=()=>{HERO.on=true;still.src=still.dataset.src;still.classList.remove('hidden');box.classList.add('is-still');placeLabels(Object.entries(STILL_POS).map(([hva,v])=>({hva,x:v[0],y:v[1]})));Object.values(HERO.labels).forEach(l=>l.classList.add('on'));};
+function legend(){const L=t();document.getElementById('legend').innerHTML=`<span><i style="background:var(--worse)"></i>${L.lg[0]}</span><span><i style="background:var(--better)"></i>${L.lg[1]}</span><span><i style="background:#DFE3E3"></i>${L.lg[2]}</span>`;}
+function map3d(){
+  const box=document.getElementById('globe'),still=document.getElementById('globeStill');
+  const showStill=()=>{still.src=still.dataset.src;still.classList.remove('hidden');HERO_ON=true;POS={};Object.entries(STILL_POS).forEach(([k,v])=>POS[k]=v);labels();};
   let gl=false;try{const c=document.createElement('canvas');gl=!!(c.getContext('webgl2')||c.getContext('webgl'));}catch(e){}
   if(!gl||matchMedia('(prefers-reduced-motion: reduce)').matches){showStill();return;}
-  const start=()=>Promise.all([import('/assets/hero3d.js'),fetch('/assets/finland_3d.json').then(r=>r.json())]).then(([m,data])=>{
-    const areas={};D.smr.forEach(r=>{areas[r[0]]={smr:r[1],sig:r[2]>1?'hi':(r[3]<1?'lo':'')};});
-    HERO.view=m.mount(box,{data,areas,onLabels:placeLabels,onPick:setRegion,selected:REG});
-    setTimeout(()=>{HERO.on=true;Object.values(HERO.labels).forEach(l=>l.classList.add('on'))},1300);
+  Promise.all([import('/assets/hero3d.js'),fetch('/assets/finland_3d.json').then(r=>r.json())]).then(([m,data])=>{
+    const areas={};SIGN.forEach(r=>{areas[r[0]]={smr:r[1],sig:r[2]>1?'hi':(r[3]<1?'lo':'')};});
+    VIEW=m.mount(box,{data,areas,selected:REG,onPick:setRegion,onLabels:list=>{list.forEach(p=>POS[p.hva]=[p.x,p.y]);labels();}});
+    if(HL.length)VIEW.mark(HL);
+    setTimeout(()=>{HERO_ON=true;labels();},1300);
   }).catch(showStill);
-  if(document.readyState==='complete') setTimeout(start,50); else addEventListener('load',()=>setTimeout(start,50),{once:true});
 }
-const glue = x => String(x).replace(/ (\S+ ?[→←])$/,'\u00a0$1').replace(/ ([→←])/g,'\u00a0$1');
-function stephead(pg){
-  const back={fi:'← Yleiskuva',sv:'← Översikt',en:'← Overview'}[lang];
-  const map=pg.id==='do'?`<p style="margin:0"><a class="mapbtn" href="/kartta?county=HVA21">${glue(L({fi:'Avaa Lapin pilottikartta →',sv:'Öppna pilotkartan för Lappland →',en:'Open the pilot map for Lapland →'}))}</a></p>`:'';
-  const no=pg.n?`<div class="no" aria-hidden="true">${pg.n}<small>/ 4</small></div>`:'<div></div>';
-  document.getElementById('pghead').innerHTML=`<p class="back"><a href="#t=ov" data-back>${back}</a></p>${no}<div><h1>${pg.n?`<span class="sr">${pg.n} / 4. </span>`:''}${L(pg.t)}</h1>${pg.d?`<p class="lead">${L(pg.d)}</p>`:''}${map}</div>`;
-  document.querySelector('#pghead [data-back]').onclick=e=>{e.preventDefault();go('ov');};
+
+/* ---------- AI analyst ---------- */
+const IND={fi:{smr:'kuolleisuus',daily_smokers:'tupakointi',screening_breast:'seulontaan osallistuminen',risk_group_share:'riskiryhmä',excess_deaths:'ylikuolleisuus'},sv:{smr:'dödlighet',daily_smokers:'rökning',screening_breast:'screeningdeltagande',risk_group_share:'riskgrupp',excess_deaths:'överdödlighet'},en:{smr:'mortality',daily_smokers:'smoking',screening_breast:'screening uptake',risk_group_share:'risk group',excess_deaths:'excess deaths'}};
+function stepText(st){const I=IND[lang]||IND.en,cs=(st.codes||[]).map(nmN).join(', ');
+  return ({fi:{rank_regions:`Järjestää ${st.n} aluetta: ${I[st.ind]||st.ind}`,region_profile:`Avaa: ${cs}`,compare_regions:`Vertaa: ${cs}`,national_facts:'Lukee koko maan luvut'},
+    sv:{rank_regions:`Rangordnar ${st.n} områden: ${I[st.ind]||st.ind}`,region_profile:`Öppnar: ${cs}`,compare_regions:`Jämför: ${cs}`,national_facts:'Läser nationella siffror'},
+    en:{rank_regions:`Ranking ${st.n} regions by ${I[st.ind]||st.ind}`,region_profile:`Opening ${cs}`,compare_regions:`Comparing ${cs}`,national_facts:'Reading national figures'}}[lang]||{})[st.tool]||st.label;}
+function chips(){const L=t();document.getElementById('chips').innerHTML=Object.entries(L.p).map(([k,v])=>`<button type="button" data-p="${k}" aria-pressed="${k===aiPreset}">${esc(v)}</button>`).join('');
+  document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>runAI({preset:b.dataset.p}));}
+async function runAI(req){
+  const L=t(),my=++aiRun,brain=document.getElementById('brain'),tk=document.getElementById('ticker'),an=document.getElementById('answer'),rk=document.getElementById('ranked'),un=document.getElementById('unk');
+  aiPreset=req.preset||null;document.querySelectorAll('#chips button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===aiPreset));
+  brain.classList.add('think');tk.innerHTML=`<span class="sp"></span>${L.run}`;an.textContent='';rk.innerHTML='';un.textContent='';
+  let j;try{const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...req,lang})});
+    if(my!==aiRun)return;if(!r.ok)throw 0;j=await r.json();}catch(e){if(my!==aiRun)return;brain.classList.remove('think');tk.textContent='';an.textContent=L.off;return;}
+  if(my!==aiRun)return;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,STEP=reduce?0:420;
+  j.steps.forEach((st,i)=>setTimeout(()=>{if(my===aiRun)tk.innerHTML=`<span class="sp"></span>${esc(stepText(st))}`;},i*STEP));
+  setTimeout(()=>{if(my!==aiRun)return;brain.classList.remove('think');
+    const n=Math.max(0,...j.steps.map(s=>s.n||0));
+    tk.innerHTML=`<span class="ok">✓</span>${L.done(n,j.steps.length,j.seconds<0.1?(lang==='en'?'0.1':'0,1'):String(j.seconds).replace('.',lang==='en'?'.':','))}`;
+    HL=j.highlight||[];if(VIEW)VIEW.mark(HL);labels();
+    if(j.select)setRegion(j.select);
+    type(an,j.answer,my,()=>{
+      rk.innerHTML=HL.map((c,i)=>{const S=SIGN.find(r=>r[0]===c);return `<li><button type="button" data-c="${c}" aria-current="${c===REG}"><span class="n">${i+1}</span><span><b>${esc(nmN(c))}</b><br><span class="v">${L.v[verdict(c)]}</span></span><em>${S?'SMR '+fmt(S[1]):''}</em></button></li>`;}).join('');
+      rk.querySelectorAll('button').forEach((b,i)=>{b.onclick=()=>setRegion(b.dataset.c);setTimeout(()=>b.classList.add('in'),reduce?0:i*110);});
+      un.textContent=(j.unknowns||[]).slice(0,1).join(' ');
+    });
+  },j.steps.length*STEP);
 }
-function stepcards(){
-  const hi=D.smr.filter(r=>r[2]>1).map(r=>nmN(r[0])).join(', ');
-  const b=D.scr_lang.breast,gp=fmt(Math.round((b.Domestic-b['Other/missing'])*10)/10);
-  const F={gap:{fi:`Kuolleisuus on merkitsevästi koholla neljällä alueella: ${hi}.`,sv:`Dödligheten är signifikant förhöjd i fyra områden: ${hi}.`,en:`Mortality is significantly raised in four areas: ${hi}.`},
-    where:{fi:'Ennen diagnoosia: potilasviive ja perusterveydenhuolto. Hoidon aloitus on pääosin ajallaan.',sv:'Före diagnos: patientfördröjning och primärvård. Behandlingen startar oftast i tid.',en:'Before diagnosis: patient delay and primary care. Treatment mostly starts on time.'},
-    who:{fi:`Matalasti koulutetut ja muuta kieltä puhuvat. Seulontaan osallistuu ${gp} prosenttiyksikköä vähemmän.`,sv:`Lågutbildade och personer med annat språk. Deltagandet i screening är ${gp} procentenheter lägre.`,en:`People with less education or another language. Screening participation is ${gp} points lower.`},
-    do:{fi:'Bussipilotti Lapissa, sairaalan TT-kutsut ensin Kymenlaaksossa ja Satakunnassa, ja pilottikartta, joka näyttää, missä sairaalan TT riittää ja missä tarvitaan bussia.',sv:'En busspilot i Lappland, inbjudningar till sjukhusets DT först i Kymmenedalen och Satakunta, och en pilotkarta som visar var sjukhusets DT räcker och var en buss behövs.',en:'A bus pilot in Lapland, hospital-CT invitations first in Kymenlaakso and Satakunta, and a pilot map that shows where a hospital CT is enough and where a bus is needed.'}};
-  const open={fi:'Avaa',sv:'Öppna',en:'Open'}[lang];
-  document.getElementById('stepcards').innerHTML=NAV.filter(n=>n.n).map(n=>`<button class="stc${n.id==='do'?' dark':''}" data-go="${n.id}"><span class="num">${n.n}</span><h3>${L(n.t)}</h3><p>${L(F[n.id])}</p><span class="open">${open}&nbsp;→</span></button>`).join('');
-  document.querySelectorAll('#stepcards [data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function type(node,text,my,done){if(matchMedia('(prefers-reduced-motion: reduce)').matches){node.textContent=text;done();return;}
+  let i=0;const st=()=>{if(my!==aiRun)return;i=Math.min(text.length,i+Math.max(2,Math.round(text.length/60)));node.textContent=text.slice(0,i);if(i<text.length)requestAnimationFrame(st);else done();};st();}
+
+/* ---------- insight tiles (3D bars) ---------- */
+let B3=null;
+function tiles(){
+  const L=t(),el=document.getElementById('tiles'),sl=D.scr_lang,ns=D.nordsurv.men;
+  const RED='#D92D20',GREY='#B5BCBF',TEAL='#2BA39A',AMB='#E39A2D',INK='#0F1A24';
+  const defs=[
+   {d:L.t1,max:170,bars:[{v:155,color:RED,top:'155',label:L.t1[3][0],group:0},{v:107,color:GREY,top:'107',label:L.t1[3][1],group:0},{v:67,color:TEAL,top:'67',label:L.t1[3][2],group:0}]},
+   {d:L.t2,max:140,key:[[AMB,L.t2[4][0]],[TEAL,L.t2[4][1]]],bars:[{v:128.7,color:AMB,top:f1(128.7),group:0,gname:L.t2[3][0]},{v:48.5,color:TEAL,top:f1(48.5),group:0,gname:L.t2[3][0]},{v:108.1,color:AMB,top:f1(108.1),group:1,gname:L.t2[3][1]},{v:39.2,color:TEAL,top:f1(39.2),group:1,gname:L.t2[3][1]}]},
+   {d:L.t3,max:100,key:[[TEAL,L.t3[4][0]],[AMB,L.t3[4][1]]],bars:['breast','colorectal','cervical'].flatMap((k,i)=>[{v:sl[k].Domestic,color:TEAL,top:pc(Math.round(sl[k].Domestic)+' %'),group:i,gname:L.t3[3][i]},{v:sl[k]['Other/missing'],color:AMB,top:pc(Math.round(sl[k]['Other/missing'])+' %'),group:i,gname:L.t3[3][i]}])},
+   {d:L.t4,max:34,bars:[['Finland',RED],['Denmark',GREY],['Sweden',GREY],['Norway',TEAL]].map(([k,c],i)=>({v:ns[k],color:c,top:pc(ns[k]+' %'),label:L.t4[3][i],group:0}))}
+  ];
+  el.innerHTML=defs.map((x,i)=>`<article class="tile"><p class="eyebrow">${x.d[0]}</p><div class="big${i===0||i===3?' w':''}">${x.d[1]}</div><p>${x.d[2]}</p>${x.key?`<div class="key">${x.key.map(k=>`<span><i style="background:${k[0]}"></i>${esc(k[1])}</span>`).join('')}</div>`:''}<div class="b3" id="b3-${i}"></div></article>`).join('');
+  let gl=false;try{const c=document.createElement('canvas');gl=!!(c.getContext('webgl2')||c.getContext('webgl'));}catch(e){}
+  const flat=()=>defs.forEach((x,i)=>{document.getElementById('b3-'+i).outerHTML=`<div class="flat">${x.bars.map(b=>`<div style="height:${b.v/x.max*100}%;background:${b.color}"><span>${esc(b.top)}</span></div>`).join('')}</div>`;});
+  if(!gl){flat();return;}
+  const go=m=>defs.forEach((x,i)=>m.mount(document.getElementById('b3-'+i),{bars:x.bars,max:x.max}));
+  if(B3)go(B3);else import('/assets/bars3d.js').then(m=>{B3=m;go(m);}).catch(flat);
 }
-function render(){
-  cur={t:'ov',s:null}; snapHTML(); syncHash(); headline(); hero3d();
-  Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
-  evidence();
-}
-const EVI=[['delay',{fi:'Missä kohtaa polkua',sv:'Var i vårdkedjan',en:'Where on the pathway'}],['edu',{fi:'Ketä se koskee: koulutus',sv:'Vem det gäller: utbildning',en:'Who it affects: education'}],['scrlang',{fi:'Ketä se koskee: kieli',sv:'Vem det gäller: språk',en:'Who it affects: language'}],['nordsurv',{fi:'Lopputulos',sv:'Utfall',en:'Outcome'}]];
-function evidence(){
-  const E={fi:['Näyttö analyysin takana','Neljä kansallista havaintoa, joihin tekoäly ja aluekooste nojaavat. Jokaisella on lähde.','Lähteet ja menetelmä'],
-           sv:['Underlaget bakom analysen','Fyra nationella fynd som AI:n och områdessammanfattningen bygger på. Alla har en källa.','Källor och metod'],
-           en:['The evidence behind the analysis','Four national findings the AI and the region brief build on. Each has its source.','Sources and method']}[lang]||[];
-  document.getElementById('evH').textContent=E[0];document.getElementById('evP').textContent=E[1];document.getElementById('srcSum').textContent=E[2];
-  const grid=document.getElementById('grid2');
-  const vs=EVI.map(([id,eb])=>[VIEWS.find(v=>v.id===id),eb]).filter(x=>x[0]);
-  grid.innerHTML=vs.map(([v,eb])=>{const charty=!v.kind||v.kind==='smr';
-    return `<div class="card"><div class="eb">${L(eb)}</div><h2>${L(v.title)}${tagHTML(v.tag)}</h2>${v.sub?`<div class="sub">${L(v.sub)}</div>`:'<div class="sub"></div>'}${MSG(v)}${body(v)}${v.src?`<div class="foot"><span>${t('source')+': '+src(v.src)}</span>${charty?`<button data-t2="${v.id}">${t('show')}</button>`:''}</div>`:''}</div>`;}).join('');
-  vs.forEach(([v])=>{if(!v.kind||v.kind==='smr'){const spec=v.kind==='smr'?smrSpec():v.chart();v._spec=spec;charts[v.id]=makeChart(document.getElementById('cv-'+v.id),spec);}});
-  grid.querySelectorAll('button[data-t2]').forEach(b=>b.onclick=()=>{const v=VIEWS.find(x=>x.id===b.dataset.t2);const tb=document.getElementById('tb-'+v.id);const show=tb.classList.contains('hidden');tb.innerHTML=show?tableHTML(v,v._spec):'';tb.classList.toggle('hidden',!show);b.textContent=show?t('hide'):t('show');});
-}
+
+/* ---------- language ---------- */
 function apply(l){
-  lang=T[l]?l:'en';
-  document.documentElement.lang=lang;
-  document.title=T[lang].brand+' – '+{fi:'Keuhkodata',sv:'Lungdata',en:'Lung data'}[lang];
-  document.querySelectorAll('[data-t]').forEach(e=>{const k=e.getAttribute('data-t');if(T[lang][k]!=null)e.textContent=T[lang][k];});
-  document.querySelectorAll('[data-m]').forEach(a=>a.textContent=MT[lang][a.getAttribute('data-m')]);
-  const menuBtn=document.getElementById('menuBtn');if(menuBtn)menuBtn.setAttribute('aria-label',MT[lang].menu);
-  document.getElementById('sources').innerHTML=SOURCES[lang];
+  lang=T[l]?l:'en';document.documentElement.lang=lang;
+  const L=t();document.title='Polku hoitoon – '+{fi:'Keuhkodata',sv:'Lungdata',en:'Lung data'}[lang];
+  document.querySelectorAll('[data-k]').forEach(e=>{const v=L[e.dataset.k];if(typeof v==='string')e.textContent=v;});
+  const i=document.getElementById('askI');i.placeholder=L.ph;i.setAttribute('aria-label',L.ph);
   try{localStorage.setItem('vayla-lang',lang)}catch(e){}
-  buildArea(); buildPicker(); render();
+  chips();legend();card();labels();tiles();
 }
-document.addEventListener('click',ev=>{const d=document.querySelector('details.menu');if(d&&d.open&&!d.contains(ev.target))d.open=false;});
-const sel=document.getElementById('lang'); let start='';
+document.getElementById('askF').onsubmit=e=>{e.preventDefault();const v=document.getElementById('askI').value.trim();if(v)runAI({question:v,region:REG});};
+const sel=document.getElementById('lang');let start='';
 try{start=localStorage.getItem('vayla-lang')||''}catch(e){}
-if(!start) start=(navigator.language||'fi').slice(0,2);
-if(!T[start]) start='en';
-sel.value=start; Chart.defaults.font.family='"Golos Text", sans-serif'; apply(start);
-if(document.fonts&&document.fonts.status!=='loaded') document.fonts.ready.then(()=>render());   // charts measure labels after the web font loads
-sel.addEventListener('change',()=>{apply(sel.value);if(aiPreset)runAnalyst({preset:aiPreset});});
-setTimeout(()=>{if(cur.t==='ov')runAnalyst({preset:'first_pilot'});},900);
+if(!start)start=(navigator.language||'fi').slice(0,2);
+if(!T[start])start='en';
+if(sel){sel.value=start;sel.addEventListener('change',()=>{apply(sel.value);runAI(aiPreset?{preset:aiPreset}:{preset:'first_pilot'});});}
+apply(start);map3d();
+setTimeout(()=>runAI({preset:'first_pilot'}),700);
 </script>
 </body>
 </html>
