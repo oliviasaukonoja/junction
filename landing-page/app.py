@@ -1,5 +1,6 @@
 """Polku hoitoon waitlist: bus page (/) + lung cancer data dashboard (/keuhkodata) + pilot map (/kartta) + sign-up API on Modal.
-/sovellus redirects to / and /ammattilaisille to /kartta (the HTML files stay in the repo but are not served).
+/sovellus redirects to / (the HTML file stays in the repo but is not served). /ammattilaisille is the professional
+flagging view, linked from the footer only.
 
 Deploy:      python3 ../ct-sim/docs/analysis/build_pilot_map_data.py   (creates map/private/pilot_map_advanced.json, not in git)
              modal deploy app.py
@@ -40,6 +41,7 @@ if modal:
         .add_local_file(HERE / "ukk.html", "/root/ukk.html")
         .add_local_file(HERE / "palaute.html", "/root/palaute.html")
         .add_local_file(HERE / "keuhkodata.html", "/root/keuhkodata.html")
+        .add_local_file(HERE / "ammattilaisille.html", "/root/ammattilaisille.html")
         .add_local_file(HERE / "layout.js", "/root/layout.js")
         .add_local_file(HERE / "site.css", "/root/site.css")
         .add_local_dir(HERE / "assets", "/root/assets")
@@ -97,6 +99,7 @@ def build_api(src):
     faq_page = src("ukk.html").read_text(encoding="utf-8")
     fb_page = src("palaute.html").read_text(encoding="utf-8")
     data_page = src("keuhkodata.html").read_text(encoding="utf-8")
+    pro_page = src("ammattilaisille.html").read_text(encoding="utf-8")
     layout_script = src("layout.js").read_text(encoding="utf-8")
     site_css = src("site.css").read_bytes()
     ASSET_TYPES = {".js": "application/javascript", ".json": "application/json", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml"}
@@ -173,10 +176,12 @@ def build_api(src):
     def app_index():
         return RedirectResponse(url="/", status_code=302)
 
-    @api.get("/ammattilaisille")
-    @api.get("/ammattilaisille/")
+    @api.get("/ammattilaisille", response_class=HTMLResponse)
+    @api.get("/ammattilaisille/", response_class=HTMLResponse)
+    @api.get("/pro", response_class=HTMLResponse)
     def pro_index():
-        return RedirectResponse(url="/kartta", status_code=302)
+        # Professional view (flagging concept). Linked from the footer only, kept apart from Keuhkodata.
+        return HTMLResponse(pro_page)
 
     @api.get("/paattajille", response_class=HTMLResponse)
     @api.get("/paattajille/", response_class=HTMLResponse)

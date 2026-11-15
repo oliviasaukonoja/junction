@@ -8,14 +8,14 @@
     et: "Eesti", ar: "العربية", so: "Soomaali", uk: "Українська"
   };
   const labels = {
-    fi: { more: "Lisätietoa", join: "Liity", menu: "Valikko", about: "Tietoa meistä", faq: "Usein kysytyt kysymykset", feedback: "Anna palautetta", privacy: "Tietosuojaseloste", lungdata: "Keuhkodata", pilotmap: "Pilottikartta" },
-    sv: { more: "Mer information", join: "Anmäl dig", menu: "Meny", about: "Om oss", faq: "Vanliga frågor", feedback: "Ge respons", privacy: "Dataskyddsbeskrivning", lungdata: "Lungdata", pilotmap: "Pilotkarta" },
-    en: { more: "More information", join: "Join", menu: "Menu", about: "About us", faq: "Questions", feedback: "Give feedback", privacy: "Privacy notice", lungdata: "Lung data", pilotmap: "Pilot map" },
-    ru: { more: "Дополнительно", join: "Записаться", menu: "Меню", about: "О нас", faq: "Частые вопросы", feedback: "Оставить отзыв", privacy: "Политика конфиденциальности", lungdata: "Данные о раке лёгких", pilotmap: "Пилотная карта" },
-    et: { more: "Lisateave", join: "Liitu", menu: "Menüü", about: "Meist", faq: "Korduma kippuvad küsimused", feedback: "Anna tagasisidet", privacy: "Privaatsusteade", lungdata: "Kopsuvähi andmed", pilotmap: "Pilootkaart" },
-    ar: { more: "مزيد من المعلومات", join: "انضم", menu: "القائمة", about: "من نحن", faq: "أسئلة شائعة", feedback: "أرسل ملاحظاتك", privacy: "إشعار الخصوصية", lungdata: "بيانات سرطان الرئة", pilotmap: "خريطة المشروع التجريبي" },
-    so: { more: "Macluumaad dheeraad ah", join: "Ku biir", menu: "Liiska", about: "Nagu saabsan", faq: "Su'aalaha", feedback: "Na sii ra'yi", privacy: "Ogeysiiska asturnaanta", lungdata: "Xogta kansarka sambabka", pilotmap: "Khariidadda tijaabada" },
-    uk: { more: "Більше інформації", join: "Записатися", menu: "Меню", about: "Про нас", faq: "Поширені запитання", feedback: "Залишити відгук", privacy: "Повідомлення про конфіденційність", lungdata: "Дані про рак легень", pilotmap: "Пілотна карта" }
+    fi: { more: "Lisätietoa", join: "Liity", menu: "Valikko", about: "Tietoa meistä", faq: "Usein kysytyt kysymykset", feedback: "Anna palautetta", privacy: "Tietosuojaseloste", lungdata: "Keuhkodata", pilotmap: "Pilottikartta", pro: "Ammattilaisille" },
+    sv: { more: "Mer information", join: "Anmäl dig", menu: "Meny", about: "Om oss", faq: "Vanliga frågor", feedback: "Ge respons", privacy: "Dataskyddsbeskrivning", lungdata: "Lungdata", pilotmap: "Pilotkarta", pro: "För vårdpersonal" },
+    en: { more: "More information", join: "Join", menu: "Menu", about: "About us", faq: "Questions", feedback: "Give feedback", privacy: "Privacy notice", lungdata: "Lung data", pilotmap: "Pilot map", pro: "For professionals" },
+    ru: { more: "Дополнительно", join: "Записаться", menu: "Меню", about: "О нас", faq: "Частые вопросы", feedback: "Оставить отзыв", privacy: "Политика конфиденциальности", lungdata: "Данные о раке лёгких", pilotmap: "Пилотная карта", pro: "Для специалистов" },
+    et: { more: "Lisateave", join: "Liitu", menu: "Menüü", about: "Meist", faq: "Korduma kippuvad küsimused", feedback: "Anna tagasisidet", privacy: "Privaatsusteade", lungdata: "Kopsuvähi andmed", pilotmap: "Pilootkaart", pro: "Spetsialistidele" },
+    ar: { more: "مزيد من المعلومات", join: "انضم", menu: "القائمة", about: "من نحن", faq: "أسئلة شائعة", feedback: "أرسل ملاحظاتك", privacy: "إشعار الخصوصية", lungdata: "بيانات سرطان الرئة", pilotmap: "خريطة المشروع التجريبي", pro: "للمهنيين الصحيين" },
+    so: { more: "Macluumaad dheeraad ah", join: "Ku biir", menu: "Liiska", about: "Nagu saabsan", faq: "Su'aalaha", feedback: "Na sii ra'yi", privacy: "Ogeysiiska asturnaanta", lungdata: "Xogta kansarka sambabka", pilotmap: "Khariidadda tijaabada", pro: "Xirfadlayaasha caafimaadka" },
+    uk: { more: "Більше інформації", join: "Записатися", menu: "Меню", about: "Про нас", faq: "Поширені запитання", feedback: "Залишити відгук", privacy: "Повідомлення про конфіденційність", lungdata: "Дані про рак легень", pilotmap: "Пілотна карта", pro: "Для фахівців" }
   };
   const supported = (document.body.dataset.languages || "fi,sv,en,ru,et,ar,so,uk").split(",");
   const current = () => document.getElementById("lang")?.value || document.documentElement.lang || "fi";
@@ -44,7 +44,7 @@
     const footer = document.getElementById("site-footer");
     if (!footer) return;
     const t = copy();
-    footer.innerHTML = `<footer><div class="wrap"><nav aria-label="${t.more}"><a href="/keuhkodata">${t.lungdata}</a><a href="/kartta">${t.pilotmap}</a><a href="/ukk">${t.faq}</a><a href="/meista">${t.about}</a><a href="/palaute">${t.feedback}</a><a href="/tietosuoja">${t.privacy}</a></nav><div class="colophon"><span><b>Polku Labs</b> · Junction 2026</span><a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>`;
+    footer.innerHTML = `<footer><div class="wrap"><nav aria-label="${t.more}"><a href="/keuhkodata">${t.lungdata}</a><a href="/kartta">${t.pilotmap}</a><a href="/ammattilaisille">${t.pro}</a><a href="/ukk">${t.faq}</a><a href="/meista">${t.about}</a><a href="/palaute">${t.feedback}</a><a href="/tietosuoja">${t.privacy}</a></nav><div class="colophon"><span><b>Polku Labs</b> · Junction 2026</span><a href="mailto:info@polkuhoitoon.fi">info@polkuhoitoon.fi</a></div></div></footer>`;
     const note = document.getElementById("site-footer-note");
     if (note) footer.querySelector(".wrap").prepend(note);
     reveal();
