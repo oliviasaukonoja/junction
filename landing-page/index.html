@@ -12,47 +12,32 @@ html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 #join{scroll-margin-top:var(--s10)}
 
-/* hero: the pixel bus drives in along the road, stops, and the text appears under it.
-   --s is a whole-number pixel scale so the 161x68 sprite stays crisp. */
-.hero{--s:5;--bw:calc(161px * var(--s));--bh:calc(68px * var(--s));--dir:1;
-  min-height:calc(100svh - 72px);display:flex;flex-direction:column;justify-content:center;padding:var(--s8) 0 var(--s8)}
-[dir=rtl] .hero{--dir:-1}
-@media (max-width:1100px){.hero{--s:4}}
-@media (max-width:860px){.hero{--s:3}}
-@media (max-width:560px){.hero{--s:2;padding:var(--s5) 0 var(--s6)}}
-.pxstage{position:relative;width:var(--bw);height:var(--bh);margin:0 auto}
-.pxroad{position:absolute;top:100%;left:calc(50% - 50vw);width:100vw;height:2px;background:var(--line-2)}
-.pxbus{position:absolute;inset:0;display:block;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.pxbus:focus-visible{outline-offset:6px}
-.pxsprites{position:absolute;inset:0;transform:scaleX(var(--dir))}
-.pxsprites>span{position:absolute;inset:0;image-rendering:pixelated;image-rendering:crisp-edges;background-repeat:no-repeat}
-.pxout{background-image:url(/assets/bus_px_frames.png);background-size:calc(var(--bw) * 12) var(--bh);background-position:0 0}
-.pxin{background-image:url(/assets/bus_px_inside.png);background-size:100% 100%;clip-path:inset(0 100% 0 0);transition:clip-path .5s var(--ease)}
-.pxbus.open .pxin{clip-path:inset(0 0 0 0)}
-@media (hover:hover){.hero.parked .pxbus:hover .pxin{clip-path:inset(0 0 0 0)}}
-.ct-tag{position:absolute;inset-inline-start:calc(60 / 161 * 100%);bottom:calc(100% - 12 / 68 * 100% + 0px);transform:translate(-50%,-14px);pointer-events:none;
-  font-family:var(--mono);font-size:12px;line-height:1;padding:6px 8px;background:#fff;color:var(--ink);border:1px solid var(--line-2);border-radius:2px;white-space:nowrap;opacity:0;transition:opacity .25s var(--ease)}
-[dir=rtl] .ct-tag{transform:translate(50%,-14px)}
-.ct-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--line-2)}
-.pxbus.open .ct-tag{opacity:1}
-@media (hover:hover){.hero.parked .pxbus:hover .ct-tag{opacity:1}}
-.pxfoot{width:var(--bw);max-width:calc(100% - 2 * var(--s2));margin:var(--s2) auto 0;display:flex;justify-content:flex-end;min-height:40px}
-.pxfoot .peek{position:static}
-.hero .copy{width:var(--bw);max-width:100%;margin:var(--s4) auto 0}
+/* hero: the bus (3D, or the 2D drawing without WebGL / with reduced motion) arrives centred; the text appears when it has stopped.
+   The text column is exactly as wide as the bus stage. */
+.hero{--bw:min(860px,calc(100vw - 2 * var(--s3)));min-height:calc(100svh - 72px);display:flex;flex-direction:column;justify-content:center;padding:var(--s6) 0 var(--s8)}
+@media (max-width:560px){.hero{--bw:calc(100vw - 2 * var(--s2));padding:var(--s4) 0 var(--s6)}}
+.busstage{position:relative;width:var(--bw);margin:0 auto}
+.bus3d{position:relative;width:100%;aspect-ratio:2/1;cursor:pointer;display:none;-webkit-tap-highlight-color:transparent}
+@media (max-width:560px){.bus3d{aspect-ratio:16/11}}
+.bus3d canvas{display:block;width:100%!important;height:100%!important}
+.busstage.is3d .bus3d{display:block}
+.busstage.is3d svg.bus,.busstage.wait3d svg.bus{display:none}
+.busstage.wait3d{min-height:calc(var(--bw) / 2)}
+svg.bus{display:block;width:78%;height:auto;margin:0 auto}
+[dir=rtl] svg.bus{transform:scaleX(-1)}
+.bus3d-tag{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--mono);font-size:12px;line-height:1;padding:6px 8px;background:#fff;color:var(--ink);border:1px solid var(--line-2);border-radius:2px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.bus3d-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:18px;background:var(--line-2)}
+.busfoot{width:var(--bw);margin:var(--s1) auto 0;display:flex;justify-content:flex-end;min-height:40px}
+.hero .copy{width:var(--bw);max-width:100%;margin:var(--s3) auto 0}
 .hero .copy h1{max-width:18ch}
 .hero .copy .lead{margin-top:var(--s2);max-width:34em}
 @media (max-width:560px){.hero .copy{width:auto}}
-/* the drive: wheels turn only while moving; text waits for the stop */
+/* text waits for the bus to stop */
 @media (prefers-reduced-motion:no-preference){
-  html.js .hero:not(.parked) .pxbus{transform:translateX(calc((-50vw - var(--bw)) * var(--dir)))}
-  html.js .hero.go .pxbus{animation:drive 1.5s cubic-bezier(.2,.7,.25,1) both}
-  html.js .hero.go:not(.parked) .pxout{animation:wheels .6s steps(12) infinite}
-  html.js .hero:not(.parked) .pxfoot,html.js .hero:not(.parked) .copy>*{opacity:0;transform:translateY(12px)}
-  .hero .pxfoot,.hero .copy>*{transition:opacity .6s var(--ease),transform .6s var(--ease)}
-  .hero .copy>:nth-child(2){transition-delay:.12s}.hero .copy>:nth-child(3){transition-delay:.24s}.hero .pxfoot{transition-delay:.5s}
+  html.js .hero:not(.parked) .busfoot,html.js .hero:not(.parked) .copy>*{opacity:0;transform:translateY(12px)}
+  .hero .busfoot,.hero .copy>*{transition:opacity .6s var(--ease),transform .6s var(--ease)}
+  .hero .copy>:nth-child(2){transition-delay:.12s}.hero .copy>:nth-child(3){transition-delay:.24s}.hero .busfoot{transition-delay:.5s}
 }
-@keyframes drive{from{transform:translateX(calc((-50vw - var(--bw)) * var(--dir)))}to{transform:none}}
-@keyframes wheels{to{background-position:calc(var(--bw) * -12) 0}}
 .hero-acts{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);margin-top:var(--s4)}
 .hero-acts p{margin:0;font-weight:500}
 .hero-acts p a{display:inline-flex;align-items:center;min-height:44px}
@@ -144,14 +129,33 @@ form>.btn{align-self:flex-start}
 
 <main id="top">
   <section class="band hero" id="hero">
-    <div class="pxstage">
-      <span class="pxroad" aria-hidden="true"></span>
-      <div class="pxbus" id="pxBus" role="img" aria-label="Polku hoitoon bus">
-        <span class="pxsprites" aria-hidden="true"><span class="pxout"></span><span class="pxin"></span></span>
-        <span class="ct-tag" id="ctTag" aria-hidden="true"></span>
-      </div>
+    <div class="busstage" id="busStage">
+      <div class="bus3d" id="bus3d" role="img" aria-label="Polku hoitoon bus"></div>
+      <svg class="bus" viewBox="0 0 440 250" role="img" aria-label="Polku hoitoon bus">
+        <path d="M0 226H440" stroke="#CDD2D3" stroke-width="2"/>
+        <path d="M24 74a12 12 0 0 1 12-12H344a10 10 0 0 1 8 4l34 46a14 14 0 0 1 3 8V196a10 10 0 0 1-10 10H36a12 12 0 0 1-12-12Z" fill="#2BA39A"/>
+        <path d="M24 176H389V194a12 12 0 0 1-10 12H36a12 12 0 0 1-12-12Z" fill="#1D7C75"/>
+        <path d="M24 170H389" stroke="#E39A2D" stroke-width="3"/>
+        <rect x="44" y="82" width="54" height="40" rx="3" fill="#0F1A24"/>
+        <rect x="108" y="82" width="54" height="40" rx="3" fill="#0F1A24"/>
+        <rect x="174" y="78" width="124" height="84" rx="4" fill="#FFFFFF"/>
+        <circle cx="222" cy="120" r="30" fill="none" stroke="#0F1A24" stroke-width="10"/>
+        <circle cx="222" cy="120" r="30" fill="none" stroke="#2BA39A" stroke-width="2" stroke-dasharray="3 5"/>
+        <rect x="200" y="124" width="90" height="6" rx="1" fill="#5B6670"/>
+        <path d="M262 130v20M282 130v20" stroke="#5B6670" stroke-width="3"/>
+        <rect x="312" y="82" width="28" height="94" rx="2" fill="#1D7C75" stroke="#0F1A24" stroke-opacity=".25"/>
+        <rect x="317" y="88" width="18" height="32" rx="2" fill="#0F1A24"/>
+        <path d="M352 76l30 40H352Z" fill="#0F1A24"/>
+        <rect x="380" y="160" width="9" height="10" rx="1" fill="#E39A2D"/>
+        <path d="M44 150c10 0 10-14 20-14s10-14 20-14" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="84" cy="122" r="5" fill="#E39A2D"/>
+        <circle cx="92" cy="206" r="22" fill="#0F1A24" stroke="#5B6670" stroke-width="2"/>
+        <circle cx="92" cy="206" r="7" fill="#CDD2D3"/>
+        <circle cx="330" cy="206" r="22" fill="#0F1A24" stroke="#5B6670" stroke-width="2"/>
+        <circle cx="330" cy="206" r="7" fill="#CDD2D3"/>
+      </svg>
     </div>
-    <div class="pxfoot"><button class="peek" id="busPeek" type="button" aria-pressed="false"><span class="eye" aria-hidden="true"></span><span id="busPeekTxt"></span></button></div>
+    <div class="busfoot"><button class="peek hidden" id="busPeek" type="button" aria-pressed="false"><span class="eye" aria-hidden="true"></span><span id="busPeekTxt"></span></button></div>
     <div class="wrap">
       <div class="copy">
         <h1 data-t="h1"></h1>
@@ -309,26 +313,28 @@ if (!start) { var nl = (navigator.language || "fi").slice(0, 2); start = T[nl] ?
 sel.value = T[start] ? start : "fi";
 apply(sel.value);
 sel.addEventListener("change", function(){ apply(sel.value); });
-// Pixel bus: drives in along the road, parks, then the text appears. Hover, tap or the button opens the side to show the CT scanner.
+// Bus: the 3D bus loads after first paint, drives in (2.1 s) and parks; then the text appears. Hover, tap or "Look inside" shows the CT scanner.
+// Without WebGL, or with reduced motion, the 2D bus is shown and the text appears at once.
 var BUS3D = {fi:{look:"Katso sisään",close:"Sulje",ct:"Matala-annos-TT"},sv:{look:"Titta in",close:"Stäng",ct:"Lågdos-DT"},en:{look:"Look inside",close:"Close",ct:"Low-dose CT"},ru:{look:"Заглянуть внутрь",close:"Закрыть",ct:"Низкодозная КТ"},et:{look:"Vaata sisse",close:"Sulge",ct:"Väikesedoosiline KT"},ar:{look:"انظر إلى الداخل",close:"إغلاق",ct:"أشعة مقطعية منخفضة الجرعة"},so:{look:"Gudaha eeg",close:"Xir",ct:"CT qiyaas yar"},uk:{look:"Зазирнути всередину",close:"Закрити",ct:"Низькодозова КТ"}};
 (function(){
-  var hero=document.getElementById("hero"),bus=document.getElementById("pxBus"),btn=document.getElementById("busPeek"),txt=document.getElementById("busPeekTxt"),tag=document.getElementById("ctTag"),on=false;
+  var hero=document.getElementById("hero"),stage=document.getElementById("busStage"),box=document.getElementById("bus3d"),btn=document.getElementById("busPeek"),txt=document.getElementById("busPeekTxt"),api=null,on=false;
   function L(){return BUS3D[lang]||BUS3D.en}
-  function label(){txt.textContent=on?L().close:L().look;btn.setAttribute("aria-pressed",on?"true":"false");bus.classList.toggle("open",on);tag.textContent=L().ct}
-  function toggle(){on=!on;label()}
+  function label(){txt.textContent=on?L().close:L().look;btn.setAttribute("aria-pressed",on?"true":"false");if(api)api.setLabel(L().ct)}
   function park(){hero.classList.add("parked")}
-  btn.addEventListener("click",toggle);
-  bus.addEventListener("click",function(){if(hero.classList.contains("parked"))toggle()});
   var reduce=false;try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
-  if(reduce){park()}else{
-    var srcs=["/assets/bus_px_frames.png","/assets/bus_px_inside.png"],left=srcs.length,started=false;
-    var start=function(){if(started)return;started=true;requestAnimationFrame(function(){hero.classList.add("go")})};
-    srcs.forEach(function(u){var i=new Image();i.onload=i.onerror=function(){if(--left===0)start()};i.src=u});
-    setTimeout(start,1500);                                             // slow network: drive anyway
-    bus.addEventListener("animationend",function(e){if(e.animationName==="drive")park()});
-    setTimeout(park,4000);                                              // never leave the text hidden
-  }
-  label();
+  var gl=false;try{var c=document.createElement("canvas");gl=!!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){}
+  if(!gl||reduce){park();return}
+  stage.classList.add("wait3d");                                      // keep the 2D bus out of sight while the 3D one loads
+  var fallback=function(){stage.classList.remove("wait3d","is3d");park()};
+  var go=function(){import("/assets/bus3d.js").then(function(m){
+    stage.classList.remove("wait3d");stage.classList.add("is3d");
+    api=m.mount(box,{rtl:document.documentElement.dir==="rtl",labels:{ct:L().ct},onState:function(o){on=o;label()}});
+    btn.classList.remove("hidden");label();
+    setTimeout(park,2200);                                            // the module drives in for 2.1 s
+  }).catch(fallback)};
+  btn.addEventListener("click",function(){if(api){on=api.toggle();label()}});
+  if(document.readyState==="complete")go();else window.addEventListener("load",go);
+  setTimeout(park,7000);                                              // never leave the text hidden
   var _apply=apply;apply=function(l){_apply(l);label()};
 })();
 // Waitlist: the form stays closed until someone asks for it (this button, or any "Join the waitlist" link to #join)
