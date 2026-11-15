@@ -157,6 +157,9 @@ def register_api(api, pub: dict, advanced_json: bytes):
             system.append({"type": "text", "text": "The tools plan_route and hospital_scenario are not available in this session: the map's advanced tools are locked. "
                            "If the user asks you to build or change a route or size a hospital pilot, say in one sentence that this needs the password-protected "
                            "Advanced tools (the lock button above the map), then answer from MAP DATA what you can."})
+        else:   # the user may have unlocked mid-conversation: earlier answers that said "locked" were right at the time, so don't retract them
+            system.append({"type": "text", "text": "The map's password-protected Advanced tools are unlocked in this session, so plan_route and hospital_scenario are "
+                           "available. If an earlier answer said they were locked, that was before the user unlocked them: do not call it a mistake, just use the tools."})
         import anthropic
         client = anthropic.Anthropic(timeout=90.0)
         out, text = {}, ""
