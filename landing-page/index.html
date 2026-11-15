@@ -70,6 +70,29 @@ form>.btn{align-self:flex-start}
 .share span{font-size:15px;color:var(--sec)}
 .share .opts{margin-top:var(--s1)}
 
+/* 3D bus stage */
+.busstage{position:relative;align-self:center}
+.bus3d{position:relative;width:100%;aspect-ratio:16/10;cursor:pointer;display:none;-webkit-tap-highlight-color:transparent}
+.bus3d canvas{display:block;width:100%!important;height:100%!important}
+.busstage.is3d .bus3d{display:block}
+.busstage.is3d svg.bus{display:none}
+.bus3d-tag{position:absolute;left:0;top:0;pointer-events:none;font-family:var(--mono);font-size:12px;line-height:1;padding:6px 8px;background:#fff;color:var(--ink);border:1px solid var(--line-2);border-radius:2px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.bus3d-tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:18px;background:var(--line-2)}
+.peek{position:absolute;inset-inline-start:0;bottom:-4px;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s var(--ease),background-color .2s var(--ease)}
+.peek:hover{border-color:var(--ink)}
+.peek[aria-pressed=true]{background:var(--accent-t);border-color:var(--teal)}
+.peek .eye{width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 0 rgba(227,154,45,.5);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(227,154,45,.5)}70%{box-shadow:0 0 0 10px rgba(227,154,45,0)}100%{box-shadow:0 0 0 0 rgba(227,154,45,0)}}
+/* hero text arrives line by line */
+@media (prefers-reduced-motion:no-preference){
+  html.js .rise{opacity:0;transform:translateY(18px);filter:blur(6px);animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards}
+  html.js .rise.d1{animation-delay:.08s}html.js .rise.d2{animation-delay:.22s}html.js .rise.d3{animation-delay:.38s}html.js .rise.d4{animation-delay:.52s}html.js .rise.d5{animation-delay:.66s}
+  html.js .busstage{opacity:0;animation:fadein .6s .1s ease forwards}
+}
+@keyframes rise{to{opacity:1;transform:none;filter:none}}
+@keyframes fadein{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.peek .eye{animation:none}}
+
 @media (max-width:900px){
   .hero-g,.uk-g,.join-g{grid-template-columns:minmax(0,1fr)}
   .bus{max-width:360px;margin-inline-start:0;margin-bottom:calc(-1 * var(--s5))}
@@ -97,19 +120,21 @@ form>.btn{align-self:flex-start}
   <section class="band">
     <div class="wrap hero-g">
       <div>
-        <h1 data-t="h1"></h1>
-        <p class="lead" data-t="lead"></p>
-        <div class="hero-acts">
+        <h1 class="rise d1" data-t="h1"></h1>
+        <p class="lead rise d2" data-t="lead"></p>
+        <div class="hero-acts rise d3">
           <a class="btn" href="#join" data-t="cta"></a>
           <p><a href="/keuhkodata" data-t="datalink"></a></p>
         </div>
-        <div class="hero-meta">
+        <div class="hero-meta rise d4">
           <span class="tag" data-t="badge"></span>
           <span class="tag" data-t="free"></span>
         </div>
         <p id="mtNote" class="hidden" lang="en" dir="ltr"></p>
       </div>
-      <svg class="bus" viewBox="0 0 440 250" role="img" aria-label="Polku hoitoon bus">
+      <div class="busstage" id="busStage">
+        <div class="bus3d" id="bus3d" role="img" aria-label="Polku hoitoon bus"></div>
+        <svg class="bus" viewBox="0 0 440 250" role="img" aria-label="Polku hoitoon bus">
         <path d="M0 226H440" stroke="#CDD2D3" stroke-width="2"/>
         <path d="M24 74a12 12 0 0 1 12-12H344a10 10 0 0 1 8 4l34 46a14 14 0 0 1 3 8V196a10 10 0 0 1-10 10H36a12 12 0 0 1-12-12Z" fill="#2BA39A"/>
         <path d="M24 176H389V194a12 12 0 0 1-10 12H36a12 12 0 0 1-12-12Z" fill="#1D7C75"/>
@@ -132,6 +157,8 @@ form>.btn{align-self:flex-start}
         <circle cx="330" cy="206" r="22" fill="#0F1A24" stroke="#5B6670" stroke-width="2"/>
         <circle cx="330" cy="206" r="7" fill="#CDD2D3"/>
       </svg>
+        <button class="peek hidden" id="busPeek" type="button" aria-pressed="false"><span class="eye" aria-hidden="true"></span><span id="busPeekTxt"></span></button>
+      </div>
     </div>
   </section>
 
@@ -265,6 +292,26 @@ if (!start) { var nl = (navigator.language || "fi").slice(0, 2); start = T[nl] ?
 sel.value = T[start] ? start : "fi";
 apply(sel.value);
 sel.addEventListener("change", function(){ apply(sel.value); });
+// 3D bus: loads after first paint; the 2D bus stays for no-WebGL and reduced motion
+var BUS3D = {fi:{look:"Katso sisään",close:"Sulje",ct:"Matala-annos-TT"},sv:{look:"Titta in",close:"Stäng",ct:"Lågdos-DT"},en:{look:"Look inside",close:"Close",ct:"Low-dose CT"},ru:{look:"Заглянуть внутрь",close:"Закрыть",ct:"Низкодозная КТ"},et:{look:"Vaata sisse",close:"Sulge",ct:"Väikesedoosiline KT"},ar:{look:"انظر إلى الداخل",close:"إغلاق",ct:"أشعة مقطعية منخفضة الجرعة"},so:{look:"Gudaha eeg",close:"Xir",ct:"CT qiyaas yar"},uk:{look:"Зазирнути всередину",close:"Закрити",ct:"Низькодозова КТ"}};
+(function(){
+  var stage=document.getElementById("busStage"),box=document.getElementById("bus3d"),btn=document.getElementById("busPeek"),txt=document.getElementById("busPeekTxt"),api=null,on=false;
+  function L(){return BUS3D[lang]||BUS3D.en}
+  function label(){txt.textContent=on?L().close:L().look;btn.setAttribute("aria-pressed",on?"true":"false");if(api)api.setLabel(L().ct)}
+  var reduce=false;try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+  var gl=false;try{var c=document.createElement("canvas");gl=!!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){}
+  if(!gl||reduce)return;
+  var go=function(){import("/assets/bus3d.js").then(function(m){
+    stage.classList.add("is3d");
+    api=m.mount(box,{rtl:document.documentElement.dir==="rtl",labels:{ct:L().ct},onState:function(o){on=o;label()}});
+    btn.classList.remove("hidden");label();
+    btn.addEventListener("click",function(){on=api.toggle();label()});
+  }).catch(function(){stage.classList.remove("is3d")})};
+  if(document.readyState==="complete")go();else window.addEventListener("load",go);
+  var _apply=apply;apply=function(l){_apply(l);label()};
+  sel.addEventListener("change",function(){label()});
+})();
+
 
 function show(kind, text){ var o = document.getElementById("out"); o.className = "msg " + kind; o.textContent = text; }
 
