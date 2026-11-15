@@ -36,6 +36,14 @@ DEFAULTS = dict(counties=["HVA21"], gamma=1.0, lam=0.5, mu=0.15, spare=0.05, wor
                 start=None, exclude=[], hospital_minutes=45)
 LIMITS = dict(gamma=(0.0, 2.0), lam=(0.0, 3.0), mu=(0.0, 1.0), spare=(0.01, 0.30), work_days=(20, 260), interval=(1.0, 3.0), k_elig=(0.3, 1.5), hospital_minutes=(15, 120))
 SMR_CAP = (0.8, 1.3)
+REGISTRY = {   # wellbeing services county -> name in landing-page/regions.json (SMR); Åland has none (weight 1.0)
+    "HVA01": "Itä-Uudenmaan", "HVA02": "Keski-Uudenmaan", "HVA03": "Länsi-Uudenmaan", "HVA04": "Vantaan ja Keravan", "HVA05": "Varsinais-Suomen",
+    "HVA06": "Satakunnan", "HVA07": "Kanta-Hämeen", "HVA08": "Pirkanmaan", "HVA09": "Päijät-Hämeen", "HVA10": "Kymenlaakson", "HVA11": "Etelä-Karjalan",
+    "HVA12": "Etelä-Savon", "HVA13": "Pohjois-Savon", "HVA14": "Pohjois-Karjalan", "HVA15": "Keski-Suomen", "HVA16": "Etelä-Pohjanmaan",
+    "HVA17": "Pohjanmaan", "HVA18": "Keski-Pohjanmaan", "HVA19": "Pohjois-Pohjanmaan", "HVA20": "Kainuun", "HVA21": "Lapin"}
+REGISTRY = {k: v + " hyvinvointialue" for k, v in REGISTRY.items()} | {"HVA90": "Helsingin kaupunki"}
+AREA_RADIUS = (30.0, 200.0)                       # km, ct-sim's region(): straight line x detour 1.3
+AREA_TRAVEL = "estimate: straight line x 1.3 at 60 km/h (ct-sim national model), not OpenStreetMap road times"
 T_FAR = 45
 LEG_CACHE = CT / "data/routing/osrm_legs_cache.json"
 
@@ -103,16 +111,63 @@ def make_world(sp: dict):
     fixed = S.fixed_names(scn)
     D = [[(v or 0) / 60.0 for v in row] for row in I["durations"]]            # minutes, used as "km" at the engine's 60 km/h
     w = R.World(rows, prm, fixed, D=D, area=S.area_hook(scn, prm))
-    for r in rows:                                                              # the audited weight replaces the engine's
-        pr = PRIORITY.get(I["cmap"][r["code"]])
-        smr = float(I["smr"][pr["registry"]]["smr"]) if pr else 1.0
-        need = min(max(smr, SMR_CAP[0]), SMR_CAP[1]) ** sp["gamma"]
-        z = ((I["edu"].get(r["code"]) or I["edu_mean"]) - I["edu_mean"]) / I["edu_sd"]
-        r["w"] = (1 + sp["lam"] * min(r["f"] / 0.10, 3.0)) * need * (1 + sp["mu"] * min(max(z, 0.0), 2.0))
+    _weights(w, rows, sp)
     fixed_idx = [r["i"] for r in rows if r["name"] in fixed]
     for r in rows:
         j = min(fixed_idx, key=lambda k: w.D[r["i"]][k]); r["ct_town"], r["tt_ct"] = rows[j]["name"], w.D[r["i"]][j]
     return w, rows, prm, cen, scn, fixed, fixed_idx
+
+
+def _weights(w, rows, sp, nationwide=False):
+    """The audited weight replaces the engine's. The three-region world uses SMR only for its own regions (as the published routes do);
+    the national world uses every region's SMR."""
+    I = inputs()
+    for r in rows:
+        hva = I["cmap"][r["code"]]
+        reg = I["smr"].get(REGISTRY.get(hva, "")) if (nationwide or hva in PRIORITY) else None
+        smr = float(reg["smr"]) if reg else 1.0
+        need = min(max(smr, SMR_CAP[0]), SMR_CAP[1]) ** sp["gamma"]
+        z = ((I["edu"].get(r["code"]) or I["edu_mean"]) - I["edu_mean"]) / I["edu_sd"]
+        r["w"] = (1 + sp["lam"] * min(r["f"] / 0.10, 3.0)) * need * (1 + sp["mu"] * min(max(z, 0.0), 2.0))
+
+
+def national_names() -> list[str]:
+    return sorted(r["name"] for r in inputs()["muni"].values())
+
+
+def name_hint(name) -> str:
+    import difflib
+    close = difflib.get_close_matches(str(name or ""), national_names(), n=3, cutoff=0.6)
+    return f" Did you mean {', '.join(close)}?" if close else ""
+
+
+def make_world_area(sp: dict):
+    """ct-sim's national world: all 308 municipalities, straight-line distances x detour, minutes = km at 60 km/h. Used outside the three regions."""
+    scn = {"objective": "weighted", "risk_model": "area", "ct_sites": sp["ct_mode"],
+           "routing": {"lam": sp["lam"], "spare_share": sp["spare"], "work_days": sp["work_days"], "interval": sp["interval"], "k_elig": sp["k_elig"]}}
+    prm, params, cen = S.setup(scn)
+    rows = R.load()
+    fixed = S.fixed_names(scn)
+    w = R.World(rows, prm, fixed, area=S.area_hook(scn, prm))
+    _weights(w, rows, sp, nationwide=True)
+    fixed_idx = [r["i"] for r in rows if r["name"] in fixed]
+    for r in rows:
+        j = min(fixed_idx, key=lambda k: w.D[r["i"]][k]); r["ct_town"], r["tt_ct"] = rows[j]["name"], w.D[r["i"]][j]
+    return w, rows, prm, cen, scn, fixed, fixed_idx
+
+
+def clean_area_spec(spec: dict) -> dict:
+    """Spec for a pilot around any municipality: {town, radius_km, start, exclude, ...}. Raises ValueError with a readable message."""
+    names = set(national_names())
+    town = (spec or {}).get("town")
+    if town not in names: raise ValueError(f"'{town}' is not a Finnish municipality name in the data.{name_hint(town)}")
+    sp = clean_spec(dict({k: v for k, v in spec.items() if k not in ("start", "exclude")}, counties=["HVA21"]))   # numbers clamped the same way
+    try: radius = float(spec.get("radius_km") or 100)
+    except (TypeError, ValueError): raise ValueError("radius_km must be a number")
+    sp.update(counties=[], town=town, radius_km=min(max(radius, AREA_RADIUS[0]), AREA_RADIUS[1]), own_region_only=spec.get("own_region_only", True) is not False)
+    sp["exclude"] = [n for n in (spec.get("exclude") or []) if n in names][:60]
+    sp["start"] = spec.get("start") if spec.get("start") in names else None
+    return sp
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -207,7 +262,7 @@ def _rdp(pts, eps):
     return _rdp(pts[:im + 1], eps)[:-1] + _rdp(pts[im:], eps) if dm > eps else [pts[0], pts[-1]]
 
 
-def get_leg(a: dict, b: dict, fetch=True, budget=None) -> dict:
+def get_leg(a: dict, b: dict, fetch=True, budget=None, fallback=None) -> dict:
     """Road geometry between two points. Uses the cache; fetches from the OSRM demo server when allowed; falls back to a straight line (schematic)."""
     I = inputs(); key = f"{a['lon']:.5f},{a['lat']:.5f};{b['lon']:.5f},{b['lat']:.5f}"
     leg = I["legs"].get(key)
@@ -222,6 +277,8 @@ def get_leg(a: dict, b: dict, fetch=True, budget=None) -> dict:
             time.sleep(0.2)
         except Exception:
             leg = None
+    if leg is None and fallback is not None:
+        leg = dict(minutes=round(fallback, 1), km=round(fallback, 1), coords=[[a["lat"], a["lon"]], [b["lat"], b["lon"]]], schematic=True)
     if leg is None:
         ia, ib = a["i"], b["i"]
         leg = dict(minutes=round(I["durations"][ia][ib] / 60, 1), km=round(I["distances"][ia][ib] / 1000, 1), coords=[[a["lat"], a["lon"]], [b["lat"], b["lon"]]], schematic=True)
@@ -276,12 +333,35 @@ def _hav(a, b):
 def plan(spec: dict, geometry=True, fetch=True, max_fetch=None) -> dict:
     """max_fetch limits new road lookups (server use); legs beyond it are drawn as straight lines and flagged schematic."""
     sp = clean_spec(spec)
+    I = inputs()
+    world = make_world(sp)
+    rows = world[1]
+    reg = {r["name"] for r in rows if I["cmap"][r["code"]] in sp["counties"] and r["name"] not in set(sp["exclude"])}
+    return _plan_core(sp, world, reg, geometry, fetch, max_fetch, area=False)
+
+
+def plan_area(spec: dict, geometry=True, fetch=True, max_fetch=None) -> dict:
+    """A bus pilot around any municipality (e.g. Oulu): ct-sim's national model, municipalities within radius_km of the town."""
+    sp = clean_area_spec(spec)
+    world = make_world_area(sp)
+    I = inputs()
+    reg = R.region(world[0], sp["town"], sp["radius_km"]) - set(sp["exclude"])
+    if sp["own_region_only"]:                                                    # a pilot is run by one wellbeing services county
+        home = I["cmap"][next(r["code"] for r in world[1] if r["name"] == sp["town"])]
+        reg = {n for n in reg if I["cmap"][next(r["code"] for r in world[1] if r["name"] == n)] == home}
+    if len(reg) < 2: raise ValueError("Too few municipalities in that area; use a larger radius_km")
+    out = _plan_core(sp, world, reg, geometry, fetch, max_fetch, area=True)
+    out["area"] = dict(town=sp["town"], radius_km=sp["radius_km"], own_region_only=sp["own_region_only"], municipalities=len(reg), counties=out["spec"]["counties"], travel=AREA_TRAVEL,
+                       names=sorted(reg))
+    return out
+
+
+def _plan_core(sp, world, reg, geometry, fetch, max_fetch, area):
     budget = [max_fetch] if max_fetch is not None else None
     I = inputs()
-    w, rows, prm, cen, scn, fixed, fixed_idx = make_world(sp)
+    w, rows, prm, cen, scn, fixed, fixed_idx = world
     by_name = {r["name"]: r for r in rows}
-    excl = set(sp["exclude"])
-    reg = {r["name"] for r in rows if I["cmap"][r["code"]] in sp["counties"] and r["name"] not in excl}
+    if area: sp = dict(sp, counties=sorted({I["cmap"][by_name[n]["code"]] for n in reg}))
     ev = w.evaluate(w.optimise(reg, "weighted"))
     summ, reach, _ = S._area_summary(w, ev, rows, cen, prm, fixed, reg)
     elig_all = sum(r["elig"] for r in rows if r["name"] in reg) or 1
@@ -294,7 +374,9 @@ def plan(spec: dict, geometry=True, fetch=True, max_fetch=None) -> dict:
     # legs, minutes, kilometres along the open path (one pass)
     legs = []
     for a, b in zip(order, order[1:]):
-        L = get_leg(rows[a], rows[b], fetch=fetch, budget=budget) if geometry else dict(minutes=round(I["durations"][a][b] / 60, 1), km=round(I["distances"][a][b] / 1000, 1),
+        fb = w.D[a][b] if area else None                                         # national world: straight-line estimate when no road leg
+        L = get_leg(rows[a], rows[b], fetch=fetch, budget=budget, fallback=fb) if geometry else dict(minutes=round(fb, 1), km=round(fb, 1),
+            coords=[[rows[a]["lat"], rows[a]["lon"]], [rows[b]["lat"], rows[b]["lon"]]], schematic=True) if area else dict(minutes=round(I["durations"][a][b] / 60, 1), km=round(I["distances"][a][b] / 1000, 1),
                                                                         coords=[[rows[a]["lat"], rows[a]["lon"]], [rows[b]["lat"], rows[b]["lon"]]], schematic=True)
         legs.append(dict(frm=rows[a]["name"], to=rows[b]["name"], minutes=L["minutes"], km=L["km"], coords=L["coords"], schematic=bool(L.get("schematic"))))
     path_min = sum(l["minutes"] for l in legs); path_km = sum(l["km"] for l in legs)
@@ -321,7 +403,7 @@ def plan(spec: dict, geometry=True, fetch=True, max_fetch=None) -> dict:
             nearest_ct=row["ct_town"], tt_ct_min=round(tt), ct_status=town_status(row["ct_town"]), kind=kind,
             foreign_share=round(sum(r["f"] * r["pop"] for r in cat) / wsum, 3),
             basic_share=round(sum((I["edu"].get(r["code"]) or I["edu_mean"]) * r["pop"] for r in cat) / wsum, 3), flags=flags))
-    eligible = round(sum(c["eligible"] for c in summ if c["hva_code"] in sp["counties"]))
+    eligible = round(reach["eligible_persons"]) if area else round(sum(c["eligible"] for c in summ if c["hva_code"] in sp["counties"]))
     out = dict(
         spec=sp, stops=stops, legs=legs, start=names[0] if names else None, end=names[-1] if names else None,
         totals=dict(stops=len(names), path_minutes=round(path_min), path_km=round(path_km), km_year=round(path_km * passes), passes=passes,
@@ -346,10 +428,11 @@ def hospital_scenario(spec: dict) -> dict:
     """Size the invitation population around one CT town. Uses observed population and modelled eligibility and uptake.
     Reserved capacity is a user input (`slots_per_week`), never data. Returns demand per year and, if slots are given, the time to cover it."""
     I = inputs()
-    sp = clean_spec(dict(spec, counties=spec.get("counties") or list(PRIORITY)))
     town = spec.get("town")
     names = {p["name"] for p in I["points"]}
-    if town not in names: raise ValueError("Choose a CT town from the list")
+    inside = town in names and any(I["cmap"][p["code"]] in PRIORITY for p in I["points"] if p["name"] == town)
+    if not inside: return _hospital_area(spec)
+    sp = clean_spec(dict(spec, counties=spec.get("counties") or list(PRIORITY)))
     minutes = float(sp["hospital_minutes"]); slots = spec.get("slots_per_week")
     w, rows, prm, cen, scn, fixed, fixed_idx = make_world(sp)
     by = {r["name"]: r for r in rows}
@@ -362,9 +445,32 @@ def hospital_scenario(spec: dict) -> dict:
         if d <= minutes and r["name"] not in set(sp["exclude"]) and r["ct_town"] == town:      # people whose nearest CT town is this one
             u = prm["u0"] * math.exp(-d / prm["d0_fixed"]) * (1 - r["f"] * (1 - prm["minority_factor_fixed"]))
             inc.append(dict(name=r["name"], minutes=round(d), eligible=round(r["elig"]), uptake=round(u, 3), scans_year=round(r["elig"] * u / prm["interval"], 1),
-                            foreign_share=round(r["f"], 3), basic_share=I["edu"].get(r["code"])))
+                            foreign_share=round(r["f"], 3), basic_share=I["edu"].get(r["code"]), lat=r["lat"], lon=r["lon"]))
+    return _hospital_out(town, minutes, inc, prm, slots, travel="OpenStreetMap road times")
+
+
+def _hospital_area(spec: dict) -> dict:
+    """Hospital pilot around a CT town outside the three regions: ct-sim's national model, straight-line travel estimate."""
+    I = inputs()
+    town = spec.get("town")
+    sp = clean_area_spec(dict(spec, town=town))
+    w, rows, prm, cen, scn, fixed, fixed_idx = make_world_area(sp)
+    if town not in fixed: raise ValueError(f"{town} is not on the researched CT list ({sp['ct_mode']}).")
+    minutes = float(sp["hospital_minutes"]); slots = spec.get("slots_per_week")
+    t = next(r for r in rows if r["name"] == town)
+    inc = []
+    for r in rows:
+        d = w.D[t["i"]][r["i"]]                                                  # km at 60 km/h = minutes (estimate)
+        if d <= minutes and r["name"] not in set(sp["exclude"]) and r["ct_town"] == town:
+            u = prm["u0"] * math.exp(-d / prm["d0_fixed"]) * (1 - r["f"] * (1 - prm["minority_factor_fixed"]))
+            inc.append(dict(name=r["name"], minutes=round(d), eligible=round(r["elig"]), uptake=round(u, 3), scans_year=round(r["elig"] * u / prm["interval"], 1),
+                            foreign_share=round(r["f"], 3), basic_share=I["edu"].get(r["code"]), lat=r["lat"], lon=r["lon"], county=I["cmap"][r["code"]]))
+    return _hospital_out(town, minutes, inc, prm, slots, travel=AREA_TRAVEL)
+
+
+def _hospital_out(town, minutes, inc, prm, slots, travel):
     elig = sum(m["eligible"] for m in inc); scans = sum(m["scans_year"] for m in inc)
-    out = dict(town=town, ct_status=town_status(town), minutes=minutes, municipalities=sorted(inc, key=lambda m: m["minutes"]),
+    out = dict(town=town, ct_status=town_status(town), minutes=minutes, travel=travel, municipalities=sorted(inc, key=lambda m: m["minutes"]),
                eligible=elig, invitations_per_year=round(elig / prm["interval"]), expected_scans_year=round(scans), expected_scans_week=round(scans / 52, 1),
                interval=prm["interval"], uptake_u0=prm["u0"], d0_fixed=prm["d0_fixed"],
                capacity=dict(verified=False, needed_data=["scanners and operating hours at this site", "annual CT volume and slots free for screening",
